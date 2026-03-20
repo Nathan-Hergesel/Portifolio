@@ -49,12 +49,4 @@ Para ver o projeto localmente:
 
 ---
 
-## 📫 Contato
-
-Sinta-se à vontade para entrar em contato comigo para parcerias ou apenas para trocar uma ideia sobre tecnologia!
-
-* **GitHub**: [Nathan-Hergesel](https://github.com/Nathan-Hergesel)
-* **LinkedIn**: [Seu Link de LinkedIn aqui]
-
----
 ⭐️ *Se gostou do projeto, sinta-se à vontade para dar uma estrela no repositório!*
