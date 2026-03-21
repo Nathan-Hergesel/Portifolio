@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portifolio - Nathan Hergesel</title>
   <meta name="description" content="Portfólio de Nathan Hergesel: programação, design e edição com soluções inteligentes para pessoas e empresas." />
+  <link rel="icon" type="image/png" href="src/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -19,11 +20,11 @@
   <header class="site-header container">
     <a class="brand" href="#home" aria-label="Inicio">
       <img class="brand-logo" src="src/logo.png" alt="Logo Nathan Hergesel" />
-      <span class="brand-name">athan.</span>
     </a>
     <nav class="main-nav" aria-label="Principal">
       <a class="nav-link" href="#services">Serviços</a>
       <a class="nav-link" href="#works">Portfólio</a>
+      <a class="nav-link" href="#social">Redes Sociais</a>
       <a class="nav-link" href="#blog">Contato</a>
     </nav>
   </header>
@@ -50,7 +51,7 @@
           Soluções inteligentes para você: desenvolvimento web, design e conteúdo
           digital para transformar ideias em resultados reais.
         </p>
-        <a class="link-arrow" href="#about">Quem é Nathan <span aria-hidden="true">→</span></a>
+        <a class="link-arrow" href="#about">Quem é Nathan <span aria-hidden="true">?</span></a>
       </div>
     </section>
 
@@ -79,7 +80,7 @@
               <span>Python</span>
             </article>
             <article class="tech-cert-card">
-              <i class="devicon-reactnative-original colored" aria-hidden="true"></i>
+              <i class="devicon-expo-original colored" aria-hidden="true"></i>
               <span>Expo</span>
             </article>
             <article class="tech-cert-card">
@@ -188,8 +189,7 @@
         </article>
         <article class="work-card reveal delay-3">
           <div class="work-card-media work-carousel" data-carousel="design" data-interval="2800">
-            <img class="carousel-slide is-active" src="src/design.png" alt="Projeto de design 1" loading="lazy" />
-            <img class="carousel-slide" src="src/design2.png" alt="Projeto de design 2" loading="lazy" />
+            <img class="carousel-slide is-active" src="src/design2.png" alt="Projeto de design 2" loading="lazy" />
             <div class="work-overlay">
               <h4>Design</h4>
               <p>Direção visual, identidade e interfaces</p>
@@ -206,6 +206,16 @@
             </div>
           </div>
         </article>
+      </div>
+    </section>
+
+    <section class="works container" id="social">
+      <div class="works-head reveal">
+        <p class="eyebrow">Redes Sociais</p>
+        <h3>Conecte-se comigo nas<br />minhas redes sociais.</h3>
+        <span class="link-arrow">Acessar perfis</span>
+      </div>
+      <div class="works-grid social-grid">
         <article class="work-card quick-link-card github-dashboard-card reveal delay-1">
           <a class="quick-link-anchor" href="https://github.com/Nathan-Hergesel" target="_blank" rel="noopener noreferrer" aria-label="Abrir projetos no GitHub">
             <i class="bi bi-github quick-link-icon" aria-hidden="true"></i>
@@ -216,13 +226,28 @@
             </div>
           </a>
         </article>
-        <article class="work-card quick-link-card reveal delay-2">
+        <article class="work-card quick-link-card linkedin-card reveal delay-2">
           <a class="quick-link-anchor" href="https://www.linkedin.com/in/nathan-hergesel/" target="_blank" rel="noopener noreferrer" aria-label="Abrir LinkedIn">
             <i class="bi bi-linkedin quick-link-icon" aria-hidden="true"></i>
             <h4>Perfil no LinkedIn</h4>
             <p>Experiências, networking e atualizações profissionais.</p>
+            <div class="linkedin-preview-inline" aria-label="Prévia do perfil">
+              <span class="linkedin-preview-row"><i class="bi bi-person-circle" aria-hidden="true"></i>nathan-hergesel</span>
+              <span class="linkedin-preview-row"><i class="bi bi-briefcase-fill" aria-hidden="true"></i>Engenharia da Computação</span>
+              <span class="linkedin-preview-row"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i>UNISO</span>
+            </div>
           </a>
         </article>
+        <div class="social-rest-inline reveal" aria-label="Instagram e X">
+          <div class="social-rest-wrap" aria-label="Links de redes sociais">
+            <a class="social-tile" href="https://www.instagram.com/nathanhergesel/" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram">
+              <i class="bi bi-instagram" aria-hidden="true"></i>
+            </a>
+            <a class="social-tile" href="https://x.com/Herisguel" target="_blank" rel="noopener noreferrer" aria-label="Abrir X">
+              <i class="bi bi-twitter-x" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
