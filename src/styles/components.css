@@ -1,0 +1,108 @@
+/* Componentes reutilizaveis */
+
+.c-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  color: #eff4ff;
+  border: 1px solid rgba(var(--accent-rgb), 0.46);
+  background: rgba(var(--accent-rgb), 0.18);
+  padding: 0.5rem 0.78rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.c-button:hover,
+.c-button:focus-visible {
+  background: rgba(var(--accent-rgb), 0.3);
+  border-color: rgba(var(--accent-rgb), 0.62);
+  transform: translateY(-1px);
+}
+
+.c-button--accent {
+  color: #eff4ff;
+}
+
+.c-icon-button {
+  text-decoration: none;
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(25, 31, 50, 0.86);
+  transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.c-icon-button:hover,
+.c-icon-button:focus-visible {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.16);
+}
+
+.c-icon-button--round-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border-color: #5a6283;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: transparent;
+}
+
+.c-icon-button--round-sm:hover,
+.c-icon-button--round-sm:focus-visible {
+  transform: translateY(-4px) scale(1.05);
+}
+
+.c-icon-button--tile {
+  width: 70px;
+  height: 70px;
+  min-height: 0;
+  border-radius: 0;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, rgba(45, 53, 79, 0.96), rgba(32, 38, 59, 0.96));
+  color: #e1e8fb;
+  padding: 0;
+  transition: border-color 0.25s ease;
+}
+
+.c-icon-button--tile:hover,
+.c-icon-button--tile:focus-visible {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(160deg, rgba(45, 53, 79, 0.96), rgba(32, 38, 59, 0.96));
+  outline: none;
+}
+
+.c-icon-button--fab {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.c-icon-button--fab:hover,
+.c-icon-button--fab:focus-visible {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 680px) {
+  .c-button {
+    min-height: 42px;
+    font-size: 0.8rem;
+    padding: 0.58rem 0.8rem;
+  }
+
+  .c-icon-button--round-sm {
+    width: 38px;
+    height: 38px;
+  }
+
+  .c-icon-button--tile {
+    width: 60px;
+    height: 60px;
+  }
+}
