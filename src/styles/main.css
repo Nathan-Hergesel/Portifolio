@@ -792,6 +792,14 @@ body {
   gap: 0.32rem;
   max-height: 5.5rem;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.repo-preview-inline::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .repo-preview-empty {
@@ -1332,7 +1340,7 @@ body {
 
   .contact-grid {
     gap: 0.9rem;
-    padding: 1.5rem 1.2rem 1.2rem;
+    padding: 1.5rem 0 1.2rem;
   }
 
   .contact-grid h3 {
@@ -1358,6 +1366,14 @@ body {
     overflow-x: auto;
     padding-top: 0.22rem;
     padding-bottom: 0.3rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .project-flow-list::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
   }
 
   .project-flow-step {
@@ -1432,9 +1448,16 @@ body {
     gap: 0.42rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     padding-bottom: 0.2rem;
     margin-bottom: 0.75rem;
+  }
+
+  .tech-cert-grid::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
   }
 
   .tech-cert-card {
