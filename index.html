@@ -99,17 +99,32 @@
             </article>
           </div>
           <h3>Qualquer tipo de projeto<br />e discussão.</h3>
-          <p class="muted">Seu sucesso, minha missão. Vamos conversar sobre seu próximo projeto.</p>
-          <ul class="contact-list" aria-label="Contatos">
-            <li>
-              <i class="bi bi-envelope-fill" aria-hidden="true"></i>
-              <a href="mailto:nathanhergesel15@gmail.com">nathanhergesel15@gmail.com</a>
-            </li>
-            <li>
-              <i class="bi bi-telephone-fill" aria-hidden="true"></i>
-              <a href="tel:+5515996746079">15 99674-6079</a>
-            </li>
-          </ul>
+       
+          <article class="project-flow" aria-label="Passo a passo do projeto">
+            <p class="project-flow-kicker">Passo a passo</p>
+            <ol class="project-flow-list">
+              <li class="project-flow-step" aria-label="Briefing rapido">
+                <span class="project-flow-index" aria-hidden="true"><i class="bi bi-chat-dots-fill"></i></span>
+                <span class="project-flow-label">Briefing</span>
+              </li>
+              <li class="project-flow-step" aria-label="Plano e direcao">
+                <span class="project-flow-index" aria-hidden="true"><i class="bi bi-diagram-3-fill"></i></span>
+                <span class="project-flow-label">Planejamento</span>
+              </li>
+              <li class="project-flow-step" aria-label="Producao">
+                <span class="project-flow-index" aria-hidden="true"><i class="bi bi-code-slash"></i></span>
+                <span class="project-flow-label">Producao</span>
+              </li>
+              <li class="project-flow-step" aria-label="Validacao e refinamento">
+                <span class="project-flow-index" aria-hidden="true"><i class="bi bi-clipboard2-check-fill"></i></span>
+                <span class="project-flow-label">Validacao</span>
+              </li>
+              <li class="project-flow-step" aria-label="Entrega e ajustes">
+                <span class="project-flow-index" aria-hidden="true"><i class="bi bi-rocket-takeoff-fill"></i></span>
+                <span class="project-flow-label">Entrega</span>
+              </li>
+            </ol>
+          </article>
         </div>
         <div>
           <h3>Atuo com tecnologia e design para resolver problemas complexos.</h3>
@@ -117,6 +132,11 @@
           <div class="stats">
             <div><strong>10+</strong><span>Projetos<br />Entregues</span></div>
             <div><strong>+3</strong><span>Anos de<br />Projetos digitais</span></div>
+            <div><strong>24h</strong><span>Primeiro<br />retorno</span></div>
+          </div>
+          <div class="project-flow-actions">
+            <a class="c-button c-button--accent" href="#blog">Iniciar conversa</a>
+            <a class="link-arrow" href="#works">Ver projetos <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
@@ -289,7 +309,8 @@
           </a>
         </section>
       </div>
-      <form class="contact-form reveal delay-1" action="#" method="post">
+      <form class="contact-form reveal delay-1" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="9643d2f1-fd40-45e2-aa9f-513dbde226f6">
         <h3>Vamos estimar seu projeto?<br />Me conte aqui.</h3>
         <label>
           <span>Qual seu nome?</span>

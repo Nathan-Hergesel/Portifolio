@@ -81,11 +81,16 @@
   width: 44px;
   height: 44px;
   border-radius: 999px;
+  border-color: rgba(var(--accent-rgb), 0.48);
+  background: rgba(var(--accent-rgb), 0.18);
+  color: #eff4ff;
   cursor: pointer;
 }
 
 .c-icon-button--fab:hover,
 .c-icon-button--fab:focus-visible {
+  border-color: rgba(var(--accent-rgb), 0.7);
+  background: rgba(var(--accent-rgb), 0.3);
   transform: translateY(-1px);
 }
 
@@ -106,3 +111,4 @@
     height: 60px;
   }
 }
+
