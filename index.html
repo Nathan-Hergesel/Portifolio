@@ -196,39 +196,52 @@
       </div>
       <div class="works-grid">
         <article class="work-card reveal delay-1">
-          <div class="work-card-media" aria-label="Projeto website">
-            <img src="src/images/website.png" alt="Projeto de website" loading="lazy" />
+          <div class="work-card-media work-card-trigger" role="button" tabindex="0" aria-label="Abrir modal do projeto Websites" aria-haspopup="dialog" data-project-title="Websites">
+            <img src="src/portifolio/NextDev%20-%20Website%20Commercial.png" alt="Projeto de website" loading="lazy" />
             <div class="work-overlay">
               <h4>Websites</h4>
               <p>Sites institucionais e páginas de alta conversão</p>
             </div>
+            <div class="work-modal-data" hidden aria-hidden="true">
+              <img src="src/portifolio/NextDev%20-%20Website%20Commercial.png" alt="Projeto website 1" loading="lazy" />
+            </div>
           </div>
         </article>
         <article class="work-card reveal delay-2">
-          <div class="work-card-media" aria-label="Projeto aplicação">
-            <img src="src/images/aplicacoes.png" alt="Projeto de aplicação" loading="lazy" />
+          <div class="work-card-media work-card-trigger" role="button" tabindex="0" aria-label="Abrir modal do projeto Aplicações" aria-haspopup="dialog" data-project-title="Aplicações">
+            <img src="src/portifolio/EstudA%C3%AD.png" alt="Projeto de aplicação" loading="lazy" />
             <div class="work-overlay">
               <h4>Aplicações</h4>
               <p>Sistemas e soluções web sob medida</p>
             </div>
+            <div class="work-modal-data" hidden aria-hidden="true">
+              <img src="src/portifolio/EstudA%C3%AD.png" alt="Projeto aplicação 1" loading="lazy" />
+            </div>
           </div>
         </article>
         <article class="work-card reveal delay-3">
-          <div class="work-card-media work-carousel" data-carousel="design" data-interval="2800">
-            <img class="carousel-slide is-active" src="src/images/design2.png" alt="Projeto de design 2" loading="lazy" />
+          <div class="work-card-media work-card-trigger work-carousel" role="button" tabindex="0" aria-label="Abrir modal do projeto Design" aria-haspopup="dialog" data-project-title="Design" data-carousel="design" data-interval="2800">
+            <img class="carousel-slide is-active" src="src/portifolio/NextDev%20-%20Proposta%20Comercial.png" alt="Projeto de design 2" loading="lazy" />
             <div class="work-overlay">
               <h4>Design</h4>
               <p>Direção visual, identidade e interfaces</p>
             </div>
+            <div class="work-modal-data" hidden aria-hidden="true">
+              <img src="src/portifolio/NextDev%20-%20Proposta%20Comercial.png" alt="Projeto design 1" loading="lazy" />
+            </div>
           </div>
         </article>
         <article class="work-card reveal delay-2">
-          <div class="work-card-media work-carousel" data-carousel="videos" data-interval="3000">
-            <img class="carousel-slide is-active" src="src/images/videos.jpg" alt="Projeto de video 1" loading="lazy" />
-            <img class="carousel-slide" src="src/images/videos%202.png" alt="Projeto de video 2" loading="lazy" />
+          <div class="work-card-media work-card-trigger work-carousel" role="button" tabindex="0" aria-label="Abrir modal do projeto Vídeos" aria-haspopup="dialog" data-project-title="Vídeos" data-carousel="videos" data-interval="3000">
+            <img class="carousel-slide is-active" src="src/portifolio/videos.jpg" alt="Projeto de video 1" loading="lazy" />
+            <img class="carousel-slide" src="src/portifolio/videos%202.png" alt="Projeto de video 2" loading="lazy" />
             <div class="work-overlay">
               <h4>Vídeos</h4>
               <p>Edição e conteúdo digital para redes sociais</p>
+            </div>
+            <div class="work-modal-data" hidden aria-hidden="true">
+              <img src="src/portifolio/videos.jpg" alt="Projeto vídeo 1" loading="lazy" />
+              <img src="src/portifolio/videos%202.png" alt="Projeto vídeo 2" loading="lazy" />
             </div>
           </div>
         </article>
@@ -287,8 +300,8 @@
             <a href="mailto:nathanhergesel15@gmail.com">nathanhergesel15@gmail.com</a>
           </li>
           <li>
-            <i class="bi bi-telephone-fill" aria-hidden="true"></i>
-            <a href="tel:+5515996746079">15 99674-6079</a>
+            <i class="bi bi-whatsapp" aria-hidden="true"></i>
+            <a href="https://wa.me/5515996746079?text=Ol%C3%A1%2C%20vim%20pelo%20seu%20portf%C3%B3lio%20e%20quero%20falar%20sobre%20um%20projeto." target="_blank" rel="noopener noreferrer">15 99674-6079</a>
           </li>
         </ul>
         <section class="mini-about" aria-label="Sobre Nathan">
@@ -329,6 +342,19 @@
     </section>
   </main>
 
+  <div class="form-popup" data-form-popup hidden aria-hidden="true">
+    <div class="form-popup-backdrop" data-form-close></div>
+    <section class="form-popup-panel" role="dialog" aria-modal="true" aria-labelledby="form-popup-title">
+      <div class="form-popup-icon" data-form-popup-icon aria-hidden="true">
+        <i class="bi bi-check2-circle"></i>
+      </div>
+      <p class="form-popup-kicker">Mensagem enviada</p>
+      <h3 class="form-popup-title" id="form-popup-title" data-form-popup-title>Tudo certo por aqui</h3>
+      <p class="form-popup-message" data-form-popup-message>Sua mensagem foi enviada com sucesso.</p>
+      <button class="form-popup-button c-button c-button--accent" type="button" data-form-close>Fechar</button>
+    </section>
+  </div>
+
   <footer class="site-footer container reveal">
     <img class="brand-logo" src="src/images/logo.png" alt="Logo Nathan Hergesel" />
     <p>Nathan Hergesel | 2025 - Todos os direitos reservados.</p>
@@ -343,6 +369,44 @@
   <button class="back-to-top c-icon-button c-icon-button--fab" type="button" aria-label="Voltar ao topo">
     <i class="bi bi-arrow-up"></i>
   </button>
+
+  <a class="email-fab contact-fab c-icon-button c-icon-button--fab" href="mailto:nathanhergesel15@gmail.com" aria-label="Enviar e-mail">
+    <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+  </a>
+
+  <a class="whatsapp-fab contact-fab c-icon-button c-icon-button--fab" href="https://wa.me/5515996746079?text=Ol%C3%A1%2C%20vim%20pelo%20seu%20portf%C3%B3lio%20e%20quero%20falar%20sobre%20um%20projeto." target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp">
+    <i class="bi bi-whatsapp" aria-hidden="true"></i>
+  </a>
+
+  <div class="project-modal" data-project-modal hidden aria-hidden="true">
+    <div class="project-modal-backdrop" data-project-close></div>
+    <section class="project-modal-panel" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+      <h3 class="project-modal-title" id="project-modal-title">Projeto</h3>
+      <p class="project-modal-kicker">Projeto selecionado:</p>
+      <p class="project-modal-file-name" data-project-file-name>arquivo.jpg</p>
+
+      <div class="project-modal-carousel" aria-label="Carrossel de projetos">
+        <button class="project-modal-nav project-modal-nav--prev c-icon-button c-icon-button--round-sm" type="button" aria-label="Imagem anterior" data-project-prev>
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+
+        <div class="project-modal-stage">
+          <figure class="project-modal-frame">
+            <img class="project-modal-image" src="" alt="" loading="lazy" />
+          </figure>
+        </div>
+
+        <button class="project-modal-nav project-modal-nav--next c-icon-button c-icon-button--round-sm" type="button" aria-label="Próxima imagem" data-project-next>
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="project-modal-footer">
+        <span class="project-modal-counter" data-project-counter>1 / 1</span>
+        <div class="project-modal-dots" data-project-dots aria-label="Navegação de slides"></div>
+      </div>
+    </section>
+  </div>
 
   <script src="src/js/main.js"></script>
 </body>

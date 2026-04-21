@@ -6,7 +6,27 @@ const navToggle = document.querySelector('.nav-toggle');
 const backToTop = document.querySelector('.back-to-top');
 const header = document.querySelector('.site-header');
 const carousels = document.querySelectorAll('.work-carousel');
+const workCardTriggers = document.querySelectorAll('.work-card-trigger');
+const projectModal = document.querySelector('[data-project-modal]');
+const projectModalTitle = projectModal?.querySelector('.project-modal-title');
+const projectModalImage = projectModal?.querySelector('.project-modal-image');
+const projectModalCounter = projectModal?.querySelector('[data-project-counter]');
+const projectModalDots = projectModal?.querySelector('[data-project-dots]');
+const projectModalFileName = projectModal?.querySelector('[data-project-file-name]');
+const projectModalPrev = projectModal?.querySelector('[data-project-prev]');
+const projectModalNext = projectModal?.querySelector('[data-project-next]');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const formPopup = document.querySelector('[data-form-popup]');
+const formPopupTitle = formPopup?.querySelector('[data-form-popup-title]');
+const formPopupIcon = formPopup?.querySelector('[data-form-popup-icon]');
+const formPopupMessage = formPopup?.querySelector('[data-form-popup-message]');
+
+let modalSlides = [];
+let modalSlideIndex = 0;
+let modalLastFocusedElement = null;
+let modalTimer = null;
+let formPopupTimer = null;
+const modalIntervalMs = 3500;
 
 const closeMobileMenu = () => {
   if (!header || !navToggle) {
@@ -140,6 +160,299 @@ carousels.forEach((carousel) => {
   });
 });
 
+const clearModalAutoplay = () => {
+  if (modalTimer) {
+    clearInterval(modalTimer);
+    modalTimer = null;
+  }
+};
+
+const startModalAutoplay = () => {
+  clearModalAutoplay();
+  if (!projectModal || projectModal.hidden || modalSlides.length <= 1 || prefersReducedMotion) {
+    return;
+  }
+
+  modalTimer = setInterval(() => {
+    modalSlideIndex = (modalSlideIndex + 1) % modalSlides.length;
+    updateModalSlide();
+  }, modalIntervalMs);
+};
+
+const updateModalDots = () => {
+  if (!projectModalDots) {
+    return;
+  }
+
+  projectModalDots.innerHTML = '';
+  modalSlides.forEach((_, index) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'project-modal-dot';
+    dot.setAttribute('aria-label', `Ir para imagem ${index + 1}`);
+    dot.dataset.slideIndex = String(index);
+    dot.classList.toggle('is-active', index === modalSlideIndex);
+    projectModalDots.appendChild(dot);
+  });
+
+  projectModalDots.hidden = modalSlides.length <= 1;
+};
+
+const updateModalSlide = () => {
+  if (!projectModalImage || modalSlides.length === 0) {
+    return;
+  }
+
+  const currentSlide = modalSlides[modalSlideIndex];
+
+  const getReadableFileName = (src) => {
+    const cleanPath = src.split('#')[0].split('?')[0];
+    const fileName = cleanPath.slice(cleanPath.lastIndexOf('/') + 1);
+    const fileNameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+
+    try {
+      return decodeURIComponent(fileNameWithoutExtension);
+    } catch {
+      return fileNameWithoutExtension;
+    }
+  };
+
+  projectModalImage.classList.remove('is-ready');
+  projectModalImage.src = currentSlide.src;
+  projectModalImage.alt = currentSlide.alt || `Projeto ${modalSlideIndex + 1}`;
+
+  if (projectModalFileName) {
+    projectModalFileName.textContent = getReadableFileName(currentSlide.src || '') || 'arquivo sem nome';
+  }
+
+  requestAnimationFrame(() => {
+    projectModalImage.classList.add('is-ready');
+  });
+
+  if (projectModalCounter) {
+    projectModalCounter.textContent = `${modalSlideIndex + 1} / ${modalSlides.length}`;
+  }
+
+  if (projectModalPrev) {
+    projectModalPrev.hidden = modalSlides.length <= 1;
+  }
+
+  if (projectModalNext) {
+    projectModalNext.hidden = modalSlides.length <= 1;
+  }
+
+  if (projectModalDots) {
+    const dots = projectModalDots.querySelectorAll('.project-modal-dot');
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('is-active', index === modalSlideIndex);
+    });
+  }
+};
+
+const goToModalSlide = (nextIndex) => {
+  if (modalSlides.length === 0) {
+    return;
+  }
+
+  modalSlideIndex = (nextIndex + modalSlides.length) % modalSlides.length;
+  updateModalSlide();
+};
+
+const buildSlidesFromCard = (card) => {
+  const sourceImages = card.querySelectorAll('.work-modal-data img');
+  const fallbackImages = card.querySelectorAll(':scope > img');
+  const rawImages = sourceImages.length > 0 ? sourceImages : fallbackImages;
+
+  return Array.from(rawImages)
+    .map((image) => ({
+      src: image.getAttribute('src') || '',
+      alt: image.getAttribute('alt') || ''
+    }))
+    .filter((slide) => slide.src);
+};
+
+const closeProjectModal = () => {
+  if (!projectModal || projectModal.hidden) {
+    return;
+  }
+
+  clearModalAutoplay();
+  projectModal.hidden = true;
+  projectModal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
+
+  modalSlides = [];
+  modalSlideIndex = 0;
+
+  if (projectModalDots) {
+    projectModalDots.innerHTML = '';
+  }
+
+  if (projectModalFileName) {
+    projectModalFileName.textContent = '';
+  }
+
+  if (modalLastFocusedElement instanceof HTMLElement) {
+    modalLastFocusedElement.focus();
+  }
+};
+
+const closeFormPopup = () => {
+  if (!formPopup || formPopup.hidden) {
+    return;
+  }
+
+  if (formPopupTimer) {
+    clearTimeout(formPopupTimer);
+    formPopupTimer = null;
+  }
+
+  formPopup.hidden = true;
+  formPopup.setAttribute('aria-hidden', 'true');
+  formPopup.classList.remove('form-popup--error');
+  document.body.classList.remove('popup-open');
+};
+
+const openFormPopup = (message, isSuccess = true) => {
+  if (!formPopup) {
+    return;
+  }
+
+  if (formPopupTitle) {
+    formPopupTitle.textContent = isSuccess ? 'Tudo certo por aqui' : 'Ops, algo falhou';
+  }
+
+  if (formPopupIcon) {
+    formPopupIcon.innerHTML = `<i class="bi ${isSuccess ? 'bi-check2-circle' : 'bi-exclamation-triangle-fill'}"></i>`;
+  }
+
+  if (formPopupMessage) {
+    formPopupMessage.textContent = message;
+  }
+
+  formPopup.classList.toggle('form-popup--error', !isSuccess);
+  formPopup.hidden = false;
+  formPopup.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('popup-open');
+
+  if (formPopupTimer) {
+    clearTimeout(formPopupTimer);
+  }
+
+  formPopupTimer = window.setTimeout(() => {
+    closeFormPopup();
+  }, 4200);
+};
+
+const openProjectModal = (card) => {
+  if (!projectModal || !projectModalTitle || !projectModalImage) {
+    return;
+  }
+
+  const slides = buildSlidesFromCard(card);
+  if (slides.length === 0) {
+    return;
+  }
+
+  modalLastFocusedElement = card;
+  modalSlides = slides;
+  modalSlideIndex = 0;
+
+  const cardTitle = card.dataset.projectTitle || card.querySelector('.work-overlay h4')?.textContent || 'Projeto';
+  projectModalTitle.textContent = cardTitle;
+
+  updateModalDots();
+  updateModalSlide();
+
+  projectModal.hidden = false;
+  projectModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+
+  startModalAutoplay();
+};
+
+workCardTriggers.forEach((card) => {
+  card.addEventListener('click', () => {
+    openProjectModal(card);
+  });
+
+  card.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+    event.preventDefault();
+    openProjectModal(card);
+  });
+});
+
+if (projectModal) {
+  projectModal.querySelectorAll('[data-project-close]').forEach((element) => {
+    element.addEventListener('click', () => {
+      closeProjectModal();
+    });
+  });
+
+  projectModalPrev?.addEventListener('click', () => {
+    goToModalSlide(modalSlideIndex - 1);
+    startModalAutoplay();
+  });
+
+  projectModalNext?.addEventListener('click', () => {
+    goToModalSlide(modalSlideIndex + 1);
+    startModalAutoplay();
+  });
+
+  projectModalDots?.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement) || !target.classList.contains('project-modal-dot')) {
+      return;
+    }
+
+    const nextIndex = Number(target.dataset.slideIndex);
+    if (Number.isNaN(nextIndex)) {
+      return;
+    }
+
+    goToModalSlide(nextIndex);
+    startModalAutoplay();
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (formPopup && !formPopup.hidden && event.key === 'Escape') {
+    closeFormPopup();
+    return;
+  }
+
+  if (!projectModal || projectModal.hidden) {
+    return;
+  }
+
+  if (event.key === 'Escape') {
+    closeProjectModal();
+    return;
+  }
+
+  if (event.key === 'ArrowLeft') {
+    goToModalSlide(modalSlideIndex - 1);
+    startModalAutoplay();
+    return;
+  }
+
+  if (event.key === 'ArrowRight') {
+    goToModalSlide(modalSlideIndex + 1);
+    startModalAutoplay();
+  }
+});
+
+if (formPopup) {
+  formPopup.querySelectorAll('[data-form-close]').forEach((element) => {
+    element.addEventListener('click', () => {
+      closeFormPopup();
+    });
+  });
+}
+
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   anchor.addEventListener('click', (event) => {
     const targetId = anchor.getAttribute('href');
@@ -157,12 +470,40 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 
 const form = document.querySelector('.contact-form');
 if (form) {
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const button = form.querySelector('button');
+
+    const button = form.querySelector('button[type="submit"]');
+    const originalText = button?.textContent || 'Enviar contato →';
+
     if (button) {
-      button.textContent = 'Mensagem enviada';
+      button.textContent = 'Enviando...';
       button.disabled = true;
+    }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json'
+        },
+        body: new FormData(form)
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message || 'Falha no envio');
+      }
+
+      form.reset();
+      openFormPopup('Sua mensagem foi enviada com sucesso. Em breve entro em contato.');
+    } catch {
+      openFormPopup('Não foi possível enviar agora. Tente novamente em instantes.');
+    } finally {
+      if (button) {
+        button.textContent = originalText;
+        button.disabled = false;
+      }
     }
   });
 }
