@@ -9427,10 +9427,12 @@ p {
   transition: background-color 260ms var(--ease-out), color 260ms var(--ease-out), border-color 260ms var(--ease-out);
 }
 
+/* Verde oficial do WhatsApp para o botao ser reconhecido de relance. O texto
+   fica em grafite: branco sobre esse verde nao passa de ~2:1 de contraste. */
 .cta-primary {
   border-color: transparent;
-  background: var(--brand-gradient);
-  color: var(--canvas);
+  background: #25d366;
+  color: var(--ink);
 }
 
 .cta-primary > svg:first-child,
@@ -9637,7 +9639,7 @@ p {
   }
 
   .cta-primary:hover {
-    background: var(--ink);
+    background: #1ebe5b;
   }
 
   .cta-secondary:hover {
