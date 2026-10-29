@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Header, MenuToggle } from "./Header";
+import { useHeaderAutoHide } from "../hooks/useHeaderAutoHide";
 import { usePageNavigation } from "../hooks/usePageNavigation";
 import { useReveal } from "../hooks/useReveal";
 
@@ -13,6 +14,7 @@ export function PortfolioChrome() {
   const activeSection = usePageNavigation(progressRef, headerRef);
 
   useReveal();
+  useHeaderAutoHide(headerRef);
 
   useEffect(() => {
     document.body.classList.toggle("menu-open", menuOpen);

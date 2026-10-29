@@ -42,7 +42,8 @@ export function usePageNavigation(progressRef, headerRef) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
+          // `data-nav` deixa uma secao sem item proprio no menu acender o item do grupo.
+          if (entry.isIntersecting) setActiveSection(entry.target.dataset.nav ?? entry.target.id);
         });
       },
       { rootMargin: "-35% 0px -58%", threshold: 0 }

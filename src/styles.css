@@ -26,6 +26,13 @@
   --space-3xl: 7rem;
   --page-pad: clamp(1rem, 4vw, 4rem);
   --header-h: 4.5rem;
+  /* Diagonal da casa: a barra preta entre hero e projetos sobe 2.6vw ao longo
+     de 110vw, entao atan(2.6/110) = 1.354deg. O wallpaper usa o mesmo valor
+     para correr paralelo a ela. */
+  --diagonal: 1.354deg;
+  /* Subida da barra e espessura dela, na mesma origem do clip-path do ticker. */
+  --bar-rise: 2.6vw;
+  --bar-thickness: 1.5rem;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -177,6 +184,15 @@ p {
   border-bottom-color: var(--line);
   background: oklch(95.2% 0.015 91 / 0.96);
   backdrop-filter: blur(0.65rem);
+}
+
+/* Recolhe ao rolar para baixo e volta ao subir ou com o mouse no topo (ver
+   useHeaderAutoHide). Restrito ao desktop: no celular o menu overlay e filho
+   fixo do cabecalho e um transform aqui mudaria a referencia dele. */
+@media (min-width: 64rem) {
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
 }
 
 .header-brand-reveal {
@@ -3061,71 +3077,6 @@ p {
   .work-visual-estudai .phone-mockup {
     width: 10.5rem;
   }
-}
-
-.under-construction {
-  position: relative;
-  min-height: clamp(24rem, 48vh, 34rem);
-  display: grid;
-  grid-template-columns: 1fr;
-  align-content: center;
-  gap: clamp(2.5rem, 5vw, 4.5rem);
-  padding-block: clamp(5rem, 8vw, 8rem);
-  overflow: hidden;
-}
-
-.under-construction .construction-heading {
-  display: grid;
-  gap: 0.9rem;
-  margin: 0;
-}
-
-.under-construction .construction-heading h2 {
-  max-width: 13ch;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(3.5rem, 8vw, 7.5rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 0.8;
-  text-transform: uppercase;
-}
-
-.under-construction .construction-heading > p,
-.under-construction .direct-contact,
-.under-construction .project-index,
-.under-construction .service-list,
-.under-construction .process-track,
-.under-construction .about-copy,
-.under-construction .about-stats,
-.under-construction .skills-rail,
-.under-construction .social-links,
-.under-construction .contact-form {
-  display: none;
-}
-
-.construction-band {
-  width: calc(100% + (var(--page-pad) * 2));
-  margin-inline: calc(var(--page-pad) * -1);
-  padding: 1rem 0;
-  overflow: hidden;
-  border-block: 0.3rem solid var(--ink);
-  background: var(--accent-yellow);
-  color: var(--ink);
-  transform: rotate(-1.15deg) scaleX(1.015);
-  transform-origin: center;
-}
-
-.construction-band span {
-  display: block;
-  width: max-content;
-  font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5vw, 4.75rem);
-  font-weight: 800;
-  letter-spacing: 0.025em;
-  line-height: 0.82;
-  white-space: nowrap;
-  text-transform: uppercase;
 }
 
 @media (hover: hover) {
@@ -7022,10 +6973,31 @@ p {
 
 /* Unified bento portfolio */
 .project-bento {
-  padding-top: clamp(6rem, 10vw, 9rem);
+  position: relative;
+  /* `clip` em vez de `hidden`: recorta o plano rotacionado sem criar um
+     scroll container, que quebraria o sticky da parede. */
+  overflow: clip;
+  /* A barra preta do ticker tem aresta inferior diagonal e o topo da secao e reto.
+     A cunha entre as duas revelava o gradiente azul do body, que so nao aparecia
+     quando a secao tambem era azul. A secao sobe para encaixar sob a barra e o
+     padding devolve o respiro perdido. */
+  /* Um topo reto nunca casa com uma aresta diagonal: cobrir a cunha da direita
+     sobra na esquerda e vice-versa. Entao a secao ganha o mesmo corte diagonal da
+     barra e sobe o exato necessario para que as duas arestas coincidam. Custa a
+     composicao da secao inteira, mas e o unico jeito de nao ter nem cunha de um
+     lado nem wallpaper acima da barra do outro. */
+  --bento-tuck: calc(var(--bar-rise) + 0.125rem);
+  margin-top: calc(-1 * var(--bento-tuck));
+  padding-top: calc(clamp(6rem, 10vw, 9rem) + var(--bento-tuck));
+  /* O ticker tem width:110% com margens laterais de -5%, entao os 2.6vw dele sobem
+     ao longo de 1.1x a largura da secao. A diagonal daqui precisa da mesma
+     inclinacao, nao da mesma subida. */
+  clip-path: polygon(0 calc(var(--bar-rise) / 1.1), 100% 0, 100% 100%, 0 100%);
+
   padding-bottom: clamp(5rem, 9vw, 8rem);
   background: var(--brand-gradient);
   color: var(--canvas);
+  isolation: isolate;
 }
 
 .project-bento :focus-visible {
@@ -7035,8 +7007,7 @@ p {
 .bento-intro,
 .bento-grid,
 .bento-outro {
-  width: min(100%, 92rem);
-  margin-inline: auto;
+  width: 100%;
 }
 
 .bento-intro {
@@ -7437,44 +7408,51 @@ p {
     grid-auto-rows: clamp(6.3rem, 7.6vw, 8.2rem);
   }
 
+  /* Spans em vez de posicao absoluta. Com o filtro removendo tiles, coordenadas
+     fixas deixariam buracos onde estava o item retirado; spans mais
+     `grid-auto-flow: dense` reempacotam qualquer subconjunto. Os pares somam 12
+     nas combinacoes que importam: vjs+mercearia, obraflow+brisa, e os tres
+     designs entre si. */
   .bento-tile-vjs {
-    grid-column: 1 / 8;
-    grid-row: 1 / 4;
+    grid-column: span 7;
+    grid-row: span 3;
   }
 
   .bento-tile-mercearia {
-    grid-column: 8 / 13;
-    grid-row: 1 / 4;
+    grid-column: span 5;
+    grid-row: span 3;
   }
 
   .bento-tile-obraflow {
-    grid-column: 1 / 9;
-    grid-row: 4 / 7;
+    grid-column: span 8;
+    grid-row: span 4;
   }
 
   .bento-tile-estudai {
-    grid-column: 9 / 13;
-    grid-row: 4 / 8;
+    grid-column: span 4;
+    grid-row: span 4;
   }
 
+  /* Quatro linhas, nao tres: a arte da Brisa e quadrada e numa caixa baixa ela
+     encolhia demais ao ser contida. Obraflow acompanha para a banda fechar. */
   .bento-tile-brisa {
-    grid-column: 1 / 5;
-    grid-row: 7 / 11;
+    grid-column: span 4;
+    grid-row: span 4;
   }
 
   .bento-tile-serra {
-    grid-column: 5 / 9;
-    grid-row: 7 / 11;
+    grid-column: span 4;
+    grid-row: span 4;
   }
 
   .bento-tile-aurora {
-    grid-column: 9 / 13;
-    grid-row: 8 / 12;
+    grid-column: span 4;
+    grid-row: span 4;
   }
 
   .bento-tile-video {
-    grid-column: 1 / 9;
-    grid-row: 11 / 12;
+    grid-column: span 12;
+    grid-row: span 1;
   }
 }
 
@@ -7496,5 +7474,2049 @@ p {
   .bento-outro > a:hover {
     background: var(--canvas);
     color: var(--ink);
+  }
+}
+
+/* ==========================================================================
+   Project wallpaper
+   A secao de projetos passa a ser um papel de parede montado com os proprios
+   trabalhos: colunas inclinadas que derivam em sentidos alternados sobre um
+   fundo creme, com o conteudo sobre uma placa de acrilico.
+   ========================================================================== */
+
+.project-wall {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  --wall-gap: clamp(0.45rem, 0.85vw, 0.8rem);
+  --wall-tile-h: clamp(8rem, 10.5vw, 13rem);
+}
+
+/* Sticky preso ao topo: a parede so precisa cobrir uma viewport, nao a altura
+   inteira da secao. Isso mantem o loop curto e da o passo de wallpaper, que
+   fica parado enquanto o conteudo rola por cima. */
+.project-wall-viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.project-wall-plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  /* Cada coluna centrada em si: com larguras (e portanto alturas de ciclo)
+     diferentes, alinhar pelo topo faria a coluna mais curta terminar acima da
+     borda inferior da janela e abrir um vazio grande. */
+  align-items: center;
+  gap: var(--wall-gap);
+  /* A rotacao faz a largura necessaria depender tambem da altura da viewport
+     (largura x cos + altura x sen), por isso as duas parcelas. */
+  width: max(108%, calc(100% + 6vh));
+  transform: translate(-50%, -50%) rotate(calc(-1 * var(--diagonal)));
+}
+
+.project-wall-col {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  will-change: transform;
+}
+
+.project-wall-col.is-up {
+  animation: project-wall-up var(--wall-duration, 72s) linear infinite;
+}
+
+.project-wall-col.is-down {
+  animation: project-wall-down var(--wall-duration, 72s) linear infinite;
+}
+
+.project-wall-tile {
+  overflow: hidden;
+  flex: 0 0 auto;
+  /* A calha entra como margem, nao como `gap`: assim a altura da coluna e um
+     multiplo exato da unidade e o deslocamento de -50% cai no inicio da
+     segunda copia. Com `gap` o loop fecharia meia calha fora de registro. */
+  /* A altura vem da proporcao real do arquivo, nao de um valor fixo: app retrato
+     vira tile retrato, site paisagem vira tile largo. */
+  aspect-ratio: var(--tile-ar, 1);
+  margin-bottom: var(--wall-gap);
+  border-radius: 0.4rem;
+  background: var(--brand-deep);
+}
+
+.project-wall-tile > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Um quarto = exatamente uma copia das quatro, entao o ciclo fecha sem salto. */
+@keyframes project-wall-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -25%, 0);
+  }
+}
+
+@keyframes project-wall-down {
+  from {
+    transform: translate3d(0, -25%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Acrilico azul sobre a parede inteira: o wallpaper vira uma superficie unica e
+   difusa, sem virar placa atras do conteudo. A densidade e o unico numero que
+   equilibra "ver o wallpaper" contra "ler o texto". */
+.project-wall-frost {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  /* Tint azul escuro em veu fino: assenta o wallpaper sem apaga-lo. O desfoque
+     fica aqui, e nao nas imagens, para que as bordas dos tiles borrem junto, como
+     vidro de verdade. As dicas de composicao abaixo servem para o navegador manter
+     um raster estavel e reduzir a cintilacao sobre a parede em movimento. */
+  background: oklch(24% 0.055 262 / 0.34);
+  /* Sem `backdrop-filter`: ele forcava leitura e desfoque do fundo a cada quadro
+     sobre a secao inteira, que era o grosso do custo de GPU e tambem a origem da
+     cintilacao. Fica so o tint, que e composicao simples.
+     Sem `translateZ(0)` tambem: ele existia so para estabilizar o desfoque e, sem
+     desfoque, so promovia a camada e custava a textura da secao inteira. */
+}
+
+/* Sem caixa: apenas a coluna de leitura sobre o acrilico. */
+.bento-plate {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 92rem);
+  margin-inline: auto;
+}
+
+/* Bug pre-existente do bento: `justify-self: end` vinha da regra base e nunca era
+   desfeito quando o grid assume o posicionamento. Como a imagem e o link sao
+   absolutos, a largura intrinseca e zero e o item encolhia para os 2px da borda. */
+@media (min-width: 48rem) {
+  .bento-tile-mercearia,
+  .bento-tile-brisa,
+  .bento-tile-aurora {
+    width: auto;
+    justify-self: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-wall-col.is-up,
+  .project-wall-col.is-down {
+    animation: none;
+    transform: translate3d(0, -12.5%, 0);
+  }
+}
+
+/* Intro centralizada e seletor de categorias */
+.bento-intro {
+  justify-items: center;
+  text-align: center;
+}
+
+.bento-intro h2 {
+  max-width: none;
+}
+
+.bento-intro-lede {
+  max-width: 46ch;
+  margin: 1.25rem 0 0;
+  color: oklch(92% 0.025 256);
+  font-size: clamp(0.95rem, 1.4vw, 1.08rem);
+  line-height: 1.55;
+}
+
+.bento-filter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.bento-filter-chip {
+  /* 44px de alvo minimo, conforme o alvo de acessibilidade do DESIGN.md. */
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 1.05rem;
+  border: 1px solid oklch(92% 0.025 256 / 0.34);
+  border-radius: 999px;
+  background: oklch(92% 0.025 256 / 0.09);
+  color: var(--canvas);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 240ms var(--ease-out),
+    border-color 240ms var(--ease-out),
+    color 240ms var(--ease-out);
+}
+
+.bento-filter-chip[aria-pressed="true"] {
+  border-color: var(--accent-yellow);
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+.bento-filter-icon {
+  flex: 0 0 auto;
+}
+
+.bento-filter-count {
+  font-size: 0.62rem;
+  opacity: 0.72;
+}
+
+/* O filtro atenua em vez de remover: o bento tem posicionamento explicito por
+   tile, entao esconder abriria buracos na composicao. */
+.bento-tile {
+  transition:
+    opacity 320ms var(--ease-out),
+    filter 320ms var(--ease-out);
+}
+
+.bento-tile[data-dimmed="true"] {
+  opacity: 0.26;
+  filter: saturate(0.3);
+}
+
+@media (min-width: 48rem) {
+  .bento-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (hover: hover) {
+  .bento-filter-chip:hover {
+    border-color: oklch(92% 0.025 256 / 0.6);
+    background: oklch(92% 0.025 256 / 0.2);
+  }
+
+  .bento-filter-chip[aria-pressed="true"]:hover {
+    border-color: var(--accent-yellow);
+    background: var(--accent-yellow);
+  }
+}
+
+/* A linha de apoio sobe de tamanho e peso de proposito: sobre o acrilico ela
+   passa a contar como texto grande (>=18.66px em negrito), cujo limiar de
+   contraste e 3:1 em vez de 4.5:1. Sem isso ela reprovaria quando um tile claro
+   cruzasse atras. */
+.bento-intro-lede {
+  font-size: clamp(1.2rem, 1.7vw, 1.4rem);
+  font-weight: 700;
+  color: var(--canvas);
+}
+
+.bento-filter-chip {
+  border-color: oklch(92% 0.025 256 / 0.42);
+  background: oklch(24% 0.05 260 / 0.55);
+}
+
+@media (hover: hover) {
+  .bento-filter-chip:hover {
+    border-color: oklch(92% 0.025 256 / 0.7);
+    background: oklch(24% 0.05 260 / 0.78);
+  }
+}
+
+.bento-filter-chip {
+  background: oklch(22% 0.05 260 / 0.82);
+}
+
+/* Em telas estreitas cinco colunas deixam cada tile minusculo e, como a altura
+   agora vem da proporcao, a coluna fica curta demais para fechar o loop. Menos
+   colunas mantem os tiles em tamanho legivel e a cobertura em pe. */
+@media (max-width: 64rem) {
+  .project-wall-col:nth-child(n + 5) {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .project-wall-col:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+/* Intro compacta. O `gap` do grid da .bento-intro se aplicava entre cada um dos
+   quatro filhos e somava as margens proprias de cada um, o que abria vaos enormes.
+   Zerado, o ritmo passa a ser so das margens. */
+.bento-intro {
+  gap: 0;
+  padding-bottom: clamp(2rem, 4vw, 3.25rem);
+}
+
+.bento-intro h2 {
+  margin-top: 0.7rem;
+  /* Mesmo tracking do h1 do hero. */
+  letter-spacing: -0.02em;
+}
+
+.bento-intro-lede {
+  margin-top: 0.9rem;
+}
+
+.bento-filter {
+  margin-top: clamp(1.1rem, 1.8vw, 1.5rem);
+}
+
+/* O respiro visivel no topo e o clamp menos o encaixe; encurtar o clamp aproxima a
+   intro da borda superior da secao sem mexer no encaixe sob a barra. */
+.project-bento {
+  padding-top: calc(clamp(2.5rem, 4.5vw, 4rem) + var(--bento-tuck));
+}
+
+/* Esmaecer o wallpaper para ele nao competir com o conteudo. Opacidade na camada
+   da parede (que ja esta composta, entao e praticamente de graca na GPU) mistura os
+   tiles com o campo azul da secao; o tint mais denso termina de assentar. Nada de
+   `backdrop-filter` aqui: era ele o custo por quadro e a origem da cintilacao. */
+.project-wall {
+  opacity: 0.7;
+}
+
+.project-wall-frost {
+  background: oklch(24% 0.055 262 / 0.48);
+}
+
+/* Sem o filete acima do grid. */
+.bento-grid {
+  border-top: 0;
+}
+
+/* Wallpaper mais recuado ainda: vira textura de fundo, nao concorrente do conteudo. */
+.project-wall {
+  opacity: 0.52;
+}
+
+.project-wall-frost {
+  background: oklch(24% 0.055 262 / 0.56);
+}
+
+/* Modo filtrado: uma categoria tem 1 a 3 itens, e manter os spans do bento
+   deixaria sobra de coluna. Com `auto-fit` e `1fr` as trilhas vazias colapsam e os
+   itens presentes dividem a largura inteira -- um item ocupa tudo, dois metade
+   cada, tres um terco. */
+.bento-grid.is-filtered {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  grid-auto-rows: clamp(17rem, 26vw, 24rem);
+}
+
+.bento-grid.is-filtered > .bento-tile {
+  grid-column: auto;
+  grid-row: span 1;
+}
+
+.bento-grid.is-filtered > .bento-tile-video {
+  grid-row: span 1;
+  min-height: 0;
+}
+
+/* O filtro passou a remover em vez de atenuar. */
+.bento-tile[data-dimmed="true"] {
+  opacity: 1;
+  filter: none;
+}
+
+/* Os cards de Design mostram boards de identidade, que sao pecas fechadas: com
+   `cover` o grid recortava parte da composicao (Brisa e quadrada num card 0.85,
+   Serra e Aurora sao 4:5). `contain` escala sem cortar e sem distorcer; o padding
+   inferior reserva a faixa do titulo para a arte nao ficar sob o texto. */
+.bento-tile-brisa > img,
+.bento-tile-serra > img,
+.bento-tile-aurora > img {
+  object-fit: contain;
+  object-position: center top;
+  padding: clamp(0.7rem, 1.3vw, 1.25rem);
+  padding-bottom: clamp(3.25rem, 5vw, 4.25rem);
+  background: var(--canvas);
+}
+
+/* Com a arte contida, o veu escuro so precisa cobrir a faixa do titulo. */
+.bento-tile-brisa .bento-tile-shade,
+.bento-tile-serra .bento-tile-shade,
+.bento-tile-aurora .bento-tile-shade {
+  background: linear-gradient(
+    to top,
+    oklch(16.5% 0.014 258 / 0.92) 0,
+    oklch(16.5% 0.014 258 / 0.82) clamp(3.5rem, 5.5vw, 4.75rem),
+    transparent clamp(5.5rem, 8vw, 7rem)
+  );
+}
+
+/* No modo filtrado a altura passa a vir da proporcao de cada card, nao de uma
+   linha de altura fixa: assim a caixa acompanha a arte e o `contain` escala a peca
+   ate o limite, em vez de deixar margem morta dos lados. */
+.bento-grid.is-filtered {
+  grid-auto-rows: auto;
+}
+
+.bento-grid.is-filtered > .bento-tile {
+  grid-row: auto;
+  aspect-ratio: 4 / 3;
+}
+
+.bento-grid.is-filtered > .bento-tile-brisa,
+.bento-grid.is-filtered > .bento-tile-serra,
+.bento-grid.is-filtered > .bento-tile-aurora {
+  aspect-ratio: 0.8;
+}
+
+.bento-grid.is-filtered > .bento-tile-estudai {
+  aspect-ratio: 0.62;
+}
+
+.bento-grid.is-filtered > .bento-tile-video {
+  aspect-ratio: 16 / 5;
+}
+
+/* ==========================================================================
+   Capitulos: processo criativo, etapas, depoimentos e CTA
+   Mesma linguagem do bento de projetos: chips em pilula com icone animado,
+   cantos arredondados e o amarelo como sinal de "ativo".
+   ========================================================================== */
+
+.creative,
+.stages,
+.testimonials {
+  /* Mesma coluna de leitura de 92rem do bento, mas via padding para que o fundo
+     continue de ponta a ponta e o sticky interno nao precise de wrapper. */
+  padding-block: clamp(5rem, 9vw, 8rem);
+  padding-inline: max(var(--page-pad), calc((100% - 92rem) / 2));
+}
+
+.chapter-intro {
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+/* Codigo de secao em pilula, com o icone animado no lugar do ponto. */
+.chapter-code {
+  min-height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.95rem 0.35rem 0.7rem;
+  border: 1px solid var(--chapter-code-line, var(--line));
+  border-radius: 999px;
+  background: var(--chapter-code-fill, transparent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-code svg {
+  color: var(--chapter-icon, var(--blue));
+}
+
+.chapter-intro h2 {
+  margin-top: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(3.6rem, 11vw, 8rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 0.78;
+  text-transform: uppercase;
+}
+
+.chapter-intro h2 > span {
+  color: var(--chapter-accent, var(--brand));
+}
+
+.chapter-lede {
+  max-width: 46ch;
+  margin-top: 1.25rem;
+  color: var(--chapter-soft, var(--ink-soft));
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.55;
+}
+
+.chapter-cta {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.3rem;
+  border-radius: 0.65rem;
+  background: var(--accent-yellow);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 750;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 260ms var(--ease-out), color 260ms var(--ease-out);
+}
+
+.chapter-cta svg {
+  transition: transform 260ms var(--ease-out);
+}
+
+/* --- Processo criativo --------------------------------------------------- */
+
+.creative {
+  background: var(--canvas);
+}
+
+/* Reserva a margem negativa do estudio fixo (ver .creative-stage), para que ele
+   nao cubra o fim da introducao no celular. */
+.creative .chapter-intro {
+  padding-bottom: calc(var(--header-h) + 1.25rem);
+}
+
+.creative-layout {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* No celular o estudio vem antes e fica preso no topo; os passos rolam por baixo
+   dele, entao ele precisa de fundo opaco. O cabecalho mobile e transparente, entao
+   ele gruda em 0 e o proprio padding cobre a faixa dele; a margem negativa devolve
+   esse espaco enquanto ele ainda nao grudou. */
+.creative-stage {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  order: -1;
+  margin-top: calc(-1 * var(--header-h));
+  padding-top: calc(var(--header-h) + 0.25rem);
+  padding-bottom: 0.75rem;
+  background: var(--canvas);
+}
+
+.creative-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.creative-step {
+  min-height: 55svh;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 0.45rem;
+  padding-block: clamp(1.75rem, 5vh, 3.5rem);
+  border-top: 1px solid var(--line);
+}
+
+.creative-step-chip {
+  min-height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0.85rem 0.3rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out), color 300ms var(--ease-out);
+}
+
+.creative-step[data-active="true"] .creative-step-chip {
+  border-color: var(--accent-yellow);
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+/* Marca-texto amarelo que corre por baixo do verbo ativo. O cinza do verbo inativo
+   fica acima de 3:1, o limiar de texto grande. */
+.creative-step h3 {
+  color: oklch(58% 0.015 258);
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  text-transform: uppercase;
+  background: linear-gradient(transparent 58%, var(--accent-yellow) 58% 86%, transparent 86%) no-repeat 0 0 / 0% 100%;
+  transition: color 400ms var(--ease-out), background-size 700ms var(--ease-out);
+}
+
+.creative-step[data-active="true"] h3 {
+  color: var(--ink);
+  background-size: 100% 100%;
+}
+
+.creative-step-lead {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.creative-step > p:not(.creative-step-lead) {
+  max-width: 42ch;
+  color: var(--ink-soft);
+}
+
+.creative-step > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.creative-step > ul li {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--canvas-deep);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Estudio: janela de ferramenta com barra, ferramentas, area de trabalho e linha
+   do tempo. A area usa o mesmo campo azul do bento de projetos. */
+.studio {
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background: var(--ink);
+  color: var(--canvas);
+  box-shadow: 0 2rem 3rem -1.75rem oklch(16.5% 0.014 258 / 0.55);
+}
+
+.studio-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.3rem 0.45rem 0.6rem;
+}
+
+.studio-dots {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.studio-dots i {
+  width: 0.62rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: oklch(92% 0.025 256 / 0.22);
+}
+
+.studio-dots i:first-child {
+  background: var(--accent-yellow);
+}
+
+.studio-file {
+  justify-self: center;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: oklch(25% 0.018 258);
+  color: oklch(82% 0.014 91);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studio-file b {
+  color: var(--accent-yellow);
+}
+
+.studio-count {
+  color: var(--accent-yellow);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.studio-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.45rem;
+}
+
+.studio-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border-radius: 0.65rem;
+  background: oklch(22% 0.018 258);
+}
+
+.studio-tool {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.5rem;
+  color: oklch(72% 0.014 91);
+  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
+}
+
+.studio-tool[data-on="true"] {
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+.studio-canvas {
+  position: relative;
+  aspect-ratio: 16 / 11;
+  overflow: hidden;
+  border-radius: 0.65rem;
+  background:
+    radial-gradient(oklch(92% 0.025 256 / 0.26) 1px, transparent 1.4px) 0 0 / 1.1rem 1.1rem,
+    var(--brand-gradient);
+}
+
+.studio-layer {
+  position: absolute;
+  inset: 8% 7%;
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.98);
+  transition: opacity 450ms var(--ease-out), transform 650ms var(--ease-out);
+}
+
+.studio-layer[data-on="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Camada 1: conversa de briefing */
+.studio-chat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.chat-bubble {
+  max-width: 74%;
+  padding: 0.6em 0.95em;
+  border-radius: 1rem;
+  color: var(--ink);
+  font-size: clamp(0.7rem, 1.15vw, 0.95rem);
+  font-weight: 600;
+  line-height: 1.3;
+  opacity: 0;
+  translate: 0 0.5rem;
+  transition: opacity 400ms var(--ease-out), translate 500ms var(--ease-out);
+}
+
+.chat-client {
+  align-self: flex-start;
+  border-bottom-left-radius: 0.25rem;
+  background: var(--canvas);
+}
+
+.chat-me {
+  align-self: flex-end;
+  border-bottom-right-radius: 0.25rem;
+  background: var(--accent-yellow);
+}
+
+.studio-chat[data-on="true"] .chat-bubble {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.chat-bubble:nth-child(2) { transition-delay: 160ms; }
+.chat-bubble:nth-child(3) { transition-delay: 320ms; }
+.chat-bubble:nth-child(4) { transition-delay: 480ms; }
+
+/* Camada 2: moodboard com trabalhos reais como referencia */
+.studio-mood {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mood-shot {
+  overflow: hidden;
+  border: 2px solid var(--canvas);
+  border-radius: 0.55rem;
+  background: var(--canvas);
+  box-shadow: 0 0.6rem 1.2rem oklch(16% 0.05 260 / 0.35);
+}
+
+.mood-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.mood-shot:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; rotate: -3deg; }
+.mood-shot:nth-child(2) { grid-column: 3 / 5; grid-row: 1 / 4; rotate: 2deg; }
+.mood-shot:nth-child(3) { grid-column: 5 / 7; grid-row: 2 / 4; rotate: -2deg; }
+
+.mood-palette {
+  grid-column: 1 / 3;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border-radius: 0.55rem;
+  background: var(--canvas);
+}
+
+.mood-palette i {
+  width: 20%;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+}
+
+.mood-palette i:nth-child(1) { background: var(--ink); }
+.mood-palette i:nth-child(2) { background: var(--brand); }
+.mood-palette i:nth-child(3) { background: var(--accent-yellow); }
+.mood-palette i:nth-child(4) { background: var(--canvas-deep); }
+
+.mood-type {
+  grid-column: 1 / 3;
+  grid-row: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0 0.6rem;
+  border-radius: 0.55rem;
+  background: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.8vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.mood-type small {
+  overflow: hidden;
+  color: var(--accent-yellow);
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mood-tags {
+  grid-column: 3 / 7;
+  grid-row: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 0.3rem;
+}
+
+.mood-tags span {
+  padding: 0.2em 0.75em;
+  border: 1px solid oklch(92% 0.025 256 / 0.55);
+  border-radius: 999px;
+  background: oklch(16% 0.05 260 / 0.45);
+  font-size: clamp(0.55rem, 0.9vw, 0.66rem);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Camadas 3 e 4: a mesma moldura, tracejada no esboco; no refino a tela real
+   entra por cima em uma varredura da esquerda para a direita. */
+.studio-browser {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1.5px dashed oklch(92% 0.025 256 / 0.75);
+  border-radius: 0.65rem;
+  background: oklch(16% 0.05 260 / 0.3);
+  transition: border-color 500ms var(--ease-out), background-color 500ms var(--ease-out);
+}
+
+.studio-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1.5px dashed oklch(92% 0.025 256 / 0.5);
+}
+
+.studio-browser-bar i {
+  width: 0.45rem;
+  aspect-ratio: 1;
+  border: 1.5px solid oklch(92% 0.025 256 / 0.75);
+  border-radius: 50%;
+}
+
+.studio-browser-bar span {
+  flex: 1;
+  height: 0.55rem;
+  margin-left: 0.4rem;
+  border: 1.5px dashed oklch(92% 0.025 256 / 0.6);
+  border-radius: 999px;
+}
+
+.studio-wire,
+.studio-final {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.studio-wire {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6%;
+  padding: 6%;
+}
+
+.wire-nav {
+  justify-self: end;
+  width: 32%;
+  height: 0.55rem;
+  border: 1.5px dashed oklch(92% 0.025 256 / 0.7);
+  border-radius: 999px;
+}
+
+.wire-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-auto-rows: min-content;
+  align-content: center;
+  column-gap: 8%;
+  row-gap: 0.45rem;
+}
+
+.wire-line {
+  grid-column: 1;
+  height: clamp(0.45rem, 1vw, 0.8rem);
+  border-radius: 999px;
+  background: oklch(92% 0.025 256 / 0.55);
+}
+
+.wire-line-lg { width: 100%; }
+.wire-line-md { width: 70%; }
+
+.wire-button {
+  grid-column: 1;
+  width: 42%;
+  height: clamp(1rem, 2.2vw, 1.7rem);
+  margin-top: 0.3rem;
+  border: 1.5px dashed oklch(92% 0.025 256 / 0.8);
+  border-radius: 999px;
+}
+
+.wire-media {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  align-self: stretch;
+  min-height: 3rem;
+  border: 1.5px dashed oklch(92% 0.025 256 / 0.7);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(to top right, transparent calc(50% - 0.75px), oklch(92% 0.025 256 / 0.5) 50%, transparent calc(50% + 0.75px)),
+    linear-gradient(to top left, transparent calc(50% - 0.75px), oklch(92% 0.025 256 / 0.5) 50%, transparent calc(50% + 0.75px));
+}
+
+.wire-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  height: clamp(1.6rem, 4.5vw, 3.2rem);
+}
+
+.wire-cards span {
+  border: 1.5px dashed oklch(92% 0.025 256 / 0.7);
+  border-radius: 0.45rem;
+}
+
+.studio-final {
+  overflow: hidden;
+  background: var(--canvas);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 900ms var(--ease-in-out);
+}
+
+.studio-final[data-on="true"] {
+  clip-path: inset(0);
+}
+
+.studio-final img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.studio-page[data-refined="true"] .studio-browser {
+  border-style: solid;
+  border-color: var(--canvas);
+  background: var(--canvas);
+}
+
+.studio-page[data-refined="true"] .studio-browser-bar {
+  border-bottom-style: solid;
+  border-bottom-color: var(--canvas-deep);
+}
+
+.studio-page[data-refined="true"] .studio-browser-bar i {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.studio-page[data-refined="true"] .studio-browser-bar span {
+  border-style: solid;
+  border-color: var(--canvas-deep);
+  background: var(--canvas-deep);
+}
+
+.studio-approved {
+  position: absolute;
+  right: -0.4rem;
+  bottom: -0.4rem;
+  padding: 0.45em 0.95em;
+  border-radius: 999px;
+  background: var(--accent-yellow);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 1.3vw, 1rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: 0 0.6rem 1.2rem oklch(16% 0.05 260 / 0.35);
+  opacity: 0;
+  scale: 0.85;
+  transition: opacity 300ms var(--ease-out) 0ms, scale 400ms var(--ease-out) 0ms;
+}
+
+.studio-approved::before {
+  content: "✓ ";
+}
+
+.studio-approved[data-on="true"] {
+  opacity: 1;
+  scale: 1;
+  transition-delay: 700ms;
+}
+
+/* Cursor de "colaboracao ao vivo": muda de lugar a cada modo. */
+.studio-cursor {
+  position: absolute;
+  z-index: 5;
+  left: var(--cx);
+  top: var(--cy);
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none;
+  filter: drop-shadow(0 0.3rem 0.4rem oklch(16% 0.05 260 / 0.4));
+  transition: left 900ms var(--ease-in-out), top 900ms var(--ease-in-out);
+}
+
+.studio-cursor path {
+  fill: var(--accent-yellow);
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.studio-cursor > span {
+  margin: 1.05rem 0 0 -0.2rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--accent-yellow);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.studio-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-timeline li {
+  overflow: hidden;
+  padding: 0.45rem 0.4rem;
+  border-radius: 999px;
+  background: oklch(25% 0.018 258);
+  color: oklch(72% 0.014 91);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
+}
+
+.studio-timeline li[data-done="true"] {
+  background: oklch(92% 0.025 256 / 0.16);
+  color: var(--canvas);
+}
+
+.studio-timeline li[data-on="true"] {
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+/* --- Etapas do projeto: mapa do tesouro ---------------------------------- */
+
+.stages {
+  --chapter-accent: var(--accent-yellow);
+  --chapter-icon: var(--accent-yellow);
+  --chapter-soft: oklch(80% 0.014 91);
+  --chapter-code-line: oklch(92% 0.025 256 / 0.32);
+  --chapter-code-fill: oklch(22% 0.018 258);
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+.stages :focus-visible,
+.testimonials :focus-visible {
+  outline-color: var(--accent-yellow);
+}
+
+/* Altura de rolagem do mapa: cada parada ganha um trecho de pausa e um de
+   caminhada (ver SCROLL_IN em ProjectStages). */
+.quest {
+  position: relative;
+  height: 520vh;
+}
+
+.quest-sticky {
+  --map-w: min(100%, calc((100vh - var(--header-h) - 17rem) * 1200 / 520));
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: center;
+  justify-items: center;
+  gap: 1rem;
+  padding-block: 0.75rem 1.25rem;
+}
+
+.map {
+  position: relative;
+  width: var(--map-w);
+  aspect-ratio: 1200 / 520;
+  border: 1px solid oklch(92% 0.025 256 / 0.45);
+  border-radius: 1rem;
+  background:
+    radial-gradient(oklch(92% 0.025 256 / 0.14) 1px, transparent 1.4px) 0 0 / 1.4rem 1.4rem,
+    var(--brand-gradient);
+}
+
+.map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.map-relief ellipse {
+  fill: none;
+  stroke: oklch(92% 0.025 256 / 0.17);
+  stroke-width: 1.5;
+}
+
+.map-coord {
+  fill: oklch(92% 0.025 256 / 0.5);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.map-x path {
+  fill: none;
+  stroke: var(--accent-yellow);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.map-trail {
+  fill: none;
+  stroke: oklch(92% 0.025 256 / 0.6);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 2 12;
+}
+
+.map-trail-done {
+  fill: none;
+  stroke: var(--accent-yellow);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.map-traveler {
+  fill: var(--accent-yellow);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.map-traveler-ring {
+  fill: none;
+  stroke: var(--accent-yellow);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: map-ping 1.8s var(--ease-out) infinite;
+}
+
+@keyframes map-ping {
+  from {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+.map-compass {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 4rem;
+  height: 4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid oklch(92% 0.025 256 / 0.35);
+  border-radius: 50%;
+  color: oklch(92% 0.025 256 / 0.8);
+}
+
+.map-stop {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+.map-stop:focus-visible {
+  outline: none;
+}
+
+.map-stop:focus-visible .map-stop-pin {
+  outline: 3px solid var(--accent-yellow);
+  outline-offset: 3px;
+}
+
+.map-stop-pin {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid oklch(92% 0.025 256 / 0.7);
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--canvas);
+  box-shadow: 0 0.6rem 1.2rem oklch(16% 0.05 260 / 0.4);
+  transition:
+    background-color 300ms var(--ease-out),
+    border-color 300ms var(--ease-out),
+    color 300ms var(--ease-out),
+    transform 400ms var(--ease-out);
+}
+
+.map-stop[data-done="true"] .map-stop-pin {
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+}
+
+.map-stop[data-active="true"] .map-stop-pin {
+  border-color: var(--ink);
+  background: var(--accent-yellow);
+  color: var(--ink);
+  transform: scale(1.18);
+}
+
+.map-stop-label {
+  position: absolute;
+  bottom: calc(100% + 0.6rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: oklch(16.5% 0.014 258 / 0.82);
+  color: var(--canvas);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
+}
+
+.map-stop[data-below="true"] .map-stop-label {
+  top: calc(100% + 0.6rem);
+  bottom: auto;
+}
+
+.map-stop-label b {
+  color: var(--accent-yellow);
+  font-size: 0.72rem;
+}
+
+.map-stop[data-active="true"] .map-stop-label {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.map-stop[data-active="true"] .map-stop-label b {
+  color: var(--brand);
+}
+
+.map-card {
+  width: var(--map-w);
+}
+
+.map-card-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1.35fr);
+  align-items: start;
+  gap: 1.25rem clamp(1.5rem, 3vw, 2.5rem);
+  padding: 1.35rem 1.6rem;
+  border: 1px solid var(--line-dark);
+  border-radius: 1rem;
+  background: oklch(21% 0.016 258);
+}
+
+.map-card-head {
+  display: grid;
+  justify-items: start;
+  gap: 0.45rem;
+}
+
+.map-card-step {
+  color: var(--accent-yellow);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.map-card-head strong {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+  font-weight: 800;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.map-card-summary {
+  color: oklch(82% 0.014 91);
+}
+
+.stage-duration {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--accent-yellow);
+  border-radius: 999px;
+  color: var(--accent-yellow);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage-facts {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+}
+
+.stage-facts dt {
+  color: var(--accent-yellow);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage-facts dd {
+  margin: 0.35rem 0 0;
+  font-size: 0.92rem;
+}
+
+.stage-facts ul {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage-facts li::before {
+  content: "+";
+  margin-right: 0.4rem;
+  color: var(--brand-bright);
+}
+
+/* Trilha vertical: celular e preferencia por menos movimento. */
+.trail {
+  position: relative;
+}
+
+.trail-line {
+  position: absolute;
+  top: 1.6rem;
+  bottom: 1.6rem;
+  left: 1.6rem;
+  width: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: repeating-linear-gradient(to bottom, oklch(92% 0.025 256 / 0.45) 0 4px, transparent 4px 14px);
+  translate: -50% 0;
+}
+
+.trail-line span {
+  position: absolute;
+  inset: 0;
+  background: var(--accent-yellow);
+  transform-origin: top;
+}
+
+.trail-list {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trail-stop {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem;
+}
+
+.trail-pin {
+  position: relative;
+  z-index: 1;
+  width: 3.2rem;
+  height: 3.2rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid oklch(92% 0.025 256 / 0.6);
+  border-radius: 50%;
+  background: var(--ink);
+  transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out), color 300ms var(--ease-out);
+}
+
+.trail-stop[data-done="true"] .trail-pin {
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+}
+
+.trail-stop[data-active="true"] .trail-pin {
+  border-color: var(--accent-yellow);
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+.trail-card {
+  max-width: 52rem;
+  display: grid;
+  justify-items: start;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line-dark);
+  border-radius: 1rem;
+  background: oklch(21% 0.016 258);
+  transition: border-color 300ms var(--ease-out);
+}
+
+.trail-stop[data-active="true"] .trail-card {
+  border-color: oklch(92% 0.025 256 / 0.45);
+}
+
+.trail-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  font-weight: 800;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.trail-card .stage-facts {
+  width: 100%;
+  margin-top: 0.3rem;
+}
+
+.stages-outro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+
+.stages-outro > p {
+  max-width: 52ch;
+  color: oklch(80% 0.014 91);
+  font-size: 0.9rem;
+}
+
+/* --- Depoimentos --------------------------------------------------------- */
+
+.testimonials {
+  --chapter-accent: var(--accent-yellow);
+  --chapter-icon: var(--accent-yellow);
+  --chapter-code-line: oklch(92% 0.025 256 / 0.42);
+  --chapter-code-fill: oklch(22% 0.05 260 / 0.5);
+  display: grid;
+  background: var(--brand-gradient);
+  color: var(--canvas);
+}
+
+.testimonial-stage {
+  min-width: 0;
+}
+
+.testimonial-card {
+  position: relative;
+  min-height: clamp(19rem, 30vw, 24rem);
+  overflow: hidden;
+  padding: clamp(1.5rem, 3.5vw, 3rem);
+  border: 1px solid oklch(92% 0.025 256 / 0.5);
+  border-radius: 1rem;
+  background: oklch(22% 0.05 260 / 0.55);
+}
+
+.testimonial-mark {
+  position: absolute;
+  top: 0;
+  right: clamp(1rem, 3vw, 2.5rem);
+  color: var(--accent-yellow);
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 13vw, 11rem);
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateY(-12%);
+}
+
+.testimonial {
+  position: relative;
+  margin: 0;
+}
+
+.testimonial blockquote {
+  margin: 0;
+  padding-right: clamp(3rem, 10vw, 8rem);
+}
+
+.testimonial blockquote p {
+  max-width: 26ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.3vw, 2.9rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.testimonial figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.testimonial-avatar {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--accent-yellow);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.testimonial figcaption strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.testimonial figcaption small {
+  display: block;
+  margin-top: 0.25rem;
+  color: oklch(92% 0.025 256);
+  font-size: 0.8rem;
+}
+
+.testimonial-project {
+  margin-left: auto;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid oklch(92% 0.025 256 / 0.55);
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.testimonial-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.testimonial-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.testimonial-chip {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 1.05rem;
+  border: 1px solid oklch(92% 0.025 256 / 0.42);
+  border-radius: 999px;
+  background: oklch(22% 0.05 260 / 0.82);
+  color: var(--canvas);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 240ms var(--ease-out), border-color 240ms var(--ease-out), color 240ms var(--ease-out);
+}
+
+.testimonial-chip span {
+  font-size: 0.62rem;
+  opacity: 0.72;
+}
+
+.testimonial-chip[aria-pressed="true"] {
+  border-color: var(--accent-yellow);
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+.testimonial-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.testimonial-count {
+  margin-right: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.testimonial-arrows button {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid oklch(92% 0.025 256 / 0.55);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--canvas);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out);
+}
+
+/* --- CTA final ----------------------------------------------------------- */
+
+/* Unico campo amarelo inteiro da pagina: o sinal que pontua o resto vira o
+   fechamento, entao o ultimo passo e o mais visivel. */
+.project-cta {
+  --chapter-icon: var(--ink);
+  --chapter-code-line: oklch(16.5% 0.014 258 / 0.35);
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  padding-block: clamp(5rem, 10vw, 9rem);
+  padding-inline: max(var(--page-pad), calc((100% - 92rem) / 2));
+  background: var(--accent-yellow);
+  color: var(--ink);
+}
+
+.project-cta :focus-visible {
+  outline-color: var(--ink);
+}
+
+.cta-heading h2 {
+  margin-top: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 10vw, 6.6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  /* Um pouco mais aberto que os outros titulos: o circunflexo de "faze-la"
+     encostava na linha de cima com 0.8. */
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+/* Sem isso o navegador quebra a linha no hifen de "faze-la". */
+.cta-keep {
+  white-space: nowrap;
+}
+
+.cta-dot {
+  color: var(--brand);
+}
+
+.cta-panel {
+  display: grid;
+  align-content: end;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.cta-lede {
+  max-width: 40ch;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cta-topics {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cta-topics legend {
+  margin-bottom: 0.75rem;
+  padding: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cta-topics > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cta-topic {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.05rem 0.5rem 0.85rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 220ms var(--ease-out), color 220ms var(--ease-out);
+}
+
+.cta-topic[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--accent-yellow);
+}
+
+.cta-actions {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.cta-primary,
+.cta-secondary {
+  min-height: 4.5rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem 0.85rem 1.25rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.65rem;
+  text-decoration: none;
+  transition: background-color 260ms var(--ease-out), color 260ms var(--ease-out), border-color 260ms var(--ease-out);
+}
+
+.cta-primary {
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+.cta-primary > svg:first-child,
+.cta-secondary > svg:first-child {
+  font-size: 1.5rem;
+}
+
+.cta-primary strong,
+.cta-secondary strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.cta-primary small,
+.cta-secondary small {
+  display: block;
+  margin-top: 0.3rem;
+  overflow: hidden;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cta-arrow {
+  font-size: 1.25rem;
+  transition: transform 260ms var(--ease-out);
+}
+
+.cta-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1.5px solid var(--ink);
+}
+
+/* Valor em cima, rotulo embaixo, mantendo dt antes de dd no HTML. Grid alinhado
+   ao topo para os valores ficarem na mesma linha mesmo com rotulos de alturas
+   diferentes. */
+.cta-facts > div {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+}
+
+.cta-facts dd {
+  order: -1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.cta-facts dt {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+/* --- Portal Morcegao no bento ------------------------------------------- */
+
+.bento-tile-morcegao {
+  min-height: 20rem;
+}
+
+/* --- Breakpoints --------------------------------------------------------- */
+
+@media (min-width: 40rem) {
+  .stage-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 48rem) {
+  .bento-tile-morcegao {
+    grid-column: span 6;
+    grid-row: span 3;
+  }
+}
+
+@media (min-width: 64rem) {
+  .chapter-intro-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: end;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+
+  .chapter-intro-split .chapter-lede {
+    margin-top: 0;
+  }
+
+  /* No desktop o cabecalho rolado e opaco, entao nada precisa cobrir a faixa dele. */
+  .creative .chapter-intro {
+    padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .creative-layout {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+    gap: clamp(3rem, 6vw, 7rem);
+  }
+
+  .creative-stage {
+    top: calc(var(--header-h) + 2rem);
+    order: 0;
+    margin-top: 0;
+    padding-block: 0;
+  }
+
+  .creative-step {
+    min-height: 68vh;
+  }
+
+  .studio {
+    padding: 0.65rem;
+  }
+
+  .studio-canvas {
+    aspect-ratio: 4 / 3;
+  }
+
+  .studio-tool {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .testimonials {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    align-items: start;
+    column-gap: clamp(3rem, 6vw, 7rem);
+  }
+
+  .testimonials .chapter-intro {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+  }
+
+  .project-cta {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    column-gap: clamp(3rem, 6vw, 7rem);
+  }
+
+  /* Terceira faixa do destaque: Morcegao (8) e o card de video (4) fecham as 12
+     colunas. Fora do destaque o video volta a ser a faixa fina das regras acima. */
+  .bento-tile-morcegao {
+    grid-column: span 8;
+  }
+
+  .bento-grid:not(.is-filtered) > .bento-tile-video {
+    grid-column: span 4;
+    grid-row: span 3;
+  }
+}
+
+@media (hover: hover) {
+  .chapter-cta:hover {
+    background: var(--canvas);
+  }
+
+  .chapter-cta:hover svg {
+    transform: translate(0.15rem, -0.15rem);
+  }
+
+  .map-stop:hover .map-stop-pin {
+    transform: scale(1.1);
+  }
+
+  .map-stop[data-active="true"]:hover .map-stop-pin {
+    transform: scale(1.18);
+  }
+
+  .testimonial-chip:hover {
+    border-color: oklch(92% 0.025 256 / 0.7);
+    background: oklch(22% 0.05 260 / 0.95);
+  }
+
+  .testimonial-chip[aria-pressed="true"]:hover {
+    border-color: var(--accent-yellow);
+    background: var(--accent-yellow);
+  }
+
+  .testimonial-arrows button:hover {
+    background: var(--canvas);
+    color: var(--ink);
+  }
+
+  .cta-topic:hover {
+    background: oklch(16.5% 0.014 258 / 0.1);
+  }
+
+  .cta-topic[aria-pressed="true"]:hover {
+    background: var(--ink);
+  }
+
+  .cta-primary:hover {
+    border-color: var(--brand);
+    background: var(--brand);
+  }
+
+  .cta-secondary:hover {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+
+  .cta-primary:hover .cta-arrow,
+  .cta-secondary:hover .cta-arrow {
+    transform: translate(0.15rem, -0.15rem);
   }
 }

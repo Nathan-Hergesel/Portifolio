@@ -1,8 +1,11 @@
 import { PortfolioChrome } from "../src/components/PortfolioChrome";
-import { ConstructionSections } from "../src/components/ConstructionSections";
+import { CreativeProcess } from "../src/components/CreativeProcess";
 import { Footer } from "../src/components/Footer";
 import { Hero } from "../src/components/Hero";
+import { ProjectCta } from "../src/components/ProjectCta";
+import { ProjectStages } from "../src/components/ProjectStages";
 import { RecentProjects } from "../src/components/RecentProjects";
+import { Testimonials } from "../src/components/Testimonials";
 
 export default function HomePage() {
   return (
@@ -13,7 +16,10 @@ export default function HomePage() {
         <Hero />
         <div className="ticker" aria-hidden="true" />
         <RecentProjects />
-        <ConstructionSections />
+        <CreativeProcess />
+        <ProjectStages />
+        <Testimonials />
+        <ProjectCta />
       </main>
 
       <Footer />

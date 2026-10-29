@@ -104,9 +104,9 @@ const heroActions = [
     icon: <ArrowIcon />
   },
   {
-    href: "#servicos",
-    title: "Conhecer serviços",
-    description: "O que posso fazer por você",
+    href: "#processo",
+    title: "Como trabalho",
+    description: "Processo e etapas",
     iconClassName: "action-icon-blue",
     icon: <GridIcon />
   },
