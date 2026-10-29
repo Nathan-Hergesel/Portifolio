@@ -47,11 +47,23 @@ const formaDoTile = (aspect, slot, column) => {
 // N=4 basta C >= V/2. Como a altura total da coluna e N*C, copias mais curtas e em
 // maior numero cobrem o mesmo com bem menos textura -- a coluna caiu de ~9600px
 // para ~4000px, e e isso que estava pesando na GPU.
+const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+
+// Menor passo a partir de 3 que seja coprimo com o total de projetos. Calculado
+// em vez de fixo porque um passo que divide o total (3 com 9 projetos) faria
+// cada coluna repetir so um terco da lista.
+const strideFor = (total) => {
+  let stride = 3;
+  while (gcd(stride, total) !== 1) stride += 1;
+  return stride;
+};
+
 function buildColumn(projects, column) {
+  const stride = strideFor(projects.length);
   return Array.from({ length: TILES_PER_COPY }, (_, slot) => {
-    // Passo 3 e coprimo com 8 projetos, entao cada coluna percorre a lista
-    // em uma ordem diferente e a repeticao fica menos evidente.
-    return projects[(column + slot * 3) % projects.length];
+    // Passo coprimo com o total, entao cada coluna percorre a lista em uma
+    // ordem diferente e a repeticao fica menos evidente.
+    return projects[(column + slot * stride) % projects.length];
   });
 }
 

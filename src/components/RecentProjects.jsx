@@ -126,6 +126,17 @@ const projects = [
     alt: "Tela de acesso do portal interno do Supermercado Morcegão",
     href: "https://supermercadomorcegao.tech/entrar",
   },
+  {
+    id: "tpark",
+    index: "09",
+    category: "Site",
+    title: "TPark Estacionamentos",
+    description: "Site comercial para gestão e automação de estacionamentos.",
+    image: "/assets/images/projects/tpark.webp",
+    wallImage: "/assets/images/projects/wall/tpark.webp",
+    aspect: 1.78,
+    alt: "Página inicial do site da TPark Estacionamentos",
+  },
 ];
 
 function BentoTile({ project, reducedMotion }) {
@@ -191,7 +202,7 @@ function VideoTile({ reducedMotion }) {
       exit={reducedMotion ? undefined : entrada.exit}
       transition={entrada.transition}
     >
-      <span className="bento-video-label">09 / Vídeos</span>
+      <span className="bento-video-label">10 / Vídeos</span>
       <div>
         <h3>Em produção.</h3>
         <a href="#contato">
