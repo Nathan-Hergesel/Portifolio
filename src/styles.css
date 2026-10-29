@@ -9307,24 +9307,20 @@ p {
 
 /* --- CTA final ----------------------------------------------------------- */
 
-/* Unico campo amarelo inteiro da pagina: o sinal que pontua o resto vira o
-   fechamento, entao o ultimo passo e o mais visivel. */
-/* Centralizado: o fechamento e uma unica coluna, com o titulo como eixo. */
+/* Fechamento claro, centralizado numa unica coluna com o titulo como eixo. O
+   amarelo volta a ser so sinal (chip escolhido) e o azul da marca leva a acao
+   principal. */
 .project-cta {
-  --chapter-icon: var(--ink);
-  --chapter-code-line: oklch(16.5% 0.014 258 / 0.35);
+  --chapter-icon: var(--blue);
+  --chapter-code-line: var(--line);
   display: grid;
   justify-items: center;
   gap: clamp(2rem, 4vw, 3rem);
   text-align: center;
   padding-block: clamp(5rem, 10vw, 9rem);
   padding-inline: max(var(--page-pad), calc((100% - 92rem) / 2));
-  background: var(--accent-yellow);
+  background: var(--canvas);
   color: var(--ink);
-}
-
-.project-cta :focus-visible {
-  outline-color: var(--ink);
 }
 
 .cta-heading h2 {
@@ -9357,6 +9353,7 @@ p {
 
 .cta-lede {
   max-width: 40ch;
+  color: var(--ink-soft);
   font-size: clamp(1.05rem, 1.5vw, 1.25rem);
   font-weight: 600;
   line-height: 1.5;
@@ -9392,7 +9389,7 @@ p {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1.05rem 0.5rem 0.85rem;
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 999px;
   background: transparent;
   color: var(--ink);
@@ -9401,12 +9398,12 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background-color 220ms var(--ease-out), color 220ms var(--ease-out);
+  transition: background-color 220ms var(--ease-out), border-color 220ms var(--ease-out), color 220ms var(--ease-out);
 }
 
 .cta-topic[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--accent-yellow);
+  border-color: var(--accent-yellow);
+  background: var(--accent-yellow);
 }
 
 .cta-actions {
@@ -9431,7 +9428,8 @@ p {
 }
 
 .cta-primary {
-  background: var(--ink);
+  border-color: transparent;
+  background: var(--brand-gradient);
   color: var(--canvas);
 }
 
@@ -9473,7 +9471,7 @@ p {
   gap: 1rem;
   margin: 0;
   padding-top: 1.25rem;
-  border-top: 1.5px solid var(--ink);
+  border-top: 1px solid var(--line);
 }
 
 /* Valor em cima, rotulo embaixo, mantendo dt antes de dd no HTML. Grid alinhado
@@ -9488,6 +9486,7 @@ p {
 .cta-facts dd {
   order: -1;
   margin: 0;
+  color: var(--brand);
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3.5vw, 2.6rem);
   font-weight: 900;
@@ -9630,16 +9629,15 @@ p {
   }
 
   .cta-topic:hover {
-    background: oklch(16.5% 0.014 258 / 0.1);
+    border-color: var(--ink);
   }
 
   .cta-topic[aria-pressed="true"]:hover {
-    background: var(--ink);
+    border-color: var(--accent-yellow);
   }
 
   .cta-primary:hover {
-    border-color: var(--brand);
-    background: var(--brand);
+    background: var(--ink);
   }
 
   .cta-secondary:hover {
