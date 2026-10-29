@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
@@ -40,30 +40,28 @@ const STAGE_ICONS = {
 };
 
 /* --- Geometria da trilha ---------------------------------------------------
-   O mapa tem viewBox 1200x520. Cada etapa e uma parada; entre duas paradas a
-   trilha e uma Bezier cubica que sai e chega na horizontal, o que da o
-   serpenteio. A geometria e calculada aqui, sem DOM, para que o viajante, o
-   desenho da trilha e a etapa ativa usem exatamente as mesmas medidas. */
+   O mapa ocupa a secao inteira, entao a proporcao da area muda com a janela.
+   Em vez de esticar um viewBox fixo (o que deformaria traco e relevo), as
+   paradas ficam em coordenadas normalizadas e a trilha e recalculada em pixels
+   no tamanho real. Entre duas paradas a trilha e uma Bezier cubica que sai e
+   chega na horizontal, o que da o serpenteio. Viajante, desenho da trilha e
+   etapa ativa saem todos da mesma tabela de amostras. */
 
-const MAP_W = 1200;
-const MAP_H = 520;
-const WAYPOINTS = [
-  [100, 400],
-  [340, 150],
-  [600, 360],
-  [850, 130],
-  [1090, 300],
+const STOPS = [
+  [0.07, 0.74],
+  [0.29, 0.26],
+  [0.5, 0.68],
+  [0.71, 0.22],
+  [0.9, 0.58],
 ];
 
-const SEGMENTS = WAYPOINTS.slice(1).map((end, index) => {
-  const start = WAYPOINTS[index];
-  const handle = (end[0] - start[0]) * 0.45;
-  return [start, [start[0] + handle, start[1]], [end[0] - handle, end[1]], end];
-});
-
-const PATH_D = `M${WAYPOINTS[0].join(" ")} ${SEGMENTS.map(
-  ([, c1, c2, end]) => `C${c1.join(" ")} ${c2.join(" ")} ${end.join(" ")}`,
-).join(" ")}`;
+// Ilhas de relevo: centro e raio normalizados pela largura; `squash` achata.
+const ISLANDS = [
+  { x: 0.18, y: 0.5, r: 0.11, squash: 0.5, rotate: -12 },
+  { x: 0.6, y: 0.42, r: 0.13, squash: 0.48, rotate: 8 },
+  { x: 0.84, y: 0.86, r: 0.1, squash: 0.42, rotate: -6 },
+  { x: 0.4, y: 0.1, r: 0.07, squash: 0.45, rotate: 4 },
+];
 
 const bezierPoint = ([p0, p1, p2, p3], t) => {
   const u = 1 - t;
@@ -76,12 +74,22 @@ const bezierPoint = ([p0, p1, p2, p3], t) => {
   );
 };
 
-// Amostras com comprimento acumulado: transformam "fracao da trilha" em ponto.
-const TRAIL = (() => {
-  const points = [{ length: 0, x: WAYPOINTS[0][0], y: WAYPOINTS[0][1] }];
-  const stopLengths = [0];
+function buildTrail(width, height) {
+  const waypoints = STOPS.map(([x, y]) => [x * width, y * height]);
+  const segments = waypoints.slice(1).map((end, index) => {
+    const start = waypoints[index];
+    const handle = (end[0] - start[0]) * 0.45;
+    return [start, [start[0] + handle, start[1]], [end[0] - handle, end[1]], end];
+  });
 
-  SEGMENTS.forEach((segment) => {
+  const d = `M${waypoints[0].join(" ")} ${segments
+    .map(([, c1, c2, end]) => `C${c1.join(" ")} ${c2.join(" ")} ${end.join(" ")}`)
+    .join(" ")}`;
+
+  // Amostras com comprimento acumulado: transformam "fracao da trilha" em ponto.
+  const points = [{ length: 0, x: waypoints[0][0], y: waypoints[0][1] }];
+  const stopLengths = [0];
+  segments.forEach((segment) => {
     for (let step = 1; step <= 64; step += 1) {
       const [x, y] = bezierPoint(segment, step / 64);
       const previous = points[points.length - 1];
@@ -91,34 +99,39 @@ const TRAIL = (() => {
   });
 
   const total = points[points.length - 1].length;
-  return { points, total, stops: stopLengths.map((length) => length / total) };
-})();
+  return { width, height, waypoints, d, points, total, stops: stopLengths.map((length) => length / total) };
+}
 
-const pointAt = (fraction) => {
-  const target = Math.min(Math.max(fraction, 0), 1) * TRAIL.total;
-  const index = TRAIL.points.findIndex((point) => point.length >= target);
-  if (index <= 0) return TRAIL.points[0];
-  const a = TRAIL.points[index - 1];
-  const b = TRAIL.points[index];
+const pointAt = (trail, fraction) => {
+  const target = Math.min(Math.max(fraction, 0), 1) * trail.total;
+  const index = trail.points.findIndex((point) => point.length >= target);
+  if (index <= 0) return trail.points[0];
+  const a = trail.points[index - 1];
+  const b = trail.points[index];
   const t = (target - a.length) / (b.length - a.length || 1);
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 };
 
-const stageAt = (fraction) =>
-  TRAIL.stops.reduce((found, stop, index) => (fraction >= stop - 0.004 ? index : found), 0);
+const stageAt = (trail, fraction) =>
+  trail.stops.reduce((found, stop, index) => (fraction >= stop - 0.004 ? index : found), 0);
 
 // Rolagem -> trilha. Cada parada tem um trecho de pausa (o viajante fica parado
 // enquanto o cartao e lido) e um trecho de caminhada ate a proxima.
 const SCROLL_IN = [0, 0.08, 0.22, 0.3, 0.44, 0.52, 0.66, 0.74, 0.88, 1];
-const TRAIL_OUT = [0, 0, ...TRAIL.stops.slice(1, -1).flatMap((stop) => [stop, stop]), 1, 1];
 const DWELL_CENTER = [0.04, 0.26, 0.48, 0.7, 0.94];
 
-// Ilhas de relevo do fundo: cada uma e um conjunto de curvas de nivel.
-const ISLANDS = [
-  { x: 230, y: 300, rx: 120, ry: 60, rotate: -12 },
-  { x: 720, y: 230, rx: 140, ry: 70, rotate: 8 },
-  { x: 1010, y: 430, rx: 110, ry: 46, rotate: -6 },
-];
+const trailOutput = (stops) => [0, 0, ...stops.slice(1, -1).flatMap((stop) => [stop, stop]), 1, 1];
+
+const interpolate = (value, input, output) => {
+  if (value <= input[0]) return output[0];
+  for (let index = 1; index < input.length; index += 1) {
+    if (value <= input[index]) {
+      const t = (value - input[index - 1]) / (input[index] - input[index - 1]);
+      return output[index - 1] + (output[index] - output[index - 1]) * t;
+    }
+  }
+  return output[output.length - 1];
+};
 
 function StageIcon({ stage, on, reducedMotion, size = 22 }) {
   const { Icon, animation } = STAGE_ICONS[stage.id];
@@ -160,9 +173,25 @@ function StageFacts({ stage }) {
 function TreasureMap({ reducedMotion }) {
   const questRef = useRef(null);
   const stickyRef = useRef(null);
-  const progress = useMotionValue(0);
+  const fieldRef = useRef(null);
+  const trailRef = useRef(null);
+  const [size, setSize] = useState(null);
   const [active, setActive] = useState(0);
+  const progress = useMotionValue(0);
+  const travelerX = useMotionValue(0);
+  const travelerY = useMotionValue(0);
   const { scrollY } = useScroll();
+
+  useEffect(() => {
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setSize({ width, height });
+    });
+    observer.observe(fieldRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const trail = useMemo(() => (size ? buildTrail(size.width, size.height) : null), [size]);
 
   // Janela de rolagem em que o mapa fica preso: do topo do bloco encostar sob o
   // cabecalho ate o fim do bloco encostar no fim da tela.
@@ -186,11 +215,30 @@ function TreasureMap({ reducedMotion }) {
     return () => window.removeEventListener("resize", update);
   }, [update]);
 
-  const travel = useTransform(progress, SCROLL_IN, TRAIL_OUT);
-  const travelerX = useTransform(travel, (fraction) => pointAt(fraction).x);
-  const travelerY = useTransform(travel, (fraction) => pointAt(fraction).y);
+  const travel = useTransform(progress, (value) =>
+    trailRef.current ? interpolate(value, SCROLL_IN, trailOutput(trailRef.current.stops)) : 0,
+  );
 
-  useMotionValueEvent(travel, "change", (fraction) => setActive(stageAt(fraction)));
+  const place = useCallback(
+    (fraction) => {
+      const current = trailRef.current;
+      if (!current) return;
+      const point = pointAt(current, fraction);
+      travelerX.set(point.x);
+      travelerY.set(point.y);
+      setActive(stageAt(current, fraction));
+    },
+    [travelerX, travelerY],
+  );
+
+  useMotionValueEvent(travel, "change", place);
+
+  // A trilha muda de forma no resize; o viajante e a etapa sao reposicionados
+  // sem esperar a proxima rolagem.
+  useEffect(() => {
+    trailRef.current = trail;
+    if (trail) place(interpolate(progress.get(), SCROLL_IN, trailOutput(trail.stops)));
+  }, [trail, place, progress]);
 
   const jumpTo = (index) => {
     const { start, end } = range();
@@ -198,45 +246,43 @@ function TreasureMap({ reducedMotion }) {
   };
 
   const stage = projectStages[active];
+  const treasure = trail?.waypoints[trail.waypoints.length - 1];
 
   return (
     <div className="quest" ref={questRef}>
       <div className="quest-sticky" ref={stickyRef}>
-        <div className="map">
-          <svg className="map-svg" viewBox={`0 0 ${MAP_W} ${MAP_H}`} aria-hidden="true">
-            {ISLANDS.map((island) => (
-              <g
-                className="map-relief"
-                transform={`translate(${island.x} ${island.y}) rotate(${island.rotate})`}
-                key={island.x}
-              >
-                {[1, 0.74, 0.5, 0.28].map((scale) => (
-                  <ellipse rx={island.rx * scale} ry={island.ry * scale} key={scale} />
-                ))}
+        <div className="map" ref={fieldRef}>
+          {trail && (
+            <svg
+              className="map-svg"
+              viewBox={`0 0 ${trail.width} ${trail.height}`}
+              aria-hidden="true"
+            >
+              {ISLANDS.map((island) => {
+                const rx = island.r * trail.width;
+                return (
+                  <g
+                    className="map-relief"
+                    transform={`translate(${island.x * trail.width} ${island.y * trail.height}) rotate(${island.rotate})`}
+                    key={island.x}
+                  >
+                    {[1, 0.74, 0.5, 0.28].map((scale) => (
+                      <ellipse rx={rx * scale} ry={rx * island.squash * scale} key={scale} />
+                    ))}
+                  </g>
+                );
+              })}
+
+              <g className="map-x" transform={`translate(${treasure[0] + 72} ${treasure[1] - 4})`}>
+                <path d="M-20 -20 20 20M20 -20-20 20" />
               </g>
-            ))}
 
-            {/* Para em G: a coluna H fica livre para a bussola. */}
-            {["A", "B", "C", "D", "E", "F", "G"].map((letter, index) => (
-              <text className="map-coord" x={75 + index * 150} y="28" key={letter}>
-                {letter}
-              </text>
-            ))}
-            {[1, 2, 3].map((number) => (
-              <text className="map-coord" x="18" y={number * 150 - 20} key={number}>
-                {number}
-              </text>
-            ))}
-
-            <g className="map-x" transform={`translate(${WAYPOINTS[4][0] + 72} ${WAYPOINTS[4][1] - 4})`}>
-              <path d="M-22 -22 22 22M22 -22-22 22" />
-            </g>
-
-            <path className="map-trail" d={PATH_D} />
-            <motion.path className="map-trail-done" d={PATH_D} style={{ pathLength: travel }} />
-            <motion.circle className="map-traveler-ring" cx={travelerX} cy={travelerY} r="16" />
-            <motion.circle className="map-traveler" cx={travelerX} cy={travelerY} r="8" />
-          </svg>
+              <path className="map-trail" d={trail.d} />
+              <motion.path className="map-trail-done" d={trail.d} style={{ pathLength: travel }} />
+              <motion.circle className="map-traveler-ring" cx={travelerX} cy={travelerY} r="16" />
+              <motion.circle className="map-traveler" cx={travelerX} cy={travelerY} r="8" />
+            </svg>
+          )}
 
           <span className="map-compass" aria-hidden="true">
             <Compass
@@ -255,13 +301,10 @@ function TreasureMap({ reducedMotion }) {
               type="button"
               data-active={index === active}
               data-done={index < active}
-              // Rotulo do lado oposto ao da trilha: paradas do alto (trilha descendo dos
-              // dois lados) levam o rotulo em cima, as de baixo levam embaixo.
-              data-below={WAYPOINTS[index][1] > MAP_H / 2}
-              style={{
-                left: `${(WAYPOINTS[index][0] / MAP_W) * 100}%`,
-                top: `${(WAYPOINTS[index][1] / MAP_H) * 100}%`,
-              }}
+              // Rotulo do lado oposto ao da trilha: paradas do alto (trilha descendo
+              // dos dois lados) levam o rotulo em cima, as de baixo levam embaixo.
+              data-below={STOPS[index][1] > 0.5}
+              style={{ left: `${STOPS[index][0] * 100}%`, top: `${STOPS[index][1] * 100}%` }}
               onClick={() => jumpTo(index)}
               aria-label={`Ir para a etapa ${item.index}: ${item.title}`}
               key={item.id}

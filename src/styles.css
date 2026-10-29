@@ -8697,13 +8697,17 @@ p {
 
 /* --- Etapas do projeto: mapa do tesouro ---------------------------------- */
 
+/* A propria secao e o mapa: pontilhado de carta nautica em toda a area, sem
+   quadro em volta. */
 .stages {
   --chapter-accent: var(--accent-yellow);
   --chapter-icon: var(--accent-yellow);
   --chapter-soft: oklch(80% 0.014 91);
   --chapter-code-line: oklch(92% 0.025 256 / 0.32);
   --chapter-code-fill: oklch(22% 0.018 258);
-  background: var(--ink);
+  background:
+    radial-gradient(oklch(92% 0.025 256 / 0.09) 1px, transparent 1.4px) 0 0 / 1.4rem 1.4rem,
+    var(--ink);
   color: var(--canvas);
 }
 
@@ -8719,28 +8723,22 @@ p {
   height: 520vh;
 }
 
+/* Sangra ate as bordas da janela, por cima do padding da secao. */
 .quest-sticky {
-  --map-w: min(100%, calc((100vh - var(--header-h) - 17rem) * 1200 / 520));
   position: sticky;
   top: var(--header-h);
+  width: 100vw;
   height: calc(100vh - var(--header-h));
+  margin-left: calc(50% - 50vw);
   display: grid;
-  grid-template-rows: auto auto;
-  align-content: center;
-  justify-items: center;
-  gap: 1rem;
-  padding-block: 0.75rem 1.25rem;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  padding-block: 0.5rem 1.5rem;
 }
 
 .map {
   position: relative;
-  width: var(--map-w);
-  aspect-ratio: 1200 / 520;
-  border: 1px solid oklch(92% 0.025 256 / 0.45);
-  border-radius: 1rem;
-  background:
-    radial-gradient(oklch(92% 0.025 256 / 0.14) 1px, transparent 1.4px) 0 0 / 1.4rem 1.4rem,
-    var(--brand-gradient);
+  min-height: 0;
 }
 
 .map-svg {
@@ -8753,27 +8751,20 @@ p {
 
 .map-relief ellipse {
   fill: none;
-  stroke: oklch(92% 0.025 256 / 0.17);
+  stroke: oklch(92% 0.025 256 / 0.12);
   stroke-width: 1.5;
-}
-
-.map-coord {
-  fill: oklch(92% 0.025 256 / 0.5);
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .map-x path {
   fill: none;
   stroke: var(--accent-yellow);
-  stroke-width: 9;
+  stroke-width: 8;
   stroke-linecap: round;
 }
 
 .map-trail {
   fill: none;
-  stroke: oklch(92% 0.025 256 / 0.6);
+  stroke: oklch(92% 0.025 256 / 0.45);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 2 12;
@@ -8815,15 +8806,15 @@ p {
 
 .map-compass {
   position: absolute;
-  top: 0.9rem;
-  right: 0.9rem;
+  top: 0;
+  right: var(--page-pad);
   width: 4rem;
   height: 4rem;
   display: grid;
   place-items: center;
-  border: 1px solid oklch(92% 0.025 256 / 0.35);
+  border: 1px solid oklch(92% 0.025 256 / 0.28);
   border-radius: 50%;
-  color: oklch(92% 0.025 256 / 0.8);
+  color: oklch(92% 0.025 256 / 0.75);
 }
 
 .map-stop {
@@ -8853,11 +8844,11 @@ p {
   height: 3.25rem;
   display: grid;
   place-items: center;
-  border: 2px solid oklch(92% 0.025 256 / 0.7);
+  border: 2px solid oklch(92% 0.025 256 / 0.6);
   border-radius: 50%;
-  background: var(--ink);
+  background: oklch(24% 0.02 258);
   color: var(--canvas);
-  box-shadow: 0 0.6rem 1.2rem oklch(16% 0.05 260 / 0.4);
+  box-shadow: 0 0.6rem 1.2rem oklch(10% 0.02 258 / 0.5);
   transition:
     background-color 300ms var(--ease-out),
     border-color 300ms var(--ease-out),
@@ -8871,7 +8862,7 @@ p {
 }
 
 .map-stop[data-active="true"] .map-stop-pin {
-  border-color: var(--ink);
+  border-color: var(--accent-yellow);
   background: var(--accent-yellow);
   color: var(--ink);
   transform: scale(1.18);
@@ -8884,8 +8875,9 @@ p {
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.75rem;
+  border: 1px solid oklch(92% 0.025 256 / 0.18);
   border-radius: 999px;
-  background: oklch(16.5% 0.014 258 / 0.82);
+  background: oklch(24% 0.02 258 / 0.92);
   color: var(--canvas);
   font-family: var(--font-display);
   font-size: 0.85rem;
@@ -8915,7 +8907,8 @@ p {
 }
 
 .map-card {
-  width: var(--map-w);
+  justify-self: center;
+  width: min(92rem, 100% - 2 * var(--page-pad));
 }
 
 .map-card-inner {
