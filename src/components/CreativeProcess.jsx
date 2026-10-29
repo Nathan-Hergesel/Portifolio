@@ -172,7 +172,7 @@ function Studio({ active, reducedMotion }) {
               </span>
               <span className="studio-final" data-on={active === 3}>
                 <img
-                  src="/assets/images/projects/vjs-sistemas.webp"
+                  src="/assets/images/projects/morcegao.webp"
                   alt=""
                   loading="lazy"
                   decoding="async"
