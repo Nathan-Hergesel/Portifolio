@@ -36,11 +36,8 @@ const CHAT = [
   { from: "me", text: "Então a jornada começa por lá." },
 ];
 
-const REFERENCES = [
-  "/assets/images/projects/wall/brisa-solar.webp",
-  "/assets/images/projects/wall/serra-labs.webp",
-  "/assets/images/projects/wall/aurora-casa.webp",
-];
+// Paleta generica de exemplo, de proposito fora das cores da marca do site.
+const PALETTE = ["#264653", "#2A9D8F", "#E9C46A", "#E76F51"];
 
 function StudioCursor({ position }) {
   return (
@@ -104,20 +101,39 @@ function Studio({ active, reducedMotion }) {
             ))}
           </div>
 
+          {/* Moodboard no formato classico (foto, forma, tipografia, paleta,
+              componentes e palavras-chave), com pecas genericas: e o metodo que
+              aparece aqui, nao um trabalho especifico. */}
           <div className="studio-layer studio-mood" data-on={active === 1}>
-            {REFERENCES.map((src) => (
-              <span className="mood-shot" key={src}>
-                <img src={src} alt="" loading="lazy" decoding="async" />
-              </span>
-            ))}
-            <span className="mood-palette">
-              <i />
+            <span className="mood-photo">
+              <i className="mood-sun" />
+              <i className="mood-hill mood-hill-back" />
+              <i className="mood-hill" />
+            </span>
+            <span className="mood-shapes">
               <i />
               <i />
               <i />
             </span>
             <span className="mood-type">
-              Aa<small>Barlow / Public Sans</small>
+              Aa
+              <small>
+                Título
+                <br />
+                Corpo
+              </small>
+            </span>
+            <span className="mood-palette">
+              {PALETTE.map((hex) => (
+                <span key={hex} style={{ "--swatch": hex }}>
+                  {hex}
+                </span>
+              ))}
+            </span>
+            <span className="mood-ui">
+              <span className="mood-ui-button">Botão</span>
+              <span className="mood-ui-toggle" />
+              <span className="mood-ui-input" />
             </span>
             <span className="mood-tags">
               <span>direto</span>

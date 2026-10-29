@@ -8248,91 +8248,194 @@ p {
 .chat-bubble:nth-child(3) { transition-delay: 320ms; }
 .chat-bubble:nth-child(4) { transition-delay: 480ms; }
 
-/* Camada 2: moodboard com trabalhos reais como referencia */
+/* Camada 2: moodboard no formato classico, com pecas genericas */
 .studio-mood {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-rows: repeat(4, minmax(0, 1fr));
   gap: 0.5rem;
+  color: var(--ink);
 }
 
-.mood-shot {
+.studio-mood > span {
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
-  border: 2px solid var(--canvas);
   border-radius: 0.55rem;
-  background: var(--canvas);
-  box-shadow: 0 0.6rem 1.2rem oklch(16% 0.05 260 / 0.35);
+  box-shadow: 0 0.5rem 1rem oklch(16% 0.05 260 / 0.28);
 }
 
-.mood-shot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
+/* Foto de referencia desenhada: ceu, sol e duas camadas de morro. */
+.mood-photo {
+  position: relative;
+  grid-column: 1 / 4;
+  grid-row: 1 / 3;
+  background: linear-gradient(#f4d6a6, #e9a07a);
 }
 
-.mood-shot:nth-child(1) { grid-column: 1 / 3; grid-row: 1 / 3; rotate: -3deg; }
-.mood-shot:nth-child(2) { grid-column: 3 / 5; grid-row: 1 / 4; rotate: 2deg; }
-.mood-shot:nth-child(3) { grid-column: 5 / 7; grid-row: 2 / 4; rotate: -2deg; }
-
-.mood-palette {
-  grid-column: 1 / 3;
-  grid-row: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  border-radius: 0.55rem;
-  background: var(--canvas);
+.mood-photo i {
+  position: absolute;
+  display: block;
 }
 
-.mood-palette i {
-  width: 20%;
+.mood-sun {
+  top: 18%;
+  right: 22%;
+  width: 22%;
   aspect-ratio: 1;
-  border: 1.5px solid var(--ink);
   border-radius: 50%;
+  background: #fff3d6;
 }
 
-.mood-palette i:nth-child(1) { background: var(--ink); }
-.mood-palette i:nth-child(2) { background: var(--brand); }
-.mood-palette i:nth-child(3) { background: var(--accent-yellow); }
-.mood-palette i:nth-child(4) { background: var(--canvas-deep); }
+.mood-hill {
+  inset: auto -10% -8% -10%;
+  height: 52%;
+  border-radius: 50% 50% 0 0;
+  background: #2a9d8f;
+}
+
+.mood-hill-back {
+  inset: auto 20% 12% -30%;
+  height: 58%;
+  background: #264653;
+  opacity: 0.85;
+}
+
+/* Formas basicas: circulo, quadrado e triangulo. */
+.mood-shapes {
+  grid-column: 6;
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  align-content: space-evenly;
+  background: #f6f1e7;
+}
+
+.mood-shapes i {
+  width: 52%;
+  aspect-ratio: 1;
+}
+
+.mood-shapes i:nth-child(1) {
+  border-radius: 50%;
+  background: #e76f51;
+}
+
+.mood-shapes i:nth-child(2) {
+  border-radius: 0.2rem;
+  background: #264653;
+}
+
+.mood-shapes i:nth-child(3) {
+  background: #e9c46a;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
 
 .mood-type {
-  grid-column: 1 / 3;
-  grid-row: 4;
+  grid-column: 4 / 6;
+  grid-row: 1 / 3;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 0.3rem;
-  padding: 0 0.6rem;
-  border-radius: 0.55rem;
-  background: var(--ink);
-  font-family: var(--font-display);
-  font-size: clamp(1.3rem, 2.8vw, 2.2rem);
-  font-weight: 900;
-  line-height: 1;
+  padding: 0.5rem 0.65rem;
+  background: #f6f1e7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4.6vw, 3.8rem);
+  line-height: 0.9;
 }
 
 .mood-type small {
-  overflow: hidden;
-  color: var(--accent-yellow);
+  padding-bottom: 0.25rem;
   font-family: var(--font-body);
   font-size: 0.5rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-overflow: ellipsis;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-align: right;
   text-transform: uppercase;
-  white-space: nowrap;
+}
+
+/* Paleta com o codigo de cada cor, como num board de entrega. */
+.mood-palette {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: #f6f1e7;
+}
+
+.mood-palette span {
+  display: flex;
+  align-items: flex-end;
+  padding: 0.2rem 0.25rem;
+  background: var(--swatch);
+  color: #fff;
+  font-size: clamp(0.4rem, 0.7vw, 0.55rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.mood-palette span:nth-child(3) {
+  color: var(--ink);
+}
+
+/* Componentes de interface: botao, chave e campo. */
+.mood-ui {
+  grid-column: 4 / 7;
+  grid-row: 3 / 5;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.45rem;
+  padding: 0.6rem 0.75rem;
+  background: #f6f1e7;
+}
+
+.mood-ui-button {
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: #e76f51;
+  color: #fff;
+  font-size: clamp(0.5rem, 0.85vw, 0.68rem);
+  font-weight: 700;
+}
+
+.mood-ui-toggle {
+  position: relative;
+  width: 2.1rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  background: #2a9d8f;
+}
+
+.mood-ui-toggle::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 0.85rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.mood-ui-input {
+  width: 100%;
+  height: 1.15rem;
+  border: 1.5px solid #264653;
+  border-radius: 0.35rem;
+  background: #fff;
 }
 
 .mood-tags {
-  grid-column: 3 / 7;
+  grid-column: 1 / 4;
   grid-row: 4;
   display: flex;
   flex-wrap: wrap;
   align-content: center;
   gap: 0.3rem;
+  box-shadow: none !important;
 }
 
 .mood-tags span {
@@ -8340,6 +8443,7 @@ p {
   border: 1px solid oklch(92% 0.025 256 / 0.55);
   border-radius: 999px;
   background: oklch(16% 0.05 260 / 0.45);
+  color: var(--canvas);
   font-size: clamp(0.55rem, 0.9vw, 0.66rem);
   font-weight: 700;
   text-transform: uppercase;
