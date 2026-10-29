@@ -9283,11 +9283,14 @@ p {
 
 /* Unico campo amarelo inteiro da pagina: o sinal que pontua o resto vira o
    fechamento, entao o ultimo passo e o mais visivel. */
+/* Centralizado: o fechamento e uma unica coluna, com o titulo como eixo. */
 .project-cta {
   --chapter-icon: var(--ink);
   --chapter-code-line: oklch(16.5% 0.014 258 / 0.35);
   display: grid;
-  gap: clamp(2.5rem, 5vw, 4rem);
+  justify-items: center;
+  gap: clamp(2rem, 4vw, 3rem);
+  text-align: center;
   padding-block: clamp(5rem, 10vw, 9rem);
   padding-inline: max(var(--page-pad), calc((100% - 92rem) / 2));
   background: var(--accent-yellow);
@@ -9320,8 +9323,9 @@ p {
 }
 
 .cta-panel {
+  width: min(100%, 50rem);
   display: grid;
-  align-content: end;
+  justify-items: center;
   gap: clamp(1.5rem, 3vw, 2.25rem);
 }
 
@@ -9339,8 +9343,10 @@ p {
 }
 
 .cta-topics legend {
+  width: 100%;
   margin-bottom: 0.75rem;
   padding: 0;
+  text-align: center;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -9350,6 +9356,7 @@ p {
 .cta-topics > div {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -9377,8 +9384,10 @@ p {
 }
 
 .cta-actions {
+  width: 100%;
   display: grid;
   gap: 0.6rem;
+  text-align: left;
 }
 
 .cta-primary,
@@ -9431,8 +9440,10 @@ p {
 }
 
 .cta-facts {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
   gap: 1rem;
   margin: 0;
   padding-top: 1.25rem;
@@ -9544,10 +9555,8 @@ p {
     top: calc(var(--header-h) + 2rem);
   }
 
-  .project-cta {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: center;
-    column-gap: clamp(3rem, 6vw, 7rem);
+  .cta-actions {
+    grid-template-columns: 1fr 1fr;
   }
 
   /* Terceira faixa do destaque: Morcegao (8) e o card de video (4) fecham as 12
