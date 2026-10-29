@@ -8701,17 +8701,13 @@ p {
 
 /* --- Etapas do projeto: mapa do tesouro ---------------------------------- */
 
-/* A propria secao e o mapa: pontilhado de carta nautica em toda a area, sem
-   quadro em volta. */
 .stages {
   --chapter-accent: var(--accent-yellow);
   --chapter-icon: var(--accent-yellow);
   --chapter-soft: oklch(80% 0.014 91);
   --chapter-code-line: oklch(92% 0.025 256 / 0.32);
   --chapter-code-fill: oklch(22% 0.018 258);
-  background:
-    radial-gradient(oklch(92% 0.025 256 / 0.09) 1px, transparent 1.4px) 0 0 / 1.4rem 1.4rem,
-    var(--ink);
+  background: var(--ink);
   color: var(--canvas);
 }
 
@@ -8728,6 +8724,8 @@ p {
 }
 
 /* Sangra ate as bordas da janela, por cima do padding da secao. */
+/* O pontilhado de carta nautica fica na camada presa, nao na secao: assim ele
+   para junto com a trilha em vez de correr por baixo dela durante a rolagem. */
 .quest-sticky {
   position: sticky;
   top: var(--header-h);
@@ -8735,6 +8733,9 @@ p {
   height: calc(100vh - var(--header-h));
   margin-left: calc(50% - 50vw);
   padding-block: 1.5rem 2rem;
+  background:
+    radial-gradient(oklch(92% 0.025 256 / 0.09) 1px, transparent 1.4px) 0 0 / 1.4rem 1.4rem,
+    var(--ink);
 }
 
 .map {
