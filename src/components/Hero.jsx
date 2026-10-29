@@ -6,11 +6,12 @@ import { BsArrowUpRight } from "react-icons/bs";
 const projectCards = [
   {
     className: "stack-card-left",
-    image: "/assets/images/projects/mercearia-facil.webp",
-    width: 1254,
-    height: 1254,
-    title: "Mercearia Fácil",
-    description: "Aplicativo de gestão"
+    image: "/assets/images/projects/vjs-sistemas.webp",
+    width: 1600,
+    height: 762,
+    title: "VJS Sistemas",
+    description: "Site comercial",
+    href: "https://vjssistemas.com.br/"
   },
   {
     className: "stack-card-right",
@@ -22,12 +23,12 @@ const projectCards = [
   },
   {
     className: "stack-card-front",
-    image: "/assets/images/projects/vjs-sistemas.webp",
+    image: "/assets/images/projects/morcegao.webp",
     width: 1600,
-    height: 762,
-    title: "VJS Sistemas",
-    description: "Site comercial",
-    href: "https://vjssistemas.com.br/"
+    height: 900,
+    title: "Portal Morcegão",
+    description: "Portal interno",
+    href: "https://supermercadomorcegao.tech/entrar"
   }
 ];
 
