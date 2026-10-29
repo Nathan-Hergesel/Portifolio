@@ -48,20 +48,44 @@ const STAGE_ICONS = {
    etapa ativa saem todos da mesma tabela de amostras. */
 
 const STOPS = [
-  [0.07, 0.74],
-  [0.29, 0.26],
-  [0.5, 0.68],
-  [0.71, 0.22],
-  [0.9, 0.58],
+  [0.07, 0.72],
+  [0.29, 0.15],
+  [0.5, 0.78],
+  [0.71, 0.15],
+  [0.9, 0.52],
 ];
 
-// Ilhas de relevo: centro e raio normalizados pela largura; `squash` achata.
-const ISLANDS = [
-  { x: 0.18, y: 0.5, r: 0.11, squash: 0.5, rotate: -12 },
-  { x: 0.6, y: 0.42, r: 0.13, squash: 0.48, rotate: 8 },
-  { x: 0.84, y: 0.86, r: 0.1, squash: 0.42, rotate: -6 },
-  { x: 0.4, y: 0.1, r: 0.07, squash: 0.45, rotate: 4 },
+// Para onde o cartao de cada parada abre. Escolhido a mao, e nao por regra, para
+// que nenhum cartao cubra o pino de outra parada.
+const CARD_DIRECTIONS = [
+  { side: "right", dir: "up" },
+  { side: "right", dir: "down" },
+  { side: "left", dir: "up" },
+  { side: "left", dir: "down" },
+  { side: "left", dir: "down" },
 ];
+
+// Cartao ancorado no pino ativo, na direcao de CARD_DIRECTIONS. O canto mais
+// proximo fica rente ao pino e e dali que ele cresce, com a ponta apontando
+// para o icone.
+const PIN_GAP = "3rem";
+const NOTCH_OFFSET = "1.75rem";
+
+const cardPlacement = (index) => {
+  const [x, y] = STOPS[index];
+  const { side, dir } = CARD_DIRECTIONS[index];
+  const style = {
+    transformOrigin: `${side === "right" ? "left" : "right"} ${dir === "up" ? "bottom" : "top"}`,
+  };
+
+  if (side === "right") style.left = `calc(${x * 100}% + ${PIN_GAP})`;
+  else style.right = `calc(${(1 - x) * 100}% + ${PIN_GAP})`;
+
+  if (dir === "up") style.bottom = `calc(${(1 - y) * 100}% - ${NOTCH_OFFSET})`;
+  else style.top = `calc(${y * 100}% - ${NOTCH_OFFSET})`;
+
+  return { side, dir, style };
+};
 
 const bezierPoint = ([p0, p1, p2, p3], t) => {
   const u = 1 - t;
@@ -246,6 +270,7 @@ function TreasureMap({ reducedMotion }) {
   };
 
   const stage = projectStages[active];
+  const placement = cardPlacement(active);
   const treasure = trail?.waypoints[trail.waypoints.length - 1];
 
   return (
@@ -258,29 +283,14 @@ function TreasureMap({ reducedMotion }) {
               viewBox={`0 0 ${trail.width} ${trail.height}`}
               aria-hidden="true"
             >
-              {ISLANDS.map((island) => {
-                const rx = island.r * trail.width;
-                return (
-                  <g
-                    className="map-relief"
-                    transform={`translate(${island.x * trail.width} ${island.y * trail.height}) rotate(${island.rotate})`}
-                    key={island.x}
-                  >
-                    {[1, 0.74, 0.5, 0.28].map((scale) => (
-                      <ellipse rx={rx * scale} ry={rx * island.squash * scale} key={scale} />
-                    ))}
-                  </g>
-                );
-              })}
-
-              <g className="map-x" transform={`translate(${treasure[0] + 72} ${treasure[1] - 4})`}>
-                <path d="M-20 -20 20 20M20 -20-20 20" />
+              <g className="map-x" transform={`translate(${treasure[0] + 84} ${treasure[1] - 4})`}>
+                <path d="M-22 -22 22 22M22 -22-22 22" />
               </g>
 
               <path className="map-trail" d={trail.d} />
               <motion.path className="map-trail-done" d={trail.d} style={{ pathLength: travel }} />
-              <motion.circle className="map-traveler-ring" cx={travelerX} cy={travelerY} r="16" />
-              <motion.circle className="map-traveler" cx={travelerX} cy={travelerY} r="8" />
+              <motion.circle className="map-traveler-ring" cx={travelerX} cy={travelerY} r="20" />
+              <motion.circle className="map-traveler" cx={travelerX} cy={travelerY} r="10" />
             </svg>
           )}
 
@@ -310,7 +320,7 @@ function TreasureMap({ reducedMotion }) {
               key={item.id}
             >
               <span className="map-stop-pin">
-                <StageIcon stage={item} on={index === active} reducedMotion={reducedMotion} />
+                <StageIcon stage={item} on={index === active} reducedMotion={reducedMotion} size={30} />
               </span>
               <span className="map-stop-label">
                 <b>{item.index}</b>
@@ -318,17 +328,21 @@ function TreasureMap({ reducedMotion }) {
               </span>
             </button>
           ))}
-        </div>
 
-        <div className="map-card" aria-hidden="true">
-          <AnimatePresence mode="wait" initial={false}>
+          {/* Sem `mode="wait"`: o cartao antigo some no pino dele enquanto o novo
+              cresce a partir do proximo, cada um no proprio lugar. */}
+          <AnimatePresence initial={false}>
             <motion.div
-              className="map-card-inner"
+              className="map-card"
+              data-side={placement.side}
+              data-dir={placement.dir}
+              style={placement.style}
               key={stage.id}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.32, ease: easeOutExpo }}
+              initial={{ opacity: 0, scale: 0.86 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.18 } }}
+              transition={{ duration: 0.42, ease: easeOutExpo }}
+              aria-hidden="true"
             >
               <div className="map-card-head">
                 <span className="map-card-step">
