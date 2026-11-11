@@ -2,9 +2,23 @@
 
 import { motion, useReducedMotion } from "motion/react";
 
+import { BsArrowUpRight } from "react-icons/bs";
+
+import { Brush } from "./animate-ui/icons/brush";
+import { Layers } from "./animate-ui/icons/layers";
+import { MessageSquareCode } from "./animate-ui/icons/message-square-code";
 import { Star } from "./animate-ui/icons/star";
+import { Terminal } from "./animate-ui/icons/terminal";
 import { Marquee } from "./ui/3d-testimonials";
 import { testimonials } from "../data/site";
+
+// Mesmos icones do filtro de projetos, pelo tipo de trabalho de cada cliente.
+const TYPE_ICONS = {
+  "Site comercial": { Icon: MessageSquareCode },
+  Sistema: { Icon: Terminal },
+  App: { Icon: Layers, animation: "default-loop" },
+  "Identidade visual": { Icon: Brush },
+};
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
 
@@ -112,6 +126,38 @@ export function Testimonials() {
         <p className="chapter-lede">
           O que fica depois da entrega, nas palavras de quem contratou.
         </p>
+
+        <div className="testimonial-clients">
+          <span className="testimonial-clients-label">Quem já contratou</span>
+          <ul>
+            {testimonials.map((testimonial, index) => {
+              const { Icon, animation } = TYPE_ICONS[testimonial.project];
+
+              return (
+                <li key={testimonial.id}>
+                  {/* Atrasos irregulares para os icones nao piscarem em unissono. */}
+                  <Icon
+                    size={16}
+                    strokeWidth={2.2}
+                    animation={animation}
+                    animate={!reducedMotion}
+                    loop={!reducedMotion}
+                    delay={index * 380}
+                    loopDelay={2400 + (index % 3) * 500}
+                    aria-hidden="true"
+                  />
+                  {testimonial.author}
+                  <small>{testimonial.project}</small>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <a className="chapter-cta testimonial-cta" href="#contato">
+          Quero ser o próximo
+          <BsArrowUpRight aria-hidden="true" />
+        </a>
       </motion.header>
 
       {/* Mural em perspectiva: as colunas repetem os cartoes para o loop fechar,
