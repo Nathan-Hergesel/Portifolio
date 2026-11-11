@@ -9,11 +9,12 @@ import { testimonials } from "../data/site";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
 
-// So numeros sustentaveis: entregues e anos vem de docs/INFO.md; depoimentos e a
-// propria lista, entao acompanha quando entrar um novo.
+// So numeros sustentaveis. Entregues e anos vem de docs/INFO.md; clientes sao os
+// do portfolio (VJS, Morcegao, TPark, Mercearia Facil, ObraFlow, Brisa Solar,
+// Serra Labs e Aurora Casa). Atualizar aqui quando entrar cliente novo.
 const METRICS = [
   { value: "10+", label: "projetos entregues" },
-  { value: String(testimonials.length), label: "depoimentos de clientes" },
+  { value: "8+", label: "clientes atendidos" },
   { value: "3+", label: "anos em projetos digitais" },
 ];
 

@@ -9840,10 +9840,17 @@ p {
     height: 2.6rem;
   }
 
+  /* Altura guiada pelo conteudo, com respiro menor que o dos outros capitulos: o
+     mural e absoluto e acompanha qualquer altura. */
   .testimonials {
-    min-height: clamp(38rem, 52vw, 48rem);
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     align-items: center;
+    padding-block: clamp(3.5rem, 5vw, 4.5rem);
+  }
+
+  /* Titulo em duas linhas na coluna estreita, em vez de tres. */
+  .testimonials .chapter-intro h2 {
+    font-size: clamp(3.6rem, 5.4vw, 5.6rem);
   }
 
   .testimonials .chapter-intro {
