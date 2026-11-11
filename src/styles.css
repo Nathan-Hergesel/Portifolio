@@ -8590,9 +8590,22 @@ p {
   border-radius: 0.45rem;
 }
 
+/* Site final desenhado com a paleta do moodboard. A fonte em `cqi` acompanha a
+   largura da moldura e tudo dentro e medido em `em`, entao o desenho e o mesmo
+   em qualquer tela, so que maior ou menor. */
+.studio-browser {
+  container-type: inline-size;
+}
+
 .studio-final {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0.9em;
+  padding: 0.9em 1.3em 1.1em;
   overflow: hidden;
-  background: var(--canvas);
+  background: #f6f1e7;
+  color: #264653;
+  font-size: 2.1cqi;
   clip-path: inset(0 100% 0 0);
   transition: clip-path 900ms var(--ease-in-out);
 }
@@ -8601,11 +8614,188 @@ p {
   clip-path: inset(0);
 }
 
-.studio-final img {
+.mock-nav {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.mock-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-display);
+  font-size: 1.05em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.mock-logo i {
+  width: 1.2em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #2a9d8f;
+}
+
+.mock-links {
+  display: flex;
+  gap: 0.8em;
+  margin-left: auto;
+}
+
+.mock-links i {
+  width: 2.6em;
+  height: 0.35em;
+  border-radius: 999px;
+  background: rgb(38 70 83 / 0.35);
+}
+
+.mock-cta {
+  padding: 0.35em 0.9em;
+  border-radius: 999px;
+  background: #264653;
+  color: #f6f1e7;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+.mock-hero {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1.4em;
+}
+
+.mock-copy {
+  display: grid;
+  justify-items: start;
+  gap: 0.55em;
+}
+
+.mock-tag {
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  background: #e9c46a;
+  font-size: 0.7em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.mock-title {
+  font-family: var(--font-display);
+  font-size: 2.3em;
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.mock-text {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  display: grid;
+  gap: 0.35em;
+}
+
+.mock-text i {
+  height: 0.4em;
+  border-radius: 999px;
+  background: rgb(38 70 83 / 0.22);
+}
+
+.mock-text i:last-child {
+  width: 70%;
+}
+
+.mock-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  margin-top: 0.3em;
+}
+
+.mock-button {
+  padding: 0.45em 1.1em;
+  border-radius: 999px;
+  background: #e76f51;
+  color: #fff;
+  font-size: 0.85em;
+  font-weight: 700;
+}
+
+.mock-link {
+  border-bottom: 0.12em solid #2a9d8f;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+/* A mesma foto ilustrada do moodboard, agora aplicada no site. */
+.mock-art {
+  position: relative;
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 0.8em;
+  background: linear-gradient(#f4d6a6, #e9a07a);
+}
+
+.mock-art i {
+  position: absolute;
+  display: block;
+}
+
+.mock-sun {
+  top: 16%;
+  right: 20%;
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff3d6;
+}
+
+.mock-hill {
+  inset: auto -10% -8% -10%;
+  height: 50%;
+  border-radius: 50% 50% 0 0;
+  background: #2a9d8f;
+}
+
+.mock-hill-back {
+  inset: auto 20% 10% -30%;
+  height: 58%;
+  background: #264653;
+  opacity: 0.85;
+}
+
+.mock-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8em;
+}
+
+.mock-cards > span {
+  display: grid;
+  gap: 0.35em;
+  padding: 0.7em;
+  border-radius: 0.6em;
+  background: #fff;
+  box-shadow: 0 0.3em 0.8em rgb(38 70 83 / 0.08);
+}
+
+.mock-cards i {
+  width: 1.4em;
+  aspect-ratio: 1;
+  border-radius: 0.4em;
+  background: var(--accent);
+}
+
+.mock-cards b {
+  height: 0.35em;
+  border-radius: 999px;
+  background: rgb(38 70 83 / 0.25);
+}
+
+.mock-cards b:last-child {
+  width: 60%;
 }
 
 .studio-page[data-refined="true"] .studio-browser {

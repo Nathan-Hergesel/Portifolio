@@ -26,7 +26,7 @@ const TOOLS = {
   escutar: { Icon: MessageCircle, cursor: [74, 78] },
   referenciar: { Icon: GalleryHorizontal, cursor: [34, 44] },
   esbocar: { Icon: Brush, cursor: [58, 30] },
-  refinar: { Icon: Sparkles, cursor: [80, 70] },
+  refinar: { Icon: Sparkles, cursor: [64, 56] },
 };
 
 const CHAT = [
@@ -170,13 +170,50 @@ function Studio({ active, reducedMotion }) {
                   <span />
                 </span>
               </span>
+              {/* Site final desenhado, nao um print: e o moodboard aplicado (mesma
+                  paleta, a ilustracao da foto, botoes em pilula) sobre o mesmo
+                  esqueleto do wireframe. */}
               <span className="studio-final" data-on={active === 3}>
-                <img
-                  src="/assets/images/projects/morcegao.webp"
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
+                <span className="mock-nav">
+                  <span className="mock-logo">
+                    <i />
+                    Sua marca
+                  </span>
+                  <span className="mock-links">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span className="mock-cta">Contato</span>
+                </span>
+                <span className="mock-hero">
+                  <span className="mock-copy">
+                    <span className="mock-tag">Novo</span>
+                    <span className="mock-title">Seu negócio pronto para crescer.</span>
+                    <span className="mock-text">
+                      <i />
+                      <i />
+                    </span>
+                    <span className="mock-actions">
+                      <span className="mock-button">Começar</span>
+                      <span className="mock-link">Saiba mais</span>
+                    </span>
+                  </span>
+                  <span className="mock-art">
+                    <i className="mock-sun" />
+                    <i className="mock-hill mock-hill-back" />
+                    <i className="mock-hill" />
+                  </span>
+                </span>
+                <span className="mock-cards">
+                  {PALETTE.slice(1).map((hex) => (
+                    <span key={hex} style={{ "--accent": hex }}>
+                      <i />
+                      <b />
+                      <b />
+                    </span>
+                  ))}
+                </span>
               </span>
             </span>
             <span className="studio-approved" data-on={active === 3}>
