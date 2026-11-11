@@ -9344,6 +9344,7 @@ p {
 
 /* --- Depoimentos --------------------------------------------------------- */
 
+/* O mural e o fundo da secao inteira; o titulo flutua por cima, a esquerda. */
 .testimonials {
   --chapter-accent: var(--accent-yellow);
   --chapter-icon: var(--accent-yellow);
@@ -9351,82 +9352,40 @@ p {
   --chapter-code-fill: oklch(22% 0.05 260 / 0.5);
   --chapter-soft: oklch(92% 0.025 256);
   position: relative;
+  min-height: clamp(42rem, 60vw, 52rem);
   display: grid;
+  align-items: start;
   overflow: hidden;
   background: var(--brand-gradient);
   color: var(--canvas);
 }
 
-/* Lista de clientes na coluna do titulo, no formato dos chips do filtro. */
-.testimonial-clients {
-  margin-top: 2rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid oklch(92% 0.025 256 / 0.3);
-}
-
-.testimonial-clients-label {
-  color: oklch(88% 0.025 256);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.testimonial-clients ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.85rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.testimonial-clients li {
-  min-height: 2.25rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.35rem 0.85rem 0.35rem 0.65rem;
-  border: 1px solid oklch(92% 0.025 256 / 0.3);
-  border-radius: 999px;
-  background: oklch(22% 0.05 260 / 0.6);
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.testimonial-clients li svg {
-  color: var(--accent-yellow);
-}
-
-.testimonial-clients li small {
-  color: oklch(85% 0.025 256);
-  font-family: var(--font-body);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+/* Cartao do titulo: azul da marca quase opaco e sombra, para ler bem mesmo com
+   prints claros passando por tras, sem virar uma faixa separada da secao. */
+.testimonial-panel {
+  position: relative;
+  z-index: 1;
+  justify-self: start;
+  max-width: 30rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 1.25rem;
+  background: oklch(46% 0.096 260 / 0.98);
+  box-shadow: 0 2rem 4rem oklch(14% 0.05 260 / 0.5);
 }
 
 .testimonial-cta {
   margin-top: 1.75rem;
 }
 
-/* Mural em perspectiva sem moldura: ele sangra ate as bordas da secao, que o
-   cortam, e so esfuma do lado em que encontra o texto (em cima no celular, a
-   esquerda no desktop). Esfumar os quatro lados desenhava uma caixa em volta. */
 .testimonial-wall {
-  position: relative;
-  min-width: 0;
-  height: clamp(28rem, 52vw, 40rem);
-  margin-inline: calc(-1 * var(--page-pad));
-  margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
 /* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
    vai no proprio transform, e nao como `perspective` no mural: com ela no
-   elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
+   elemento recortado, o Chrome deixava os filhos 3D escaparem do recorte. */
 .testimonial-wall-tilt {
   position: absolute;
   inset: -55% -15%;
@@ -9442,7 +9401,7 @@ p {
   height: 100%;
 }
 
-.testimonial-wall-col:nth-child(n + 3) {
+.testimonial-wall-col:nth-child(n + 4) {
   display: none;
 }
 
@@ -9852,26 +9811,7 @@ p {
   }
 
   .testimonials {
-    min-height: clamp(38rem, 52vw, 48rem);
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     align-items: center;
-  }
-
-  .testimonials .chapter-intro {
-    position: relative;
-    z-index: 1;
-    padding-bottom: 0;
-  }
-
-  /* Ocupa a altura inteira da secao, colado na borda direita da tela. */
-  /* Area propria a direita: comeca depois da coluna do titulo e vai ate a borda
-     da tela, com corte reto em vez de esfumar por baixo do texto. */
-  .testimonial-wall {
-    position: absolute;
-    inset: 0 0 0 auto;
-    width: 60%;
-    height: auto;
-    margin: 0;
   }
 
   .testimonial-wall-col {
@@ -9887,7 +9827,18 @@ p {
     font-size: 1.2rem;
   }
 
-  .testimonial-wall-col:nth-child(n + 3) {
+  /* Seis colunas no desktop; as duas ultimas so entram em telas bem largas. */
+  .testimonial-wall-col:nth-child(n + 4) {
+    display: flex;
+  }
+
+  .testimonial-wall-col:nth-child(n + 7) {
+    display: none;
+  }
+}
+
+@media (min-width: 100rem) {
+  .testimonial-wall-col:nth-child(n + 7) {
     display: flex;
   }
 
