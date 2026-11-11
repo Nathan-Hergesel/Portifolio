@@ -223,36 +223,43 @@ export function CreativeProcess() {
 
   return (
     <section className="creative section" id="processo" aria-labelledby="creative-title">
-      <motion.header
-        className="chapter-intro"
-        variants={reveal}
-        initial={reducedMotion ? false : "rest"}
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <span className="chapter-code">
-          <Lightbulb
-            size={16}
-            strokeWidth={2.3}
-            animate={!reducedMotion}
-            loop={!reducedMotion}
-            loopDelay={2600}
-            aria-hidden="true"
-          />
-          02 / Processo criativo
-        </span>
-        <h2 id="creative-title">
-          Da ideia
-          <br />
-          ao detalhe<span>.</span>
-        </h2>
-        <p className="chapter-lede">
-          Criatividade aqui não é inspiração repentina. É um método: ouvir com atenção, reunir
-          repertório, testar caminhos e lapidar o escolhido.
-        </p>
-      </motion.header>
-
+      {/* Introducao, estudio e passos no mesmo grid: no celular eles empilham nessa
+          ordem; no desktop o estudio ocupa a coluna da direita desde o titulo, em
+          vez de comecar so depois dele e deixar o topo vazio. */}
       <div className="creative-layout">
+        <motion.header
+          className="chapter-intro"
+          variants={reveal}
+          initial={reducedMotion ? false : "rest"}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <span className="chapter-code">
+            <Lightbulb
+              size={16}
+              strokeWidth={2.3}
+              animate={!reducedMotion}
+              loop={!reducedMotion}
+              loopDelay={2600}
+              aria-hidden="true"
+            />
+            02 / Processo criativo
+          </span>
+          <h2 id="creative-title">
+            Da ideia
+            <br />
+            ao detalhe<span>.</span>
+          </h2>
+          <p className="chapter-lede">
+            Criatividade aqui não é inspiração repentina. É um método: ouvir com atenção, reunir
+            repertório, testar caminhos e lapidar o escolhido.
+          </p>
+        </motion.header>
+
+        <div className="creative-stage">
+          <Studio active={active} reducedMotion={reducedMotion} />
+        </div>
+
         <ol className="creative-steps">
           {creativeModes.map((mode, index) => {
             const { Icon } = TOOLS[mode.id];
@@ -291,10 +298,6 @@ export function CreativeProcess() {
             );
           })}
         </ol>
-
-        <div className="creative-stage">
-          <Studio active={active} reducedMotion={reducedMotion} />
-        </div>
       </div>
     </section>
   );

@@ -7985,23 +7985,22 @@ p {
 /* Reserva a margem negativa do estudio fixo (ver .creative-stage), para que ele
    nao cubra o fim da introducao no celular. */
 .creative .chapter-intro {
-  padding-bottom: calc(var(--header-h) + 1.25rem);
+  padding-bottom: calc(var(--header-h) + 0.5rem);
 }
 
+/* Sem gap entre linhas: a reserva acima ja da o respiro entre texto e estudio. */
 .creative-layout {
   display: grid;
-  gap: 1.5rem;
 }
 
-/* No celular o estudio vem antes e fica preso no topo; os passos rolam por baixo
-   dele, entao ele precisa de fundo opaco. O cabecalho mobile e transparente, entao
-   ele gruda em 0 e o proprio padding cobre a faixa dele; a margem negativa devolve
-   esse espaco enquanto ele ainda nao grudou. */
+/* No celular o estudio vem logo depois da introducao e fica preso no topo; os
+   passos rolam por baixo dele, entao ele precisa de fundo opaco. O cabecalho mobile
+   e transparente, entao ele gruda em 0 e o proprio padding cobre a faixa dele; a
+   margem negativa devolve esse espaco enquanto ele ainda nao grudou. */
 .creative-stage {
   position: sticky;
   top: 0;
   z-index: 2;
-  order: -1;
   margin-top: calc(-1 * var(--header-h));
   padding-top: calc(var(--header-h) + 0.25rem);
   padding-bottom: 0.75rem;
@@ -9541,15 +9540,35 @@ p {
     padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
   }
 
+  /* Introducao e passos na coluna da esquerda; o estudio ocupa a da direita desde
+     o titulo, preso enquanto as duas linhas passam. */
   .creative-layout {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto 1fr;
     align-items: start;
-    gap: clamp(3rem, 6vw, 7rem);
+    gap: 0 clamp(3rem, 6vw, 7rem);
+  }
+
+  .creative-layout > .chapter-intro {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* Coluna mais estreita que a dos outros capitulos, entao o titulo encolhe para
+     "ao detalhe." caber numa linha. */
+  .creative .chapter-intro h2 {
+    font-size: clamp(3.6rem, 6.4vw, 6.4rem);
+  }
+
+  .creative-steps {
+    grid-column: 1;
+    grid-row: 2;
   }
 
   .creative-stage {
+    grid-column: 2;
+    grid-row: 1 / span 2;
     top: calc(var(--header-h) + 2rem);
-    order: 0;
     margin-top: 0;
     padding-block: 0;
   }
