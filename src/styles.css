@@ -9845,12 +9845,31 @@ p {
   .testimonials {
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     align-items: center;
-    padding-block: clamp(3.5rem, 5vw, 4.5rem);
+    padding-block: clamp(2.75rem, 4vw, 3.5rem);
   }
 
-  /* Titulo em duas linhas na coluna estreita, em vez de tres. */
+  /* Coluna do titulo compacta: duas linhas de titulo e espacos curtos, para a
+     secao ficar baixa. */
   .testimonials .chapter-intro h2 {
-    font-size: clamp(3.6rem, 5.4vw, 5.6rem);
+    margin-top: 0.75rem;
+    font-size: clamp(3.4rem, 4.6vw, 4.8rem);
+  }
+
+  .testimonials .chapter-lede {
+    margin-top: 0.85rem;
+  }
+
+  .testimonial-metrics {
+    margin-top: 1.35rem;
+    padding-top: 1rem;
+  }
+
+  .testimonial-metrics dd {
+    font-size: clamp(2rem, 2.8vw, 2.5rem);
+  }
+
+  .testimonial-cta {
+    margin-top: 1.25rem;
   }
 
   .testimonials .chapter-intro {
