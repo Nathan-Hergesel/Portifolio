@@ -146,8 +146,8 @@ export const projectStages = [
   }
 ];
 
-// Depoimentos reais, assinados pela empresa. `id` escolhe o icone do tipo de
-// projeto em Testimonials.
+// Depoimentos reais, assinados pela empresa. `shot` e o print do projeto daquele
+// cliente, que divide o mural de Testimonials com a citacao.
 export const testimonials = [
   {
     id: "vjs",
@@ -155,7 +155,8 @@ export const testimonials = [
       "Ficou perfeito, exatamente o que eu queria. Nunca trabalhei com um desenvolvedor tão bom, e aprecio muito o trabalho do Nathan.",
     author: "VJS Sistemas",
     role: "Automação para estacionamentos",
-    project: "Site comercial"
+    project: "Site comercial",
+    shot: "/assets/images/projects/vjs-sistemas.webp"
   },
   {
     id: "morcegao",
@@ -163,6 +164,7 @@ export const testimonials = [
       "O trabalho ficou exatamente o que a gente buscava. O portal passa a sensação de um lugar acolhedor para os nossos funcionários.",
     author: "Supermercado Morcegão",
     role: "Portal interno",
-    project: "Sistema"
+    project: "Sistema",
+    shot: "/assets/images/projects/morcegao.webp"
   }
 ];
