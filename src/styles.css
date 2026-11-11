@@ -9203,12 +9203,13 @@ p {
   display: none;
 }
 
+/* Sem sombra: empilhadas na coluna, as sombras se somavam numa faixa escura
+   atras de cada coluna. */
 .wall-card {
   width: 100%;
   overflow: hidden;
   border: 1px solid oklch(92% 0.025 256 / 0.32);
   border-radius: 1rem;
-  box-shadow: 0 1rem 2rem oklch(16% 0.05 260 / 0.35);
 }
 
 .wall-quote {
