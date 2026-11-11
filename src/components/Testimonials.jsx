@@ -1,12 +1,21 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { BsArrowUpRight } from "react-icons/bs";
 
 import { Star } from "./animate-ui/icons/star";
 import { Marquee } from "./ui/3d-testimonials";
 import { testimonials } from "../data/site";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
+
+// So numeros sustentaveis: entregues e anos vem de docs/INFO.md; depoimentos e a
+// propria lista, entao acompanha quando entrar um novo.
+const METRICS = [
+  { value: "10+", label: "projetos entregues" },
+  { value: String(testimonials.length), label: "depoimentos de clientes" },
+  { value: "3+", label: "anos em projetos digitais" },
+];
 
 const reveal = {
   rest: { y: 24 },
@@ -112,6 +121,20 @@ export function Testimonials() {
         <p className="chapter-lede">
           O que fica depois da entrega, nas palavras de quem contratou.
         </p>
+
+        <dl className="testimonial-metrics">
+          {METRICS.map((metric) => (
+            <div key={metric.label}>
+              <dt>{metric.label}</dt>
+              <dd>{metric.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <a className="chapter-cta testimonial-cta" href="#contato">
+          Quero ser o próximo
+          <BsArrowUpRight aria-hidden="true" />
+        </a>
       </motion.header>
 
       {/* Mural em perspectiva: as colunas repetem os cartoes para o loop fechar,
