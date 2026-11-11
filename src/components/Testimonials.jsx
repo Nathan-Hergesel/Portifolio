@@ -39,6 +39,11 @@ const COLUMNS = COLUMN_STARTS.map((start) =>
   }).flat(),
 );
 
+// Tom do avatar fixo por cliente (pela posicao na lista), para a mesma empresa ter
+// sempre a mesma cor em qualquer coluna. Quatro tons, ciclando.
+const AVATAR_TONES = 4;
+const toneOf = (testimonial) => testimonials.indexOf(testimonial) % AVATAR_TONES;
+
 function QuoteCard({ testimonial }) {
   return (
     <figure className="wall-card wall-quote">
@@ -47,7 +52,9 @@ function QuoteCard({ testimonial }) {
         <p>{testimonial.quote}</p>
       </blockquote>
       <figcaption>
-        <span className="testimonial-avatar">{initials(testimonial.author)}</span>
+        <span className="testimonial-avatar" data-tone={toneOf(testimonial)}>
+          {initials(testimonial.author)}
+        </span>
         <span>
           <strong>{testimonial.author}</strong>
           <small>{testimonial.role}</small>

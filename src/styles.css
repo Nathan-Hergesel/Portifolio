@@ -9276,6 +9276,21 @@ p {
   font-weight: 800;
 }
 
+/* Tons alternados por cliente (ver toneOf em Testimonials). Todos com texto acima
+   de 4.5:1 sobre o proprio fundo. */
+.testimonial-avatar[data-tone="1"] {
+  background: var(--canvas);
+}
+
+.testimonial-avatar[data-tone="2"] {
+  background: oklch(80% 0.09 240);
+}
+
+.testimonial-avatar[data-tone="3"] {
+  background: var(--brand-bright);
+  color: var(--canvas);
+}
+
 .wall-shot {
   position: relative;
   aspect-ratio: 4 / 3;
