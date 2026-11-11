@@ -9374,20 +9374,20 @@ p {
    elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
 .testimonial-wall-tilt {
   position: absolute;
-  inset: -55% -20%;
+  inset: -55% -15%;
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 1rem;
   transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
 }
 
 .testimonial-wall-col {
   flex: 0 0 auto;
-  width: 10.5rem;
+  width: 11.5rem;
   height: 100%;
 }
 
-.testimonial-wall-col:nth-child(n + 4) {
+.testimonial-wall-col:nth-child(n + 3) {
   display: none;
 }
 
@@ -9820,7 +9820,7 @@ p {
   }
 
   .testimonial-wall-col {
-    width: 15rem;
+    width: 17rem;
   }
 
   .wall-quote {
@@ -9832,7 +9832,7 @@ p {
     font-size: 1.2rem;
   }
 
-  .testimonial-wall-col:nth-child(n + 4) {
+  .testimonial-wall-col:nth-child(n + 3) {
     display: flex;
   }
 

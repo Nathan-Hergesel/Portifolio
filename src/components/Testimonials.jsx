@@ -27,10 +27,8 @@ const initials = (name) => {
 // uma janela de clientes e comeca num ponto diferente da lista, para as vizinhas
 // nao andarem com os mesmos cartoes lado a lado e nenhuma ficar longa demais.
 const PER_COLUMN = Math.min(4, testimonials.length);
-// Seis colunas no desktop para o mural ficar cheio; o CSS esconde as excedentes em
-// telas menores.
-const COLUMN_STARTS = [0, 4, 2, 6, 1, 5];
-const COLUMN_DURATIONS = ["56s", "64s", "52s", "60s", "58s", "50s"];
+const COLUMN_STARTS = [0, 4, 2, 6];
+const COLUMN_DURATIONS = ["56s", "64s", "52s", "60s"];
 const COLUMNS = COLUMN_STARTS.map((start) =>
   Array.from({ length: PER_COLUMN }, (_, offset) => {
     const testimonial = testimonials[(start + offset) % testimonials.length];
@@ -128,7 +126,7 @@ export function Testimonials() {
               reverse={index % 2 === 1}
               repeat={3}
               className="testimonial-wall-col"
-              style={{ "--duration": COLUMN_DURATIONS[index], "--gap": "0.75rem" }}
+              style={{ "--duration": COLUMN_DURATIONS[index] }}
               key={index}
             >
               {column.map(({ kind, testimonial }) =>
