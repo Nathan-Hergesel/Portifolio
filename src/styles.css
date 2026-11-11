@@ -9344,7 +9344,6 @@ p {
 
 /* --- Depoimentos --------------------------------------------------------- */
 
-/* O mural e o fundo da secao inteira; o titulo flutua por cima, a esquerda. */
 .testimonials {
   --chapter-accent: var(--accent-yellow);
   --chapter-icon: var(--accent-yellow);
@@ -9352,40 +9351,29 @@ p {
   --chapter-code-fill: oklch(22% 0.05 260 / 0.5);
   --chapter-soft: oklch(92% 0.025 256);
   position: relative;
-  min-height: clamp(42rem, 60vw, 52rem);
   display: grid;
-  align-items: start;
   overflow: hidden;
   background: var(--brand-gradient);
   color: var(--canvas);
 }
 
-/* Cartao do titulo: azul da marca quase opaco e sombra, para ler bem mesmo com
-   prints claros passando por tras, sem virar uma faixa separada da secao. */
-.testimonial-panel {
-  position: relative;
-  z-index: 1;
-  justify-self: start;
-  max-width: 30rem;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
-  border-radius: 1.25rem;
-  background: oklch(46% 0.096 260 / 0.98);
-  box-shadow: 0 2rem 4rem oklch(14% 0.05 260 / 0.5);
-}
-
-.testimonial-cta {
-  margin-top: 1.75rem;
-}
-
+/* Mural em perspectiva sem moldura: ele sangra ate as bordas da secao, que o
+   cortam, e so esfuma do lado em que encontra o texto (em cima no celular, a
+   esquerda no desktop). Esfumar os quatro lados desenhava uma caixa em volta. */
 .testimonial-wall {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  min-width: 0;
+  height: clamp(28rem, 52vw, 40rem);
+  margin-inline: calc(-1 * var(--page-pad));
+  margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%);
 }
 
 /* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
    vai no proprio transform, e nao como `perspective` no mural: com ela no
-   elemento recortado, o Chrome deixava os filhos 3D escaparem do recorte. */
+   elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
 .testimonial-wall-tilt {
   position: absolute;
   inset: -55% -15%;
@@ -9401,7 +9389,7 @@ p {
   height: 100%;
 }
 
-.testimonial-wall-col:nth-child(n + 4) {
+.testimonial-wall-col:nth-child(n + 3) {
   display: none;
 }
 
@@ -9811,7 +9799,26 @@ p {
   }
 
   .testimonials {
+    min-height: clamp(38rem, 52vw, 48rem);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     align-items: center;
+  }
+
+  .testimonials .chapter-intro {
+    position: relative;
+    z-index: 1;
+    padding-bottom: 0;
+  }
+
+  /* Ocupa a altura inteira da secao, colado na borda direita da tela. */
+  .testimonial-wall {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 64%;
+    height: auto;
+    margin: 0;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 20%);
+    mask-image: linear-gradient(to right, transparent, #000 20%);
   }
 
   .testimonial-wall-col {
@@ -9827,18 +9834,7 @@ p {
     font-size: 1.2rem;
   }
 
-  /* Seis colunas no desktop; as duas ultimas so entram em telas bem largas. */
-  .testimonial-wall-col:nth-child(n + 4) {
-    display: flex;
-  }
-
-  .testimonial-wall-col:nth-child(n + 7) {
-    display: none;
-  }
-}
-
-@media (min-width: 100rem) {
-  .testimonial-wall-col:nth-child(n + 7) {
+  .testimonial-wall-col:nth-child(n + 3) {
     display: flex;
   }
 

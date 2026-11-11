@@ -2,8 +2,6 @@
 
 import { motion, useReducedMotion } from "motion/react";
 
-import { BsArrowUpRight } from "react-icons/bs";
-
 import { Star } from "./animate-ui/icons/star";
 import { Marquee } from "./ui/3d-testimonials";
 import { testimonials } from "../data/site";
@@ -28,11 +26,9 @@ const initials = (name) => {
 // Cada citacao vem seguida do print do projeto do mesmo cliente. Cada coluna leva
 // uma janela de clientes e comeca num ponto diferente da lista, para as vizinhas
 // nao andarem com os mesmos cartoes lado a lado e nenhuma ficar longa demais.
-// Oito colunas porque o mural cobre a secao inteira; o CSS mostra 3 no celular,
-// 6 no desktop e as 8 so em telas bem largas, sempre com cartoes do mesmo tamanho.
 const PER_COLUMN = Math.min(4, testimonials.length);
-const COLUMN_STARTS = [0, 4, 2, 6, 1, 5, 3, 0];
-const COLUMN_DURATIONS = ["56s", "64s", "52s", "60s", "58s", "50s", "62s", "54s"];
+const COLUMN_STARTS = [0, 4, 2, 6];
+const COLUMN_DURATIONS = ["56s", "64s", "52s", "60s"];
 const COLUMNS = COLUMN_STARTS.map((start) =>
   Array.from({ length: PER_COLUMN }, (_, offset) => {
     const testimonial = testimonials[(start + offset) % testimonials.length];
@@ -90,9 +86,8 @@ export function Testimonials() {
 
   return (
     <section className="testimonials section" id="depoimentos" aria-labelledby="testimonials-title">
-      {/* Titulo flutuando sobre o mural, que ocupa a secao inteira como fundo. */}
       <motion.header
-        className="chapter-intro testimonial-panel"
+        className="chapter-intro"
         variants={reveal}
         initial={reducedMotion ? false : "rest"}
         whileInView="visible"
@@ -117,11 +112,6 @@ export function Testimonials() {
         <p className="chapter-lede">
           O que fica depois da entrega, nas palavras de quem contratou.
         </p>
-
-        <a className="chapter-cta testimonial-cta" href="#contato">
-          Quero ser o próximo
-          <BsArrowUpRight aria-hidden="true" />
-        </a>
       </motion.header>
 
       {/* Mural em perspectiva: as colunas repetem os cartoes para o loop fechar,
