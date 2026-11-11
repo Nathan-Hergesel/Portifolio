@@ -9160,37 +9160,37 @@ p {
   --chapter-code-line: oklch(92% 0.025 256 / 0.42);
   --chapter-code-fill: oklch(22% 0.05 260 / 0.5);
   --chapter-soft: oklch(92% 0.025 256);
+  position: relative;
   display: grid;
+  overflow: hidden;
   background: var(--brand-gradient);
   color: var(--canvas);
 }
 
-/* Mural em perspectiva. A mascara apaga as bordas para o campo azul da secao,
-   que e um gradiente (um veu de cor solida, como no original, deixaria faixa). */
+/* Mural em perspectiva sem moldura: ele sangra ate as bordas da secao, que o
+   cortam, e so esfuma do lado em que encontra o texto (em cima no celular, a
+   esquerda no desktop). Esfumar os quatro lados desenhava uma caixa em volta. */
 .testimonial-wall {
   position: relative;
   min-width: 0;
   height: clamp(28rem, 52vw, 40rem);
+  margin-inline: calc(-1 * var(--page-pad));
+  margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
   overflow: hidden;
-  perspective: 1100px;
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent),
-    linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent),
-    linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%);
 }
 
-/* Maior que o mural para que, inclinado, ainda cubra os cantos. */
+/* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
+   vai no proprio transform, e nao como `perspective` no mural: com ela no
+   elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
 .testimonial-wall-tilt {
   position: absolute;
-  inset: -35% -12%;
+  inset: -55% -15%;
   display: flex;
   justify-content: center;
   gap: 1rem;
-  transform: rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
+  transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
 }
 
 .testimonial-wall-col {
@@ -9589,13 +9589,26 @@ p {
   }
 
   .testimonials {
+    min-height: clamp(38rem, 52vw, 48rem);
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     align-items: center;
-    column-gap: clamp(2rem, 4vw, 4rem);
   }
 
   .testimonials .chapter-intro {
+    position: relative;
+    z-index: 1;
     padding-bottom: 0;
+  }
+
+  /* Ocupa a altura inteira da secao, colado na borda direita da tela. */
+  .testimonial-wall {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 64%;
+    height: auto;
+    margin: 0;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 20%);
+    mask-image: linear-gradient(to right, transparent, #000 20%);
   }
 
   .testimonial-wall-col {
