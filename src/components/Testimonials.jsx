@@ -16,26 +16,27 @@ const reveal = {
   },
 };
 
-const initials = (name) =>
-  name
-    .split(" ")
-    .filter((word) => word.length > 2)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
+// Duas iniciais; nome de uma palavra so ("ObraFlow") usa as duas primeiras letras.
+const initials = (name) => {
+  const words = name.split(" ").filter((word) => word.length > 2);
+  const letters = words.length > 1 ? words.slice(0, 2).map((word) => word[0]).join("") : words[0].slice(0, 2);
+  return letters.toUpperCase();
+};
 
-// Com poucos depoimentos, cada citacao divide o mural com o print do projeto do
-// mesmo cliente. Cada coluna comeca num ponto diferente da sequencia, para as
-// vizinhas nao andarem com os mesmos cartoes lado a lado.
-const SEQUENCE = testimonials.flatMap((testimonial) => [
-  { kind: "quote", testimonial },
-  { kind: "shot", testimonial },
-]);
-const COLUMN_OFFSETS = [0, 2, 1, 3];
-const COLUMN_DURATIONS = ["44s", "52s", "40s", "48s"];
-const COLUMNS = COLUMN_OFFSETS.map((offset) =>
-  SEQUENCE.map((_, index) => SEQUENCE[(index + offset) % SEQUENCE.length]),
+// Cada citacao vem seguida do print do projeto do mesmo cliente. Cada coluna leva
+// uma janela de clientes e comeca num ponto diferente da lista, para as vizinhas
+// nao andarem com os mesmos cartoes lado a lado e nenhuma ficar longa demais.
+const PER_COLUMN = Math.min(4, testimonials.length);
+const COLUMN_STARTS = [0, 4, 2, 6];
+const COLUMN_DURATIONS = ["56s", "64s", "52s", "60s"];
+const COLUMNS = COLUMN_STARTS.map((start) =>
+  Array.from({ length: PER_COLUMN }, (_, offset) => {
+    const testimonial = testimonials[(start + offset) % testimonials.length];
+    return [
+      { kind: "quote", testimonial },
+      { kind: "shot", testimonial },
+    ];
+  }).flat(),
 );
 
 function QuoteCard({ testimonial }) {
@@ -56,10 +57,16 @@ function QuoteCard({ testimonial }) {
   );
 }
 
+// Sem `loading="lazy"`: dentro do plano inclinado o navegador nem sempre percebe
+// que o cartao entrou na tela, e ele ficava em branco. Sao poucas imagens, todas
+// repetidas, entao o custo de carregar logo e baixo.
 function ShotCard({ testimonial }) {
+  // Pranchas de identidade tem margem branca; o recorte centralizado pega a peca.
+  const board = testimonial.project === "Identidade visual";
+
   return (
-    <div className="wall-card wall-shot">
-      <img src={testimonial.shot} alt="" loading="lazy" decoding="async" />
+    <div className={`wall-card wall-shot${board ? " is-board" : ""}`}>
+      <img src={testimonial.shot} alt="" decoding="async" />
       <span>
         {testimonial.author} · {testimonial.project}
       </span>

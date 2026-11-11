@@ -9289,6 +9289,10 @@ p {
   object-position: left top;
 }
 
+.wall-shot.is-board img {
+  object-position: center;
+}
+
 .wall-shot span {
   position: absolute;
   bottom: 0.6rem;

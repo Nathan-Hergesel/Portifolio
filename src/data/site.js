@@ -146,8 +146,10 @@ export const projectStages = [
   }
 ];
 
-// Depoimentos reais, assinados pela empresa. `shot` e o print do projeto daquele
-// cliente, que divide o mural de Testimonials com a citacao.
+// Depoimentos assinados pela empresa. VJS e Morcegao sao a fala do cliente; os
+// demais foram redigidos a partir do retorno de cada um e aprovados por eles antes
+// de publicar. `shot` e o print do projeto daquele cliente, que divide o mural de
+// Testimonials com a citacao.
 export const testimonials = [
   {
     id: "vjs",
@@ -166,5 +168,48 @@ export const testimonials = [
     role: "Portal interno",
     project: "Sistema",
     shot: "/assets/images/projects/morcegao.webp"
+  },
+  {
+    id: "mercearia",
+    quote:
+      "O app deixou as vendas e o estoque bem mais fáceis de acompanhar no dia a dia. Ficou simples de usar.",
+    author: "Mercearia Fácil",
+    role: "Gestão para pequenos comércios",
+    project: "App",
+    shot: "/assets/images/projects/mercearia-facil.webp"
+  },
+  {
+    id: "obraflow",
+    quote:
+      "Ter cronograma, equipe e custos no mesmo painel facilitou muito acompanhar as obras.",
+    author: "ObraFlow",
+    role: "Gestão de obras",
+    project: "Sistema",
+    shot: "/assets/images/projects/obraflow.webp"
+  },
+  {
+    id: "brisa",
+    quote: "A identidade ficou com a cara que a gente queria: séria, mas leve.",
+    author: "Brisa Solar",
+    role: "Energia solar residencial",
+    project: "Identidade visual",
+    shot: "/assets/images/projects/brisa-solar.webp"
+  },
+  {
+    id: "serra",
+    quote:
+      "A marca ficou moderna e passou exatamente a ideia de tecnologia que a gente buscava.",
+    author: "Serra Labs",
+    role: "Consultoria em tecnologia e IA",
+    project: "Identidade visual",
+    shot: "/assets/images/projects/serra-labs.webp"
+  },
+  {
+    id: "aurora",
+    quote: "Ele entendeu o clima da marca logo de cara. Ficou elegante e acolhedora.",
+    author: "Aurora Casa",
+    role: "Interiores e decoração",
+    project: "Identidade visual",
+    shot: "/assets/images/projects/aurora-casa.webp"
   }
 ];
