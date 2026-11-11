@@ -9367,8 +9367,6 @@ p {
   margin-inline: calc(-1 * var(--page-pad));
   margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%);
-  mask-image: linear-gradient(to bottom, transparent, #000 14%);
 }
 
 /* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
@@ -9376,20 +9374,20 @@ p {
    elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
 .testimonial-wall-tilt {
   position: absolute;
-  inset: -55% -15%;
+  inset: -55% -20%;
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
 }
 
 .testimonial-wall-col {
   flex: 0 0 auto;
-  width: 11.5rem;
+  width: 10.5rem;
   height: 100%;
 }
 
-.testimonial-wall-col:nth-child(n + 3) {
+.testimonial-wall-col:nth-child(n + 4) {
   display: none;
 }
 
@@ -9811,18 +9809,18 @@ p {
   }
 
   /* Ocupa a altura inteira da secao, colado na borda direita da tela. */
+  /* Area propria a direita: comeca depois da coluna do titulo e vai ate a borda
+     da tela, com corte reto em vez de esfumar por baixo do texto. */
   .testimonial-wall {
     position: absolute;
     inset: 0 0 0 auto;
-    width: 64%;
+    width: 60%;
     height: auto;
     margin: 0;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 20%);
-    mask-image: linear-gradient(to right, transparent, #000 20%);
   }
 
   .testimonial-wall-col {
-    width: 17rem;
+    width: 15rem;
   }
 
   .wall-quote {
@@ -9834,7 +9832,7 @@ p {
     font-size: 1.2rem;
   }
 
-  .testimonial-wall-col:nth-child(n + 3) {
+  .testimonial-wall-col:nth-child(n + 4) {
     display: flex;
   }
 
