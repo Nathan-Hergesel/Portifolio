@@ -33,20 +33,17 @@ const initials = (name) => {
   return letters.toUpperCase();
 };
 
-// Cada citacao vem seguida do print do projeto do mesmo cliente. Cada coluna leva
-// uma janela de clientes e comeca num ponto diferente da lista, para as vizinhas
-// nao andarem com os mesmos cartoes lado a lado e nenhuma ficar longa demais.
+// So citacoes. Cada coluna leva uma janela de clientes e comeca num ponto diferente
+// da lista, para as vizinhas nao andarem com os mesmos cartoes lado a lado. As
+// duracoes sao curtas porque cada copia da coluna tem so quatro cartoes.
 const PER_COLUMN = Math.min(4, testimonials.length);
 const COLUMN_STARTS = [0, 4, 2, 6];
-const COLUMN_DURATIONS = ["56s", "64s", "52s", "60s"];
+const COLUMN_DURATIONS = ["30s", "36s", "28s", "34s"];
 const COLUMNS = COLUMN_STARTS.map((start) =>
-  Array.from({ length: PER_COLUMN }, (_, offset) => {
-    const testimonial = testimonials[(start + offset) % testimonials.length];
-    return [
-      { kind: "quote", testimonial },
-      { kind: "shot", testimonial },
-    ];
-  }).flat(),
+  Array.from(
+    { length: PER_COLUMN },
+    (_, offset) => testimonials[(start + offset) % testimonials.length],
+  ),
 );
 
 // Tom do avatar fixo por cliente (pela posicao na lista), para a mesma empresa ter
@@ -71,23 +68,6 @@ function QuoteCard({ testimonial }) {
         </span>
       </figcaption>
     </figure>
-  );
-}
-
-// Sem `loading="lazy"`: dentro do plano inclinado o navegador nem sempre percebe
-// que o cartao entrou na tela, e ele ficava em branco. Sao poucas imagens, todas
-// repetidas, entao o custo de carregar logo e baixo.
-function ShotCard({ testimonial }) {
-  // Pranchas de identidade tem margem branca; o recorte centralizado pega a peca.
-  const board = testimonial.project === "Identidade visual";
-
-  return (
-    <div className={`wall-card wall-shot${board ? " is-board" : ""}`}>
-      <img src={testimonial.shot} alt="" decoding="async" />
-      <span>
-        {testimonial.author} · {testimonial.project}
-      </span>
-    </div>
   );
 }
 
@@ -148,18 +128,14 @@ export function Testimonials() {
               vertical
               pauseOnHover
               reverse={index % 2 === 1}
-              repeat={3}
+              repeat={4}
               className="testimonial-wall-col"
               style={{ "--duration": COLUMN_DURATIONS[index] }}
               key={index}
             >
-              {column.map(({ kind, testimonial }) =>
-                kind === "quote" ? (
-                  <QuoteCard testimonial={testimonial} key={`quote-${testimonial.id}`} />
-                ) : (
-                  <ShotCard testimonial={testimonial} key={`shot-${testimonial.id}`} />
-                ),
-              )}
+              {column.map((testimonial) => (
+                <QuoteCard testimonial={testimonial} key={testimonial.id} />
+              ))}
             </Marquee>
           ))}
         </div>

@@ -148,8 +148,7 @@ export const projectStages = [
 
 // Depoimentos assinados pela empresa. VJS e Morcegao sao a fala do cliente; os
 // demais foram redigidos a partir do retorno de cada um e aprovados por eles antes
-// de publicar. `shot` e o print do projeto daquele cliente, que divide o mural de
-// Testimonials com a citacao.
+// de publicar.
 export const testimonials = [
   {
     id: "vjs",
@@ -157,8 +156,7 @@ export const testimonials = [
       "Ficou perfeito, exatamente o que eu queria. Nunca trabalhei com um desenvolvedor tão bom, e aprecio muito o trabalho do Nathan.",
     author: "VJS Sistemas",
     role: "Automação para estacionamentos",
-    project: "Site comercial",
-    shot: "/assets/images/projects/vjs-sistemas.webp"
+    project: "Site comercial"
   },
   {
     id: "morcegao",
@@ -166,8 +164,7 @@ export const testimonials = [
       "O trabalho ficou exatamente o que a gente buscava. O portal passa a sensação de um lugar acolhedor para os nossos funcionários.",
     author: "Supermercado Morcegão",
     role: "Portal interno",
-    project: "Sistema",
-    shot: "/assets/images/projects/morcegao.webp"
+    project: "Sistema"
   },
   {
     id: "mercearia",
@@ -175,8 +172,7 @@ export const testimonials = [
       "O app deixou as vendas e o estoque bem mais fáceis de acompanhar no dia a dia. Ficou simples de usar.",
     author: "Mercearia Fácil",
     role: "Gestão para pequenos comércios",
-    project: "App",
-    shot: "/assets/images/projects/mercearia-facil.webp"
+    project: "App"
   },
   {
     id: "obraflow",
@@ -184,16 +180,14 @@ export const testimonials = [
       "Ter cronograma, equipe e custos no mesmo painel facilitou muito acompanhar as obras.",
     author: "ObraFlow",
     role: "Gestão de obras",
-    project: "Sistema",
-    shot: "/assets/images/projects/obraflow.webp"
+    project: "Sistema"
   },
   {
     id: "brisa",
     quote: "A identidade ficou com a cara que a gente queria: séria, mas leve.",
     author: "Brisa Solar",
     role: "Energia solar residencial",
-    project: "Identidade visual",
-    shot: "/assets/images/projects/brisa-solar.webp"
+    project: "Identidade visual"
   },
   {
     id: "serra",
@@ -201,15 +195,13 @@ export const testimonials = [
       "A marca ficou moderna e passou exatamente a ideia de tecnologia que a gente buscava.",
     author: "Serra Labs",
     role: "Consultoria em tecnologia e IA",
-    project: "Identidade visual",
-    shot: "/assets/images/projects/serra-labs.webp"
+    project: "Identidade visual"
   },
   {
     id: "aurora",
     quote: "Ele entendeu o clima da marca logo de cara. Ficou elegante e acolhedora.",
     author: "Aurora Casa",
     role: "Interiores e decoração",
-    project: "Identidade visual",
-    shot: "/assets/images/projects/aurora-casa.webp"
+    project: "Identidade visual"
   }
 ];
