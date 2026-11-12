@@ -9854,20 +9854,26 @@ p {
     padding-bottom: 0;
   }
 
-  /* Area reservada a direita: altura inteira da secao (os cartoes entram e saem
-     pela borda dela) e alinhada a coluna de leitura de 92rem, com a margem
-     lateral do site, para nada encostar ou passar da borda da tela. */
+  /* Area a direita do texto, com altura inteira da secao (os cartoes entram e
+     saem pela borda dela) e indo ate a borda da tela: as colunas alinham pela
+     esquerda e a ultima pode ser cortada pela tela, para os cartoes nao ficarem
+     finos. O afastamento do texto e maior em telas medias, onde a diagonal
+     espalha mais as colunas em relacao a largura. */
   .testimonial-wall {
     --wall-pad: max(var(--page-pad), calc((100% - 92rem) / 2));
     position: absolute;
     top: 0;
-    right: var(--wall-pad);
+    right: 0;
     bottom: 0;
-    width: calc((100% - 2 * var(--wall-pad)) * 0.6);
+    left: calc(var(--wall-pad) + (100% - 2 * var(--wall-pad)) * 0.4 + 5rem);
     height: auto;
     margin: 0;
-    /* A propria secao (overflow hidden) faz o corte de cima e de baixo. */
+    /* A propria secao (overflow hidden) faz o corte de cima, de baixo e da direita. */
     clip-path: none;
+  }
+
+  .testimonial-wall-tilt {
+    justify-content: flex-start;
   }
 
   .testimonial-wall-col {
@@ -9883,14 +9889,9 @@ p {
     font-size: 1.2rem;
   }
 
-  /* Quantas colunas cabem inteiras na area sem encostar no texto nem sair da tela:
-     duas ate 86rem, tres ate 90rem e quatro dai em diante (blocos abaixo). */
+  /* As quatro colunas no desktop; a da direita pode passar da tela. */
   .testimonial-wall-col:nth-child(n + 2) {
     display: flex;
-  }
-
-  .testimonial-wall-col:nth-child(n + 3) {
-    display: none;
   }
 
   .cta-actions {
@@ -9909,32 +9910,11 @@ p {
   }
 }
 
+/* Telas grandes: a diagonal espalha menos em relacao a largura, entao o mural
+   pode chegar mais perto do texto. */
 @media (min-width: 86rem) {
-  .testimonial-wall-col:nth-child(n + 3) {
-    display: flex;
-  }
-}
-
-/* Quarta coluna, a direita: o mural passa a ir ate a borda da tela, usando a
-   margem direita da pagina, e as colunas alinham pela esquerda da area, entao a
-   nova entra do lado direito sem empurrar as outras para cima do texto. */
-@media (min-width: 90rem) {
   .testimonial-wall {
-    left: calc(var(--wall-pad) + (100% - 2 * var(--wall-pad)) * 0.4 + 2rem);
-    right: 0;
-    width: auto;
-  }
-
-  .testimonial-wall-tilt {
-    justify-content: flex-start;
-  }
-
-  .testimonial-wall-col {
-    width: clamp(11rem, 11vw, 14rem);
-  }
-
-  .testimonial-wall-col:nth-child(n + 4) {
-    display: flex;
+    left: calc(var(--wall-pad) + (100% - 2 * var(--wall-pad)) * 0.4 + 3rem);
   }
 }
 
