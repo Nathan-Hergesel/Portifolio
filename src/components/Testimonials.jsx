@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { BsArrowUpRight } from "react-icons/bs";
 
 import { Star } from "./animate-ui/icons/star";
-import { Marquee } from "./ui/3d-testimonials";
 import { testimonials } from "../data/site";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
 
@@ -33,18 +34,84 @@ const initials = (name) => {
   return letters.toUpperCase();
 };
 
-// So citacoes. Cada coluna leva uma janela de clientes e comeca num ponto diferente
-// da lista, para as vizinhas nao andarem com os mesmos cartoes lado a lado. As
-// duracoes sao curtas porque cada copia da coluna tem so quatro cartoes.
-const PER_COLUMN = Math.min(4, testimonials.length);
-const COLUMN_STARTS = [0, 4, 2, 6];
-const COLUMN_DURATIONS = ["30s", "36s", "28s", "34s"];
-const COLUMNS = COLUMN_STARTS.map((start) =>
-  Array.from(
-    { length: PER_COLUMN },
-    (_, offset) => testimonials[(start + offset) % testimonials.length],
-  ),
-);
+// Grade de cartoes inteiros em vez de marquee: um marquee sempre corta cartoes na
+// borda enquanto desliza. Aqui cada vaga troca de depoimento no lugar, uma por vez,
+// entao nenhum aparece cortado. Seis vagas no maximo; o CSS mostra 2, 4 ou 6.
+const MAX_SLOTS = 6;
+const SWAP_INTERVAL = 3200;
+
+function useSlotCount() {
+  const desktop = useMediaQuery("(min-width: 64rem)");
+  const wide = useMediaQuery("(min-width: 100rem)");
+  if (wide) return 6;
+  return desktop ? 4 : 2;
+}
+
+function TestimonialGrid({ reducedMotion }) {
+  const count = useSlotCount();
+  const [slots, setSlots] = useState(() =>
+    Array.from({ length: MAX_SLOTS }, (_, index) => index % testimonials.length),
+  );
+  const [paused, setPaused] = useState(false);
+  const nextTestimonial = useRef(MAX_SLOTS % testimonials.length);
+  const nextSlot = useRef(0);
+
+  useEffect(() => {
+    if (reducedMotion || paused || testimonials.length <= count) return undefined;
+
+    const timer = window.setInterval(() => {
+      setSlots((current) => {
+        // Proximo depoimento que nao esteja visivel, para nao repetir lado a lado.
+        const visible = current.slice(0, count);
+        let candidate = nextTestimonial.current;
+        while (visible.includes(candidate)) candidate = (candidate + 1) % testimonials.length;
+        nextTestimonial.current = (candidate + 1) % testimonials.length;
+
+        const slot = nextSlot.current % count;
+        nextSlot.current = slot + 1;
+
+        const updated = [...current];
+        updated[slot] = candidate;
+        return updated;
+      });
+    }, SWAP_INTERVAL);
+
+    return () => window.clearInterval(timer);
+  }, [count, paused, reducedMotion]);
+
+  return (
+    <div
+      className="testimonial-wall"
+      aria-hidden="true"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="testimonial-grid">
+        {slots.map((index, slot) => {
+          const testimonial = testimonials[index];
+
+          return (
+            <div className="testimonial-slot" key={slot}>
+              {/* `wait`: o cartao que sai some antes do novo entrar, sem os dois
+                  textos sobrepostos no meio da troca. */}
+              <AnimatePresence initial={false} mode="wait">
+                <motion.div
+                  className="testimonial-slot-card"
+                  key={testimonial.id}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOutExpo } }}
+                  exit={{ opacity: 0, y: -12, transition: { duration: 0.22 } }}
+                >
+                  <QuoteCard testimonial={testimonial} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 // Tom do avatar fixo por cliente (pela posicao na lista), para a mesma empresa ter
 // sempre a mesma cor em qualquer coluna. Quatro tons, ciclando.
@@ -118,28 +185,9 @@ export function Testimonials() {
         </a>
       </motion.header>
 
-      {/* Mural em perspectiva: as colunas repetem os cartoes para o loop fechar,
-          entao ele e decorativo para leitores de tela, que recebem a lista abaixo
-          uma vez so. */}
-      <div className="testimonial-wall" aria-hidden="true">
-        <div className="testimonial-wall-tilt">
-          {COLUMNS.map((column, index) => (
-            <Marquee
-              vertical
-              pauseOnHover
-              reverse={index % 2 === 1}
-              repeat={4}
-              className="testimonial-wall-col"
-              style={{ "--duration": COLUMN_DURATIONS[index] }}
-              key={index}
-            >
-              {column.map((testimonial) => (
-                <QuoteCard testimonial={testimonial} key={testimonial.id} />
-              ))}
-            </Marquee>
-          ))}
-        </div>
-      </div>
+      {/* A grade troca de conteudo sozinha, entao e decorativa para leitores de
+          tela, que recebem todos os depoimentos de uma vez na lista abaixo. */}
+      <TestimonialGrid reducedMotion={reducedMotion} />
 
       <ul className="sr-only">
         {testimonials.map((testimonial) => (

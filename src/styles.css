@@ -9399,40 +9399,40 @@ p {
   margin-top: 1.75rem;
 }
 
-/* Mural em perspectiva sem moldura: ele sangra ate as bordas da secao, que o
-   cortam, e so esfuma do lado em que encontra o texto (em cima no celular, a
-   esquerda no desktop). Esfumar os quatro lados desenhava uma caixa em volta. */
+/* Grade de depoimentos com area propria, sem esfumado: cartoes sempre inteiros,
+   que trocam de conteudo no lugar. A leve inclinacao 3D parte da borda esquerda,
+   entao o lado mais proximo do texto fica parado e nada sai da area. */
 .testimonial-wall {
-  position: relative;
+  --slot-cols: 1;
+  --slot-row: 12.5rem;
   min-width: 0;
-  height: clamp(28rem, 52vw, 40rem);
-  margin-inline: calc(-1 * var(--page-pad));
-  margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%);
-  mask-image: linear-gradient(to bottom, transparent, #000 14%);
+  margin-top: 2rem;
 }
 
-/* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
-   vai no proprio transform, e nao como `perspective` no mural: com ela no
-   elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
-.testimonial-wall-tilt {
-  position: absolute;
-  inset: -55% -15%;
-  display: flex;
-  justify-content: center;
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--slot-cols), minmax(0, 1fr));
+  grid-auto-rows: var(--slot-row);
   gap: 1rem;
-  transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
+  /* rotateY positivo: o lado direito recua e encolhe, entao a grade nunca passa
+     da propria coluna. */
+  transform: perspective(1400px) rotateY(9deg) rotateX(4deg);
+  transform-origin: left center;
 }
 
-.testimonial-wall-col {
-  flex: 0 0 auto;
-  width: 11.5rem;
-  height: 100%;
+.testimonial-slot {
+  position: relative;
 }
 
-.testimonial-wall-col:nth-child(n + 3) {
+.testimonial-slot:nth-child(n + 3) {
   display: none;
+}
+
+/* Absoluto para o cartao que sai e o que entra se sobreporem sem empurrar a
+   grade durante a troca. */
+.testimonial-slot-card {
+  position: absolute;
+  inset: 0;
 }
 
 /* Sem sombra: empilhadas na coluna, as sombras se somavam numa faixa escura
@@ -9850,19 +9850,19 @@ p {
     padding-bottom: 0;
   }
 
-  /* Ocupa a altura inteira da secao, colado na borda direita da tela. */
+  /* Coluna da direita do grid da secao: 2 x 2 cartoes. */
   .testimonial-wall {
-    position: absolute;
-    inset: 0 0 0 auto;
-    width: 64%;
-    height: auto;
-    margin: 0;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 20%);
-    mask-image: linear-gradient(to right, transparent, #000 20%);
+    --slot-cols: 2;
+    --slot-row: 14rem;
+    margin-top: 0;
   }
 
-  .testimonial-wall-col {
-    width: 17rem;
+  .testimonial-slot:nth-child(n + 3) {
+    display: block;
+  }
+
+  .testimonial-slot:nth-child(n + 5) {
+    display: none;
   }
 
   .wall-quote {
@@ -9872,10 +9872,6 @@ p {
 
   .wall-quote blockquote p {
     font-size: 1.2rem;
-  }
-
-  .testimonial-wall-col:nth-child(n + 3) {
-    display: flex;
   }
 
   .cta-actions {
@@ -9931,5 +9927,24 @@ p {
   .cta-primary:hover .cta-arrow,
   .cta-secondary:hover .cta-arrow {
     transform: translate(0.15rem, -0.15rem);
+  }
+}
+
+/* Cartao ocupa a vaga inteira, com a assinatura sempre no rodape, para as vagas
+   da mesma linha ficarem alinhadas mesmo com citacoes de tamanhos diferentes. */
+.testimonial-slot-card .wall-quote {
+  height: 100%;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* Telas largas: 3 x 2 cartoes. */
+@media (min-width: 100rem) {
+  .testimonial-wall {
+    --slot-cols: 3;
+    --slot-row: 15rem;
+  }
+
+  .testimonial-slot:nth-child(n + 5) {
+    display: block;
   }
 }
