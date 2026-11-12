@@ -9402,32 +9402,36 @@ p {
 /* Mural em perspectiva sem moldura: ele sangra ate as bordas da secao, que o
    cortam, e so esfuma do lado em que encontra o texto (em cima no celular, a
    esquerda no desktop). Esfumar os quatro lados desenhava uma caixa em volta. */
+/* Area reservada, sem esfumado. As colunas ficam em pe e dividem a largura da
+   area, entao nenhum cartao e cortado nas laterais; so entram e saem pelo topo e
+   pelo fim da secao, que e o movimento do proprio marquee. */
 .testimonial-wall {
   position: relative;
   min-width: 0;
-  height: clamp(28rem, 52vw, 40rem);
-  margin-inline: calc(-1 * var(--page-pad));
+  height: clamp(26rem, 70vw, 32rem);
+  margin-top: 2rem;
   margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%);
-  mask-image: linear-gradient(to bottom, transparent, #000 14%);
 }
 
 /* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
    vai no proprio transform, e nao como `perspective` no mural: com ela no
    elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
+/* So perspectiva em Y, sem a rotacao diagonal: com origem na esquerda o lado
+   direito recua e encolhe, entao o plano nunca passa das bordas laterais. A
+   sobra vertical cobre o topo e o fim mesmo com a perspectiva. */
 .testimonial-wall-tilt {
   position: absolute;
-  inset: -55% -15%;
+  inset: -20% 0;
   display: flex;
-  justify-content: center;
   gap: 1rem;
-  transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
+  transform: perspective(1400px) rotateY(8deg);
+  transform-origin: left center;
 }
 
 .testimonial-wall-col {
-  flex: 0 0 auto;
-  width: 11.5rem;
+  flex: 1 1 0;
+  min-width: 0;
   height: 100%;
 }
 
@@ -9850,19 +9854,18 @@ p {
     padding-bottom: 0;
   }
 
-  /* Ocupa a altura inteira da secao, colado na borda direita da tela. */
+  /* Area reservada a direita: altura inteira da secao (os cartoes entram e saem
+     pela borda dela) e alinhada a coluna de leitura de 92rem, com a margem
+     lateral do site, para nada encostar ou passar da borda da tela. */
   .testimonial-wall {
+    --wall-pad: max(var(--page-pad), calc((100% - 92rem) / 2));
     position: absolute;
-    inset: 0 0 0 auto;
-    width: 64%;
+    top: 0;
+    right: var(--wall-pad);
+    bottom: 0;
+    width: calc((100% - 2 * var(--wall-pad)) * 0.6);
     height: auto;
     margin: 0;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 20%);
-    mask-image: linear-gradient(to right, transparent, #000 20%);
-  }
-
-  .testimonial-wall-col {
-    width: 17rem;
   }
 
   .wall-quote {
@@ -9874,7 +9877,18 @@ p {
     font-size: 1.2rem;
   }
 
+  /* Tres colunas no desktop, quatro em telas largas. */
   .testimonial-wall-col:nth-child(n + 3) {
+    display: flex;
+  }
+
+  .testimonial-wall-col:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (min-width: 100rem) {
+  .testimonial-wall-col:nth-child(n + 4) {
     display: flex;
   }
 
