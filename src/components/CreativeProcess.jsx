@@ -53,21 +53,21 @@ function StudioCursor({ position }) {
   );
 }
 
-function Inspector({ mode, reducedMotion }) {
+// Legenda compacta da etapa, no canto acima das animacoes.
+function Caption({ mode, reducedMotion }) {
   const { Icon } = TOOLS[mode.id];
 
   return (
-    <div className="studio-inspector">
-      <span className="studio-inspector-label">Propriedades</span>
+    <div className="creative-caption">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          className="studio-inspector-body"
+          className="creative-caption-body"
           key={mode.id}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: easeOutExpo } }}
           exit={{ opacity: 0, y: -8, transition: { duration: 0.18 } }}
         >
-          <span className="inspector-chip">
+          <span className="caption-chip">
             <Icon
               size={18}
               strokeWidth={2.2}
@@ -78,58 +78,24 @@ function Inspector({ mode, reducedMotion }) {
             {mode.index} / {String(creativeModes.length).padStart(2, "0")}
           </span>
           <h3>{mode.verb}</h3>
-          <p className="inspector-lead">{mode.lead}</p>
-          <p className="inspector-text">{mode.description}</p>
-          <ul>
-            {mode.artifacts.map((artifact) => (
-              <li key={artifact}>{artifact}</li>
-            ))}
-          </ul>
+          <p className="caption-lead">{mode.lead}</p>
+          <p className="caption-text">{mode.description}</p>
         </motion.div>
       </AnimatePresence>
     </div>
   );
 }
 
+// So o quadro com as animacoes de cada etapa e o cursor, sem interface de
+// ferramenta em volta.
 function Studio({ active, reducedMotion }) {
   const mode = creativeModes[active];
 
   return (
     <div className="studio" aria-hidden="true">
-      <div className="studio-bar">
-        <span className="studio-dots">
-          <i />
-          <i />
-          <i />
-        </span>
-        <span className="studio-file">
-          seu-projeto <b>/ {mode.verb.toLowerCase()}</b>
-        </span>
-        <span className="studio-count">
-          {mode.index}/{String(creativeModes.length).padStart(2, "0")}
-        </span>
-      </div>
+      <Caption mode={mode} reducedMotion={reducedMotion} />
 
       <div className="studio-body">
-        <div className="studio-tools">
-          {creativeModes.map((item, index) => {
-            const { Icon } = TOOLS[item.id];
-            const on = index === active;
-
-            return (
-              <span className="studio-tool" data-on={on} key={item.id}>
-                <Icon
-                  size={18}
-                  strokeWidth={2.2}
-                  animate={on && !reducedMotion}
-                  loop={on && !reducedMotion}
-                  loopDelay={1400}
-                />
-              </span>
-            );
-          })}
-        </div>
-
         <div className="studio-canvas">
           <div className="studio-layer studio-chat" data-on={active === 0}>
             {CHAT.map((line) => (
@@ -261,19 +227,7 @@ function Studio({ active, reducedMotion }) {
 
           <StudioCursor position={TOOLS[mode.id].cursor} />
         </div>
-
-        {/* Painel de propriedades, como nas ferramentas de design: e aqui que o
-            texto da etapa aparece, no canto do estudio. */}
-        <Inspector mode={mode} reducedMotion={reducedMotion} />
       </div>
-
-      <ol className="studio-timeline">
-        {creativeModes.map((item, index) => (
-          <li data-on={index === active} data-done={index < active} key={item.id}>
-            {item.verb}
-          </li>
-        ))}
-      </ol>
     </div>
   );
 }

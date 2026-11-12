@@ -8004,47 +8004,33 @@ p {
   pointer-events: none;
 }
 
-/* No celular o estudio tem altura natural (quadro + painel embaixo) e gruda logo
-   abaixo da faixa do cabecalho. */
+/* No celular o estudio tem altura natural (legenda + quadro) e gruda logo abaixo
+   da faixa do cabecalho. */
 .creative-sticky {
   position: sticky;
   top: calc(var(--header-h) + 0.25rem);
   z-index: 2;
 }
 
-/* Painel de propriedades: o texto da etapa, no canto do estudio. */
-.studio-inspector {
-  grid-column: 1 / -1;
-  display: grid;
-  align-content: start;
-  gap: 0.6rem;
+/* Legenda da etapa: uma linha compacta no canto, acima do quadro das animacoes. */
+.creative-caption {
   min-height: 0;
-  overflow: hidden;
-  padding: 1rem;
-  border-radius: 0.65rem;
-  background: oklch(22% 0.018 258);
+  margin-bottom: 0.85rem;
 }
 
-.studio-inspector-label {
-  color: oklch(72% 0.014 91);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.studio-inspector-body {
+.creative-caption-body {
   display: grid;
-  justify-items: start;
-  gap: 0.45rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+  color: var(--ink);
 }
 
-.inspector-chip {
+.caption-chip {
   min-height: 2rem;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 0.25rem;
   padding: 0.25rem 0.8rem 0.25rem 0.55rem;
   border-radius: 999px;
   background: var(--accent-yellow);
@@ -8054,141 +8040,41 @@ p {
   font-weight: 700;
 }
 
-/* Sublinhado amarelo fino sob o verbo: o marca-texto cheio dos passos antigos,
-   sobre o fundo escuro do painel, virava uma faixa opaca. */
-.studio-inspector-body h3 {
-  padding-bottom: 0.12em;
-  color: var(--canvas);
+/* Sublinhado amarelo fino sob o verbo. */
+.creative-caption-body h3 {
+  justify-self: start;
+  padding-bottom: 0.1em;
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 3.2vw, 3.4rem);
+  font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 900;
   letter-spacing: -0.02em;
-  line-height: 0.86;
+  line-height: 0.9;
   text-transform: uppercase;
   background: linear-gradient(var(--accent-yellow), var(--accent-yellow)) no-repeat 0 100% / 100% 0.12em;
 }
 
-.inspector-lead {
-  margin-top: 0.3rem;
-  color: var(--canvas);
+.caption-lead,
+.caption-text {
+  grid-column: 1 / -1;
+}
+
+.caption-lead {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.05;
   text-transform: uppercase;
 }
 
-.inspector-text {
-  color: oklch(80% 0.014 91);
+.caption-text {
+  max-width: 60ch;
+  color: var(--ink-soft);
   font-size: 0.92rem;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
-.studio-inspector-body ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin: 0.35rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.studio-inspector-body li {
-  padding: 0.28rem 0.65rem;
-  border-radius: 999px;
-  background: oklch(30% 0.02 258);
-  color: var(--canvas);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* Estudio: barra, ferramentas, area de trabalho, painel e linha do tempo, sem
-   janela em volta: os blocos ficam direto sobre o fundo da secao. A area usa o
-   mesmo campo azul do bento de projetos. */
 .studio {
   color: var(--canvas);
-}
-
-.studio-bar {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.3rem 0.45rem 0.6rem;
-}
-
-.studio-dots {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.studio-dots i {
-  width: 0.62rem;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: oklch(16.5% 0.014 258 / 0.2);
-}
-
-.studio-dots i:first-child {
-  background: var(--accent-yellow);
-}
-
-.studio-file {
-  justify-self: center;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0.3rem 0.85rem;
-  border-radius: 999px;
-  background: oklch(25% 0.018 258);
-  color: oklch(82% 0.014 91);
-  font-size: 0.68rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.studio-file b {
-  color: var(--accent-yellow);
-}
-
-/* Grafite: sem a janela escura, o amarelo sobre o creme da secao sumiria. */
-.studio-count {
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 700;
-}
-
-.studio-body {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.45rem;
-}
-
-.studio-tools {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.3rem;
-  border-radius: 0.65rem;
-  background: oklch(22% 0.018 258);
-}
-
-.studio-tool {
-  width: 2.1rem;
-  height: 2.1rem;
-  display: grid;
-  place-items: center;
-  border-radius: 0.5rem;
-  color: oklch(72% 0.014 91);
-  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
-}
-
-.studio-tool[data-on="true"] {
-  background: var(--accent-yellow);
-  color: var(--ink);
 }
 
 .studio-canvas {
@@ -8862,43 +8748,6 @@ p {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.studio-timeline {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.35rem;
-  margin: 0.5rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.studio-timeline li {
-  overflow: hidden;
-  padding: 0.45rem 0.4rem;
-  border-radius: 999px;
-  background: oklch(25% 0.018 258);
-  color: oklch(72% 0.014 91);
-  font-family: var(--font-display);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-align: center;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
-}
-
-/* Etapa concluida: tom claro sobre o fundo creme da secao, entre a pendente
-   (escura) e a ativa (amarela). */
-.studio-timeline li[data-done="true"] {
-  background: var(--canvas-deep);
-  color: var(--ink);
-}
-
-.studio-timeline li[data-on="true"] {
-  background: var(--accent-yellow);
-  color: var(--ink);
 }
 
 /* --- Etapas do projeto: mapa do tesouro ---------------------------------- */
@@ -9750,7 +9599,7 @@ p {
   }
 
   /* Estudio em tela cheia: preso abaixo do cabecalho, ocupando a altura da tela,
-     com o painel de propriedades numa coluna estreita a direita. */
+     com a legenda no canto de cima e o quadro preenchendo o resto. */
   .creative-sticky {
     top: calc(var(--header-h) + 1rem);
     height: calc(100vh - var(--header-h) - 2rem);
@@ -9759,27 +9608,16 @@ p {
   .creative-sticky .studio {
     height: 100%;
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .creative-sticky .studio-body {
-    grid-template-columns: auto minmax(0, 1fr) clamp(17rem, 22vw, 22rem);
     min-height: 0;
   }
 
   .creative-sticky .studio-canvas {
     aspect-ratio: auto;
     height: 100%;
-  }
-
-  .studio-inspector {
-    grid-column: auto;
-    padding: 1.35rem 1.25rem;
-  }
-
-  .studio-tool {
-    width: 2.6rem;
-    height: 2.6rem;
   }
 
   /* O quadro ficou bem maior: os baloes da conversa crescem junto. */
