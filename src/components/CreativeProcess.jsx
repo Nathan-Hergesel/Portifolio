@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { Brush } from "./animate-ui/icons/brush";
 import { GalleryHorizontal } from "./animate-ui/icons/gallery-horizontal";
@@ -50,6 +50,44 @@ function StudioCursor({ position }) {
       </svg>
       <span>Nathan</span>
     </span>
+  );
+}
+
+function Inspector({ mode, reducedMotion }) {
+  const { Icon } = TOOLS[mode.id];
+
+  return (
+    <div className="studio-inspector">
+      <span className="studio-inspector-label">Propriedades</span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          className="studio-inspector-body"
+          key={mode.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: easeOutExpo } }}
+          exit={{ opacity: 0, y: -8, transition: { duration: 0.18 } }}
+        >
+          <span className="inspector-chip">
+            <Icon
+              size={18}
+              strokeWidth={2.2}
+              animate={!reducedMotion}
+              loop={!reducedMotion}
+              loopDelay={1600}
+            />
+            {mode.index} / {String(creativeModes.length).padStart(2, "0")}
+          </span>
+          <h3>{mode.verb}</h3>
+          <p className="inspector-lead">{mode.lead}</p>
+          <p className="inspector-text">{mode.description}</p>
+          <ul>
+            {mode.artifacts.map((artifact) => (
+              <li key={artifact}>{artifact}</li>
+            ))}
+          </ul>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -223,6 +261,10 @@ function Studio({ active, reducedMotion }) {
 
           <StudioCursor position={TOOLS[mode.id].cursor} />
         </div>
+
+        {/* Painel de propriedades, como nas ferramentas de design: e aqui que o
+            texto da etapa aparece, no canto do estudio. */}
+        <Inspector mode={mode} reducedMotion={reducedMotion} />
       </div>
 
       <ol className="studio-timeline">
@@ -239,103 +281,90 @@ function Studio({ active, reducedMotion }) {
 export function CreativeProcess() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
-  const stepRefs = useRef([]);
+  const markerRefs = useRef([]);
 
   useEffect(() => {
-    // Faixa estreita logo abaixo do meio da tela: a etapa ativa e a que esta sendo
-    // lida, nao a primeira que encosta na borda. Abaixo do meio porque no celular o
-    // estudio fixo ocupa a metade de cima.
+    // Cada etapa tem um marcador invisivel cobrindo sua fatia da altura de rolagem.
+    // A etapa ativa e a do marcador que esta passando pela faixa do meio da tela.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) setActive(Number(entry.target.dataset.index));
         });
       },
-      { rootMargin: "-58% 0px -38%", threshold: 0 },
+      { rootMargin: "-49% 0px -49%", threshold: 0 },
     );
 
-    stepRefs.current.forEach((step) => step && observer.observe(step));
+    markerRefs.current.forEach((marker) => marker && observer.observe(marker));
     return () => observer.disconnect();
   }, []);
 
+  const share = 100 / creativeModes.length;
+
   return (
     <section className="creative section" id="processo" aria-labelledby="creative-title">
-      {/* Introducao, estudio e passos no mesmo grid: no celular eles empilham nessa
-          ordem; no desktop o estudio ocupa a coluna da direita desde o titulo, em
-          vez de comecar so depois dele e deixar o topo vazio. */}
-      <div className="creative-layout">
-        <motion.header
-          className="chapter-intro"
-          variants={reveal}
-          initial={reducedMotion ? false : "rest"}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          <span className="chapter-code">
-            <Lightbulb
-              size={16}
-              strokeWidth={2.3}
-              animate={!reducedMotion}
-              loop={!reducedMotion}
-              loopDelay={2600}
-              aria-hidden="true"
-            />
-            02 / Processo criativo
-          </span>
-          <h2 id="creative-title">
-            Da ideia
-            <br />
-            ao detalhe<span>.</span>
-          </h2>
-          <p className="chapter-lede">
-            Criatividade aqui não é inspiração repentina. É um método: ouvir com atenção, reunir
-            repertório, testar caminhos e lapidar o escolhido.
-          </p>
-        </motion.header>
+      <motion.header
+        className="chapter-intro"
+        variants={reveal}
+        initial={reducedMotion ? false : "rest"}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <span className="chapter-code">
+          <Lightbulb
+            size={16}
+            strokeWidth={2.3}
+            animate={!reducedMotion}
+            loop={!reducedMotion}
+            loopDelay={2600}
+            aria-hidden="true"
+          />
+          02 / Processo criativo
+        </span>
+        <h2 id="creative-title">
+          Da ideia
+          <br />
+          ao detalhe<span>.</span>
+        </h2>
+        <p className="chapter-lede">
+          Criatividade aqui não é inspiração repentina. É um método: ouvir com atenção, reunir
+          repertório, testar caminhos e lapidar o escolhido.
+        </p>
+      </motion.header>
 
-        <div className="creative-stage">
+      {/* Trilho de rolagem: o estudio fica preso na tela ocupando a largura toda
+          enquanto a rolagem passa pelos marcadores de cada etapa. */}
+      <div className="creative-scroll" style={{ "--steps": creativeModes.length }}>
+        {creativeModes.map((mode, index) => (
+          <span
+            className="creative-marker"
+            data-index={index}
+            style={{ top: `${index * share}%`, height: `${share}%` }}
+            ref={(node) => {
+              markerRefs.current[index] = node;
+            }}
+            aria-hidden="true"
+            key={mode.id}
+          />
+        ))}
+
+        <div className="creative-sticky">
           <Studio active={active} reducedMotion={reducedMotion} />
         </div>
-
-        <ol className="creative-steps">
-          {creativeModes.map((mode, index) => {
-            const { Icon } = TOOLS[mode.id];
-            const on = index === active;
-
-            return (
-              <li
-                className="creative-step"
-                data-index={index}
-                data-active={on}
-                ref={(node) => {
-                  stepRefs.current[index] = node;
-                }}
-                key={mode.id}
-              >
-                <span className="creative-step-chip">
-                  <Icon
-                    size={18}
-                    strokeWidth={2.2}
-                    animate={on && !reducedMotion}
-                    loop={on && !reducedMotion}
-                    loopDelay={1600}
-                    aria-hidden="true"
-                  />
-                  {mode.index}
-                </span>
-                <h3>{mode.verb}</h3>
-                <p className="creative-step-lead">{mode.lead}</p>
-                <p>{mode.description}</p>
-                <ul>
-                  {mode.artifacts.map((artifact) => (
-                    <li key={artifact}>{artifact}</li>
-                  ))}
-                </ul>
-              </li>
-            );
-          })}
-        </ol>
       </div>
+
+      {/* O estudio mostra uma etapa por vez; leitores de tela recebem todas aqui. */}
+      <ol className="sr-only">
+        {creativeModes.map((mode) => (
+          <li key={mode.id}>
+            <h3>
+              {mode.index}. {mode.verb}: {mode.lead}
+            </h3>
+            <p>{mode.description}</p>
+            <p>{mode.artifacts.join(", ")}</p>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }
