@@ -8104,14 +8104,11 @@ p {
   text-transform: uppercase;
 }
 
-/* Estudio: janela de ferramenta com barra, ferramentas, area de trabalho e linha
-   do tempo. A area usa o mesmo campo azul do bento de projetos. */
+/* Estudio: barra, ferramentas, area de trabalho, painel e linha do tempo, sem
+   janela em volta: os blocos ficam direto sobre o fundo da secao. A area usa o
+   mesmo campo azul do bento de projetos. */
 .studio {
-  padding: 0.5rem;
-  border-radius: 1rem;
-  background: var(--ink);
   color: var(--canvas);
-  box-shadow: 0 2rem 3rem -1.75rem oklch(16.5% 0.014 258 / 0.55);
 }
 
 .studio-bar {
@@ -8131,7 +8128,7 @@ p {
   width: 0.62rem;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: oklch(92% 0.025 256 / 0.22);
+  background: oklch(16.5% 0.014 258 / 0.2);
 }
 
 .studio-dots i:first-child {
@@ -8156,8 +8153,9 @@ p {
   color: var(--accent-yellow);
 }
 
+/* Grafite: sem a janela escura, o amarelo sobre o creme da secao sumiria. */
 .studio-count {
-  color: var(--accent-yellow);
+  color: var(--ink);
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
@@ -8891,9 +8889,11 @@ p {
   transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
 }
 
+/* Etapa concluida: tom claro sobre o fundo creme da secao, entre a pendente
+   (escura) e a ativa (amarela). */
 .studio-timeline li[data-done="true"] {
-  background: oklch(92% 0.025 256 / 0.16);
-  color: var(--canvas);
+  background: var(--canvas-deep);
+  color: var(--ink);
 }
 
 .studio-timeline li[data-on="true"] {
@@ -9760,7 +9760,6 @@ p {
     height: 100%;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    padding: 0.65rem;
   }
 
   .creative-sticky .studio-body {
