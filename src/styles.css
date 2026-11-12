@@ -9399,43 +9399,43 @@ p {
   margin-top: 1.75rem;
 }
 
-/* Mural em perspectiva sem moldura: ele sangra ate as bordas da secao, que o
-   cortam, e so esfuma do lado em que encontra o texto (em cima no celular, a
-   esquerda no desktop). Esfumar os quatro lados desenhava uma caixa em volta. */
-/* Area reservada, sem esfumado. As colunas ficam em pe e dividem a largura da
-   area, entao nenhum cartao e cortado nas laterais; so entram e saem pelo topo e
-   pelo fim da secao, que e o movimento do proprio marquee. */
+/* Mural sem esfumado e sem cartoes cortados nas laterais. A inclinacao diagonal
+   continua, mas so entram as colunas que cabem inteiras na area: nada recorta o
+   mural dos lados, e a secao so corta em cima e embaixo, por onde os cartoes
+   entram e saem com o proprio movimento do marquee. */
 .testimonial-wall {
   position: relative;
   min-width: 0;
   height: clamp(26rem, 70vw, 32rem);
   margin-top: 2rem;
   margin-bottom: calc(-1 * clamp(5rem, 9vw, 8rem));
-  overflow: hidden;
+  /* Corta so na vertical (topo do mural, logo abaixo do texto); dos lados ele
+     pode ocupar a secao inteira. */
+  clip-path: inset(0 -100vw);
 }
 
-/* Maior que o mural para que, inclinado, ainda cubra os cantos. A perspectiva
-   vai no proprio transform, e nao como `perspective` no mural: com ela no
-   elemento mascarado, o Chrome deixava os filhos 3D escaparem da mascara. */
-/* So perspectiva em Y, sem a rotacao diagonal: com origem na esquerda o lado
-   direito recua e encolhe, entao o plano nunca passa das bordas laterais. A
-   sobra vertical cobre o topo e o fim mesmo com a perspectiva. */
+/* Mais alto que o mural para que, inclinado, as colunas atravessem o topo e o fim.
+   Na horizontal tem a largura da area, com as colunas centralizadas. A perspectiva
+   vai no proprio transform: com `perspective` no mural, o Chrome deixava os
+   filhos 3D escaparem do recorte. */
 .testimonial-wall-tilt {
   position: absolute;
-  inset: -20% 0;
+  inset: -55% 0;
   display: flex;
+  justify-content: center;
   gap: 1rem;
-  transform: perspective(1400px) rotateY(8deg);
-  transform-origin: left center;
+  transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
 }
 
+/* No celular a diagonal espalha demais duas colunas na largura da tela; uma so
+   cabe inteira. */
 .testimonial-wall-col {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: 12rem;
   height: 100%;
 }
 
-.testimonial-wall-col:nth-child(n + 3) {
+.testimonial-wall-col:nth-child(n + 2) {
   display: none;
 }
 
@@ -9866,6 +9866,12 @@ p {
     width: calc((100% - 2 * var(--wall-pad)) * 0.6);
     height: auto;
     margin: 0;
+    /* A propria secao (overflow hidden) faz o corte de cima e de baixo. */
+    clip-path: none;
+  }
+
+  .testimonial-wall-col {
+    width: clamp(12rem, 12vw, 15.5rem);
   }
 
   .wall-quote {
@@ -9877,19 +9883,24 @@ p {
     font-size: 1.2rem;
   }
 
-  /* Tres colunas no desktop, quatro em telas largas. */
+  /* Quantas colunas cabem inteiras na area sem encostar no texto nem sair da tela:
+     duas ate 86rem, tres dai em diante (ver o bloco de 86rem). */
+  .testimonial-wall-col:nth-child(n + 2) {
+    display: flex;
+  }
+
+  .testimonial-wall-col:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+@media (min-width: 86rem) {
   .testimonial-wall-col:nth-child(n + 3) {
     display: flex;
   }
 
   .testimonial-wall-col:nth-child(n + 4) {
     display: none;
-  }
-}
-
-@media (min-width: 100rem) {
-  .testimonial-wall-col:nth-child(n + 4) {
-    display: flex;
   }
 
   .cta-actions {
