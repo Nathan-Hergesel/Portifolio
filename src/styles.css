@@ -9417,14 +9417,16 @@ p {
 /* Mais alto que o mural para que, inclinado, as colunas atravessem o topo e o fim.
    Na horizontal tem a largura da area, com as colunas centralizadas. A perspectiva
    vai no proprio transform: com `perspective` no mural, o Chrome deixava os
-   filhos 3D escaparem do recorte. */
+   filhos 3D escaparem do recorte. Ela e longa (4000px) de proposito: com o ponto
+   de vista perto, as colunas mais proximas apareciam bem mais largas que as
+   outras; de longe os mesmos angulos mantem todos os cartoes do mesmo tamanho. */
 .testimonial-wall-tilt {
   position: absolute;
   inset: -55% 0;
   display: flex;
   justify-content: center;
   gap: 1rem;
-  transform: perspective(1100px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
+  transform: perspective(4000px) rotateX(18deg) rotateY(-12deg) rotateZ(14deg);
 }
 
 /* No celular a diagonal espalha demais duas colunas na largura da tela; uma so
