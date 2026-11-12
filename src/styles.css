@@ -7195,8 +7195,7 @@ p {
   padding: clamp(1rem, 2.4vw, 1.75rem);
 }
 
-.bento-tile-copy h3,
-.bento-tile-video h3 {
+.bento-tile-copy h3 {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2.1rem, 4vw, 3.6rem);
@@ -7265,59 +7264,54 @@ p {
   justify-self: end;
 }
 
-.bento-tile-video {
-  min-height: 13rem;
-  display: grid;
-  align-content: space-between;
-  padding: clamp(1.1rem, 2vw, 1.6rem);
+/* Videos nos cards: mesmo encaixe das imagens, com fundo escuro ate a capa
+   carregar. */
+.bento-tile > video {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   background: var(--ink);
 }
 
-.bento-video-label {
-  position: relative;
-  z-index: 2;
-  color: var(--accent-yellow);
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.bento-tile-trendcast,
+.bento-tile-anuncio {
+  min-height: 20rem;
 }
 
-.bento-tile-video > div {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.bento-tile-video h3 {
-  font-size: clamp(1.9rem, 3vw, 2.8rem);
-}
-
-.bento-tile-video a {
-  flex: 0 0 auto;
+.bento-video-play {
+  position: absolute;
+  z-index: 3;
+  top: 0.8rem;
+  right: 0.8rem;
+  min-height: 2.25rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  border-bottom: 1px solid currentColor;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: oklch(15% 0.018 258 / 0.88);
   color: var(--canvas);
-  font-size: 0.62rem;
-  font-weight: 750;
-  text-decoration: none;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
-.bento-video-icon {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  right: 5%;
-  width: min(42%, 10rem);
-  height: auto;
-  color: oklch(92% 0.025 256 / 0.08);
-  transform: translateY(-50%);
+.bento-video-play svg {
+  color: var(--accent-yellow);
+  font-size: 1rem;
+}
+
+/* Com som, o player mostra os controles: sai tudo o que ficava por cima dele. */
+.bento-tile[data-sound] .bento-tile-shade,
+.bento-tile[data-sound] .bento-tile-meta,
+.bento-tile[data-sound] .bento-tile-copy {
+  display: none;
 }
 
 .bento-outro {
@@ -7407,9 +7401,9 @@ p {
     grid-row: span 3;
   }
 
-  .bento-tile-video {
+  .bento-tile-trendcast {
     grid-column: span 6;
-    grid-row: span 1;
+    grid-row: span 3;
   }
 
   .bento-outro {
@@ -7465,10 +7459,6 @@ p {
     grid-row: span 4;
   }
 
-  .bento-tile-video {
-    grid-column: span 12;
-    grid-row: span 1;
-  }
 }
 
 @media (hover: hover) {
@@ -7838,11 +7828,6 @@ p {
   grid-row: span 1;
 }
 
-.bento-grid.is-filtered > .bento-tile-video {
-  grid-row: span 1;
-  min-height: 0;
-}
-
 /* O filtro passou a remover em vez de atenuar. */
 .bento-tile[data-dimmed="true"] {
   opacity: 1;
@@ -7897,8 +7882,9 @@ p {
   aspect-ratio: 0.62;
 }
 
-.bento-grid.is-filtered > .bento-tile-video {
-  aspect-ratio: 16 / 5;
+.bento-grid.is-filtered > .bento-tile-trendcast,
+.bento-grid.is-filtered > .bento-tile-anuncio {
+  aspect-ratio: 16 / 9;
 }
 
 /* ==========================================================================
@@ -9730,13 +9716,13 @@ p {
     grid-template-columns: 1fr 1fr;
   }
 
-  /* Terceira faixa do destaque: Morcegao (8) e o card de video (4) fecham as 12
-     colunas. Fora do destaque o video volta a ser a faixa fina das regras acima. */
+  /* Terceira faixa do destaque: Morcegao (8) e o video do Trend Cast (4) fecham
+     as 12 colunas. */
   .bento-tile-morcegao {
     grid-column: span 8;
   }
 
-  .bento-grid:not(.is-filtered) > .bento-tile-video {
+  .bento-grid:not(.is-filtered) > .bento-tile-trendcast {
     grid-column: span 4;
     grid-row: span 3;
   }

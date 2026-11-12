@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { BsArrowUpRight, BsPlayFill } from "react-icons/bs";
 
@@ -137,17 +137,108 @@ const projects = [
     aspect: 1.78,
     alt: "Página inicial do site da TPark Estacionamentos",
   },
+  // Videos: `image` e a capa (um quadro do proprio video) e `video` o arquivo que
+  // toca no card.
+  {
+    id: "trendcast",
+    featured: true,
+    index: "10",
+    category: "Vídeo",
+    title: "Trend Cast",
+    description: "Vídeo em motion graphics apresentando o produto.",
+    image: "/assets/images/projects/trendcast.webp",
+    wallImage: "/assets/images/projects/wall/trendcast.webp",
+    video: "/assets/videos/trendcast.mp4",
+    aspect: 1.78,
+    alt: "Vídeo de apresentação do Trend Cast",
+  },
+  {
+    id: "anuncio",
+    index: "11",
+    category: "Vídeo",
+    title: "Anúncio Hergesel.dev",
+    description: "Anúncio em motion para divulgar os serviços do site.",
+    image: "/assets/images/projects/anuncio-hergesel.webp",
+    wallImage: "/assets/images/projects/wall/anuncio-hergesel.webp",
+    video: "/assets/videos/anuncio-hergesel.mp4",
+    aspect: 1.78,
+    alt: "Vídeo de anúncio dos serviços de Nathan Hergesel",
+  },
 ];
 
+// Video no card: toca sem som e em loop so enquanto o card esta visivel, para nao
+// pesar a pagina. "Assistir com som" liga o audio e os controles do player. Com
+// movimento reduzido nao ha autoplay; a capa fica ate a pessoa pedir.
+function TileVideo({ project, reducedMotion, withSound, onSound }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || reducedMotion || withSound) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [reducedMotion, withSound]);
+
+  const playWithSound = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = false;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+    onSound();
+  };
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        src={project.video}
+        poster={project.image}
+        muted
+        loop={!withSound}
+        playsInline
+        preload="none"
+        controls={withSound}
+        aria-label={project.alt}
+      />
+      {!withSound && (
+        <button className="bento-video-play" type="button" onClick={playWithSound}>
+          <BsPlayFill aria-hidden="true" />
+          Assistir com som
+        </button>
+      )}
+    </>
+  );
+}
+
 function BentoTile({ project, reducedMotion }) {
+  const [withSound, setWithSound] = useState(false);
+
   const content = (
     <>
-      <img
-        src={project.image}
-        alt={project.alt}
-        loading="eager"
-        decoding="async"
-      />
+      {project.video ? (
+        <TileVideo
+          project={project}
+          reducedMotion={reducedMotion}
+          withSound={withSound}
+          onSound={() => setWithSound(true)}
+        />
+      ) : (
+        <img
+          src={project.image}
+          alt={project.alt}
+          loading="eager"
+          decoding="async"
+        />
+      )}
       <span className="bento-tile-shade" aria-hidden="true" />
       <header className="bento-tile-meta">
         <span>{project.index}</span>
@@ -164,6 +255,7 @@ function BentoTile({ project, reducedMotion }) {
     <motion.article
       className={`bento-tile bento-tile-${project.id}`}
       id={`projeto-${project.id}`}
+      data-sound={withSound || undefined}
       layout={!reducedMotion}
       initial={reducedMotion ? false : entrada.initial}
       animate={entrada.animate}
@@ -187,29 +279,6 @@ function BentoTile({ project, reducedMotion }) {
   );
 }
 
-function VideoTile({ reducedMotion }) {
-  return (
-    <motion.article
-      className="bento-tile bento-tile-video"
-      layout={!reducedMotion}
-      initial={reducedMotion ? false : entrada.initial}
-      animate={entrada.animate}
-      exit={reducedMotion ? undefined : entrada.exit}
-      transition={entrada.transition}
-    >
-      <span className="bento-video-label">10 / Vídeos</span>
-      <div>
-        <h3>Em produção.</h3>
-        <a href="#contato">
-          Planejar um vídeo
-          <BsArrowUpRight aria-hidden="true" />
-        </a>
-      </div>
-      <BsPlayFill className="bento-video-icon" aria-hidden="true" />
-    </motion.article>
-  );
-}
-
 export function RecentProjects() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState("destaque");
@@ -217,11 +286,11 @@ export function RecentProjects() {
   const counts = useMemo(() => {
     // "Em destaque" mostra um item por categoria, entao a contagem dele nao e o
     // total de projetos e sim quantas categorias tem representante.
-    const tally = { Vídeo: 0 };
+    const tally = {};
     projects.forEach((project) => {
       tally[project.category] = (tally[project.category] ?? 0) + 1;
     });
-    tally.total = projects.filter((project) => project.featured).length + 1;
+    tally.total = projects.filter((project) => project.featured).length;
     return tally;
   }, []);
 
@@ -233,9 +302,6 @@ export function RecentProjects() {
       ),
     [active, emDestaque],
   );
-  // O card de video representa a categoria mesmo sem itens, entao aparece no
-  // destaque e quando o proprio filtro de video esta ativo.
-  const mostrarVideo = emDestaque || active === "Vídeo";
 
   return (
     <section
@@ -275,9 +341,6 @@ export function RecentProjects() {
                 key={project.id}
               />
             ))}
-            {mostrarVideo && (
-              <VideoTile reducedMotion={reducedMotion} key="video" />
-            )}
           </AnimatePresence>
         </div>
 
