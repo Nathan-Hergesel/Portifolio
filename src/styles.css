@@ -9884,7 +9884,7 @@ p {
   }
 
   /* Quantas colunas cabem inteiras na area sem encostar no texto nem sair da tela:
-     duas ate 86rem, tres dai em diante (ver o bloco de 86rem). */
+     duas ate 86rem, tres ate 90rem e quatro dai em diante (blocos abaixo). */
   .testimonial-wall-col:nth-child(n + 2) {
     display: flex;
   }
@@ -9913,9 +9913,28 @@ p {
   .testimonial-wall-col:nth-child(n + 3) {
     display: flex;
   }
+}
+
+/* Quarta coluna, a direita: o mural passa a ir ate a borda da tela, usando a
+   margem direita da pagina, e as colunas alinham pela esquerda da area, entao a
+   nova entra do lado direito sem empurrar as outras para cima do texto. */
+@media (min-width: 90rem) {
+  .testimonial-wall {
+    left: calc(var(--wall-pad) + (100% - 2 * var(--wall-pad)) * 0.4 + 2rem);
+    right: 0;
+    width: auto;
+  }
+
+  .testimonial-wall-tilt {
+    justify-content: flex-start;
+  }
+
+  .testimonial-wall-col {
+    width: clamp(11rem, 11vw, 14rem);
+  }
 
   .testimonial-wall-col:nth-child(n + 4) {
-    display: none;
+    display: flex;
   }
 }
 
