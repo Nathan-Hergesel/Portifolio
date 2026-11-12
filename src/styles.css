@@ -9892,16 +9892,6 @@ p {
   .testimonial-wall-col:nth-child(n + 3) {
     display: none;
   }
-}
-
-@media (min-width: 86rem) {
-  .testimonial-wall-col:nth-child(n + 3) {
-    display: flex;
-  }
-
-  .testimonial-wall-col:nth-child(n + 4) {
-    display: none;
-  }
 
   .cta-actions {
     grid-template-columns: 1fr 1fr;
@@ -9916,6 +9906,16 @@ p {
   .bento-grid:not(.is-filtered) > .bento-tile-video {
     grid-column: span 4;
     grid-row: span 3;
+  }
+}
+
+@media (min-width: 86rem) {
+  .testimonial-wall-col:nth-child(n + 3) {
+    display: flex;
+  }
+
+  .testimonial-wall-col:nth-child(n + 4) {
+    display: none;
   }
 }
 
