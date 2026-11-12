@@ -7214,22 +7214,6 @@ p {
   line-height: 1.45;
 }
 
-.bento-tile-open {
-  position: absolute;
-  z-index: 3;
-  top: 0.8rem;
-  right: 0.8rem;
-  width: 2.9rem;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  background: var(--accent-yellow);
-  color: var(--ink);
-  transition: transform 380ms var(--ease-out);
-}
-
 .bento-tile-vjs {
   min-height: 20rem;
 }
@@ -7496,10 +7480,6 @@ p {
 
   .bento-tile-estudai:hover > img {
     transform: translateX(-50%) translateY(-0.35rem);
-  }
-
-  .bento-tile:hover .bento-tile-open {
-    transform: rotate(7deg) scale(1.05);
   }
 
   .bento-outro > a:hover {

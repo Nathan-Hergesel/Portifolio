@@ -157,11 +157,6 @@ function BentoTile({ project, reducedMotion }) {
         <h3>{project.title}</h3>
         <p>{project.description}</p>
       </div>
-      {project.href && (
-        <span className="bento-tile-open" aria-hidden="true">
-          <BsArrowUpRight />
-        </span>
-      )}
     </>
   );
 
