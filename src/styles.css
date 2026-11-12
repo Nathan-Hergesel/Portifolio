@@ -7378,11 +7378,6 @@ p {
     min-height: 0;
   }
 
-  .bento-tile-vjs {
-    grid-column: span 6;
-    grid-row: span 3;
-  }
-
   .bento-tile-mercearia,
   .bento-tile-obraflow {
     grid-column: span 3;
@@ -7420,9 +7415,9 @@ p {
   /* Spans em vez de posicao absoluta. Com o filtro removendo tiles, coordenadas
      fixas deixariam buracos onde estava o item retirado; spans mais
      `grid-auto-flow: dense` reempacotam qualquer subconjunto. Os pares somam 12
-     nas combinacoes que importam: vjs+mercearia, obraflow+brisa, e os tres
+     nas combinacoes que importam: morcegao+mercearia, obraflow+brisa, e os tres
      designs entre si. */
-  .bento-tile-vjs {
+  .bento-tile-morcegao {
     grid-column: span 7;
     grid-row: span 3;
   }
@@ -9573,9 +9568,10 @@ p {
   text-transform: uppercase;
 }
 
-/* --- Portal Morcegao no bento ------------------------------------------- */
+/* --- Portal Morcegao e TPark no bento ----------------------------------- */
 
-.bento-tile-morcegao {
+.bento-tile-morcegao,
+.bento-tile-tpark {
   min-height: 20rem;
 }
 
@@ -9588,7 +9584,8 @@ p {
 }
 
 @media (min-width: 48rem) {
-  .bento-tile-morcegao {
+  .bento-tile-morcegao,
+  .bento-tile-tpark {
     grid-column: span 6;
     grid-row: span 3;
   }
@@ -9716,9 +9713,9 @@ p {
     grid-template-columns: 1fr 1fr;
   }
 
-  /* Terceira faixa do destaque: Morcegao (8) e o video do Trend Cast (4) fecham
-     as 12 colunas. */
-  .bento-tile-morcegao {
+  /* Terceira faixa do destaque: TPark (8) e o video do Trend Cast (4) fecham as
+     12 colunas. */
+  .bento-tile-tpark {
     grid-column: span 8;
   }
 

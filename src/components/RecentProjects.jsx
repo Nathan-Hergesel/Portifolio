@@ -30,11 +30,25 @@ const entrada = {
   transition: { duration: 0.38, ease: easeOutExpo },
 };
 
+// A ordem aqui e a ordem do destaque: o primeiro destacado ocupa o card grande
+// do topo (ver os spans de .bento-tile-morcegao no CSS).
 const projects = [
   {
-    id: "vjs",
+    id: "morcegao",
     featured: true,
     index: "01",
+    category: "Sistema",
+    title: "Portal Morcegão",
+    description: "Portal interno de supermercado com canal de escuta anônimo.",
+    image: "/assets/images/projects/morcegao.webp",
+    wallImage: "/assets/images/projects/wall/morcegao.webp",
+    aspect: 1.78,
+    alt: "Tela de acesso do portal interno do Supermercado Morcegão",
+    href: "https://supermercadomorcegao.tech/entrar",
+  },
+  {
+    id: "vjs",
+    index: "02",
     category: "Site",
     title: "VJS Sistemas",
     description: "Estratégia, interface e desenvolvimento comercial.",
@@ -47,7 +61,7 @@ const projects = [
   {
     id: "mercearia",
     featured: true,
-    index: "02",
+    index: "03",
     category: "App",
     title: "Mercearia Fácil",
     description: "Vendas, estoque e fornecedores para pequenos comércios.",
@@ -59,7 +73,7 @@ const projects = [
   {
     id: "obraflow",
     featured: true,
-    index: "03",
+    index: "04",
     category: "Sistema",
     title: "ObraFlow",
     description: "Cronograma, equipe, custos e indicadores em um painel.",
@@ -70,7 +84,7 @@ const projects = [
   },
   {
     id: "estudai",
-    index: "04",
+    index: "05",
     category: "App",
     title: "EstudAí",
     description: "Organização e rotina de estudos em uma experiência mobile.",
@@ -82,7 +96,7 @@ const projects = [
   {
     id: "brisa",
     featured: true,
-    index: "05",
+    index: "06",
     category: "Design",
     title: "Brisa Solar",
     description: "Comunicação visual para energia residencial.",
@@ -93,7 +107,7 @@ const projects = [
   },
   {
     id: "serra",
-    index: "06",
+    index: "07",
     category: "Design",
     title: "Serra Labs",
     description: "Identidade para consultoria em tecnologia e IA.",
@@ -104,7 +118,7 @@ const projects = [
   },
   {
     id: "aurora",
-    index: "07",
+    index: "08",
     category: "Design",
     title: "Aurora Casa",
     description: "Identidade para interiores e decoração.",
@@ -114,20 +128,8 @@ const projects = [
     alt: "Kit de identidade visual da Aurora Casa",
   },
   {
-    id: "morcegao",
-    featured: true,
-    index: "08",
-    category: "Sistema",
-    title: "Portal Morcegão",
-    description: "Portal interno de supermercado com canal de escuta anônimo.",
-    image: "/assets/images/projects/morcegao.webp",
-    wallImage: "/assets/images/projects/wall/morcegao.webp",
-    aspect: 1.78,
-    alt: "Tela de acesso do portal interno do Supermercado Morcegão",
-    href: "https://supermercadomorcegao.tech/entrar",
-  },
-  {
     id: "tpark",
+    featured: true,
     index: "09",
     category: "Site",
     title: "TPark Estacionamentos",
