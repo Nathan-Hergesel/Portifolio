@@ -7784,14 +7784,17 @@ p {
    por um elemento invisivel (ver CreativeProcess). O estudio fica preso na tela
    enquanto o trilho passa. */
 .creative-scroll {
+  --lead: 0px;
   position: relative;
-  height: calc(var(--steps) * 85vh);
+  height: calc(var(--steps) * 85vh + var(--lead));
 }
 
 .creative-marker {
   position: absolute;
+  top: calc(var(--lead) + var(--i) * 85vh);
   left: 0;
   width: 1px;
+  height: 85vh;
   pointer-events: none;
 }
 
@@ -9375,6 +9378,225 @@ p {
 .bento-tile-morcegao,
 .bento-tile-tpark {
   min-height: 20rem;
+}
+
+/* --- Notebook do processo criativo -------------------------------------- */
+
+/* Trecho de abertura no comeco do trilho (so no desktop, ver --lead abaixo):
+   enquanto ele passa, a tampa do notebook sobe. Os marcadores das etapas vem
+   depois dele, cada um com 85vh. */
+.creative-lead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: var(--lead);
+  pointer-events: none;
+}
+
+/* No celular nao ha notebook: os embrulhos somem do layout e o quadro fica como
+   antes. */
+.laptop,
+.laptop-lid,
+.laptop-screen,
+.laptop-display {
+  display: contents;
+}
+
+.laptop-back,
+.laptop-deck {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .creative-scroll {
+    --lead: 100vh;
+  }
+
+  .creative-sticky .studio-body {
+    display: grid;
+    place-items: center;
+    container-type: size;
+  }
+
+  /* Cena 3D vista de frente e um pouco de cima (perspective-origin acima da
+     dobradica). A tampa (16:10) gira na dobradica; o teclado e um plano deitado
+     que sai da dobradica em direcao a quem olha. O padding de baixo reserva o
+     espaco que o teclado ocupa em perspectiva. O tamanho e o maior que cabe: a
+     frente do teclado fica ~30% mais larga que a tela por causa da perspectiva. */
+  .laptop {
+    --lid-radius: 1.1rem 1.1rem 0.35rem 0.35rem;
+    --lw: min(100cqw / 1.32, 100cqh / 0.79);
+    position: relative;
+    display: block;
+    width: var(--lw);
+    padding-bottom: calc(var(--lw) * 0.165);
+    perspective: 2400px;
+    perspective-origin: 50% 25%;
+  }
+
+  /* Sombra do notebook na mesa. */
+  .laptop::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -6%;
+    bottom: 0.5%;
+    left: -6%;
+    height: 6%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, oklch(14% 0.06 258 / 0.5), transparent);
+    filter: blur(6px);
+  }
+
+  /* A tampa gira na dobradica (borda de baixo): -90deg e fechada, deitada sobre
+     o teclado com o dorso para cima; 0 e aberta. */
+  .laptop-lid {
+    position: relative;
+    z-index: 1;
+    display: block;
+    aspect-ratio: 16 / 10;
+    transform-origin: 50% 100%;
+    transform-style: preserve-3d;
+    transform: rotateX(calc((1 - var(--open)) * -90deg));
+    will-change: transform;
+  }
+
+  .laptop-screen,
+  .laptop-back {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--lid-radius);
+    backface-visibility: hidden;
+  }
+
+  /* Frente: moldura preta com a camera em cima. */
+  .laptop-screen {
+    display: block;
+    padding: 1.6% 1.6% 2.4%;
+    background: oklch(15% 0.01 258);
+    box-shadow: inset 0 0 0 1px oklch(42% 0.02 258);
+  }
+
+  .laptop-screen::before {
+    content: "";
+    position: absolute;
+    top: 0.55%;
+    left: 50%;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: oklch(30% 0.02 258);
+    transform: translate(-50%, 0.2rem);
+  }
+
+  /* A tela liga perto do fim da abertura: o fundo da secao vira o papel de parede
+     e os quadros aparecem por cima, como antes. */
+  .laptop-display {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0.3rem;
+    background: var(--stage-bg);
+    opacity: clamp(0, calc((var(--open) - 0.72) / 0.28), 1);
+  }
+
+  /* Dorso da tampa: aluminio com as iniciais. */
+  .laptop-back {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(170deg, oklch(88% 0.008 256), oklch(74% 0.012 256));
+    box-shadow: inset 0 0 0 1px oklch(96% 0.004 256 / 0.6);
+    transform: rotateX(180deg);
+  }
+
+  .laptop-back span {
+    color: oklch(66% 0.012 256);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 850;
+    letter-spacing: 0.04em;
+  }
+
+  /* Teclado: plano do tamanho da tampa, deitado a partir da dobradica (um pouco
+     abaixo dela, para a tampa fechada assentar por cima sem se misturar). */
+  .laptop-deck {
+    position: absolute;
+    /* Na altura da dobradica: a tampa 16:10 tem 0,625 da largura de altura. */
+    top: calc(var(--lw) * 0.625);
+    left: 0;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 0.35rem 0.35rem 1.1rem 1.1rem;
+    background: linear-gradient(to bottom, oklch(80% 0.01 256), oklch(90% 0.006 256));
+    transform-origin: 50% 0;
+    transform: translateY(0.2rem) rotateX(90deg);
+    transform-style: preserve-3d;
+  }
+
+  /* Teclas: grade escura com os vaos claros. */
+  .laptop-keys {
+    position: absolute;
+    top: 7%;
+    right: 8%;
+    left: 8%;
+    height: 44%;
+    border-radius: 0.3rem;
+    background-color: oklch(26% 0.012 258);
+    background-image:
+      linear-gradient(90deg, transparent 0 88%, oklch(82% 0.008 256) 88% 100%),
+      linear-gradient(transparent 0 80%, oklch(82% 0.008 256) 80% 100%);
+    background-size: calc(100% / 14) calc(100% / 6);
+  }
+
+  .laptop-pad {
+    position: absolute;
+    top: 58%;
+    left: 33%;
+    width: 34%;
+    height: 33%;
+    border-radius: 0.5rem;
+    background: oklch(84% 0.008 256);
+    box-shadow: inset 0 0 0 1px oklch(70% 0.01 256);
+  }
+
+  /* Borda da frente: uma lamina em pe na ponta do teclado, com o rebaixo para
+     abrir a tampa. */
+  .laptop-lip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 1.1rem;
+    border-radius: 0 0 0.9rem 0.9rem;
+    background: linear-gradient(to bottom, oklch(84% 0.008 256), oklch(64% 0.012 256));
+    transform-origin: 50% 0;
+    transform: rotateX(-90deg);
+  }
+
+  .laptop-lip::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 13%;
+    height: 45%;
+    border-radius: 0 0 0.7rem 0.7rem;
+    background: oklch(66% 0.012 256);
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .laptop-lid {
+    transform: none;
+  }
+
+  .laptop-display {
+    opacity: 1;
+  }
 }
 
 /* --- Breakpoints --------------------------------------------------------- */

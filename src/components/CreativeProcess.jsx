@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion, useScroll } from "motion/react";
 
 import { Brush } from "./animate-ui/icons/brush";
 import { GalleryHorizontal } from "./animate-ui/icons/gallery-horizontal";
@@ -86,9 +86,10 @@ function Caption({ mode, reducedMotion }) {
   );
 }
 
-// So o quadro com as animacoes de cada etapa e o cursor, sem interface de
-// ferramenta em volta.
-function Studio({ active, reducedMotion }) {
+// O quadro com as animacoes de cada etapa e o cursor, dentro da tela de um
+// notebook. `open` (0 a 1, vindo da rolagem) levanta a tampa e, perto do fim,
+// liga a tela. No celular o notebook some no CSS e o quadro fica como antes.
+function Studio({ active, reducedMotion, open }) {
   const mode = creativeModes[active];
 
   return (
@@ -96,137 +97,153 @@ function Studio({ active, reducedMotion }) {
       <Caption mode={mode} reducedMotion={reducedMotion} />
 
       <div className="studio-body">
-        <div className="studio-canvas">
-          <div className="studio-layer studio-chat" data-on={active === 0}>
-            {CHAT.map((line) => (
-              <span className={`chat-bubble chat-${line.from}`} key={line.text}>
-                {line.text}
-              </span>
-            ))}
-          </div>
+        <motion.div className="laptop" style={{ "--open": open }}>
+          <div className="laptop-lid">
+            <div className="laptop-back">
+              <span>NH</span>
+            </div>
+            <div className="laptop-screen">
+              <div className="laptop-display">
+                <div className="studio-canvas">
+                  <div className="studio-layer studio-chat" data-on={active === 0}>
+                    {CHAT.map((line) => (
+                      <span className={`chat-bubble chat-${line.from}`} key={line.text}>
+                        {line.text}
+                      </span>
+                    ))}
+                  </div>
 
-          {/* Moodboard no formato classico (foto, forma, tipografia, paleta,
-              componentes e palavras-chave), com pecas genericas: e o metodo que
-              aparece aqui, nao um trabalho especifico. */}
-          <div className="studio-layer studio-mood" data-on={active === 1}>
-            <span className="mood-photo">
-              <i className="mood-sun" />
-              <i className="mood-hill mood-hill-back" />
-              <i className="mood-hill" />
-            </span>
-            <span className="mood-shapes">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span className="mood-type">
-              Aa
-              <small>
-                Título
-                <br />
-                Corpo
-              </small>
-            </span>
-            <span className="mood-palette">
-              {PALETTE.map((hex) => (
-                <span key={hex} style={{ "--swatch": hex }}>
-                  {hex}
-                </span>
-              ))}
-            </span>
-            <span className="mood-ui">
-              <span className="mood-ui-button">Botão</span>
-              <span className="mood-ui-toggle" />
-              <span className="mood-ui-input" />
-            </span>
-            <span className="mood-tags">
-              <span>direto</span>
-              <span>humano</span>
-              <span>preciso</span>
-            </span>
-          </div>
-
-          {/* Esboco e refino dividem a mesma moldura: o refino passa por cima do
-              wireframe como uma varredura, em vez de trocar de imagem. */}
-          <div
-            className="studio-layer studio-page"
-            data-on={active >= 2}
-            data-refined={active === 3}
-          >
-            <span className="studio-browser">
-              <span className="studio-browser-bar">
-                <i />
-                <i />
-                <i />
-                <span />
-              </span>
-              <span className="studio-wire">
-                <span className="wire-nav" />
-                <span className="wire-hero">
-                  <span className="wire-line wire-line-lg" />
-                  <span className="wire-line wire-line-md" />
-                  <span className="wire-button" />
-                  <span className="wire-media" />
-                </span>
-                <span className="wire-cards">
-                  <span />
-                  <span />
-                  <span />
-                </span>
-              </span>
-              {/* Site final desenhado, nao um print: e o moodboard aplicado (mesma
-                  paleta, a ilustracao da foto, botoes em pilula) sobre o mesmo
-                  esqueleto do wireframe. */}
-              <span className="studio-final" data-on={active === 3}>
-                <span className="mock-nav">
-                  <span className="mock-logo">
-                    <i />
-                    Sua marca
-                  </span>
-                  <span className="mock-links">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className="mock-cta">Contato</span>
-                </span>
-                <span className="mock-hero">
-                  <span className="mock-copy">
-                    <span className="mock-tag">Novo</span>
-                    <span className="mock-title">Seu negócio pronto para crescer.</span>
-                    <span className="mock-text">
+                  {/* Moodboard no formato classico (foto, forma, tipografia, paleta,
+                      componentes e palavras-chave), com pecas genericas: e o metodo que
+                      aparece aqui, nao um trabalho especifico. */}
+                  <div className="studio-layer studio-mood" data-on={active === 1}>
+                    <span className="mood-photo">
+                      <i className="mood-sun" />
+                      <i className="mood-hill mood-hill-back" />
+                      <i className="mood-hill" />
+                    </span>
+                    <span className="mood-shapes">
+                      <i />
                       <i />
                       <i />
                     </span>
-                    <span className="mock-actions">
-                      <span className="mock-button">Começar</span>
-                      <span className="mock-link">Saiba mais</span>
+                    <span className="mood-type">
+                      Aa
+                      <small>
+                        Título
+                        <br />
+                        Corpo
+                      </small>
                     </span>
-                  </span>
-                  <span className="mock-art">
-                    <i className="mock-sun" />
-                    <i className="mock-hill mock-hill-back" />
-                    <i className="mock-hill" />
-                  </span>
-                </span>
-                <span className="mock-cards">
-                  {PALETTE.slice(1).map((hex) => (
-                    <span key={hex} style={{ "--accent": hex }}>
-                      <i />
-                      <b />
-                      <b />
+                    <span className="mood-palette">
+                      {PALETTE.map((hex) => (
+                        <span key={hex} style={{ "--swatch": hex }}>
+                          {hex}
+                        </span>
+                      ))}
                     </span>
-                  ))}
-                </span>
-              </span>
-            </span>
-            <span className="studio-approved" data-on={active === 3}>
-              Aprovado
-            </span>
-          </div>
+                    <span className="mood-ui">
+                      <span className="mood-ui-button">Botão</span>
+                      <span className="mood-ui-toggle" />
+                      <span className="mood-ui-input" />
+                    </span>
+                    <span className="mood-tags">
+                      <span>direto</span>
+                      <span>humano</span>
+                      <span>preciso</span>
+                    </span>
+                  </div>
 
-          <StudioCursor position={TOOLS[mode.id].cursor} />
-        </div>
+                  {/* Esboco e refino dividem a mesma moldura: o refino passa por cima do
+                      wireframe como uma varredura, em vez de trocar de imagem. */}
+                  <div
+                    className="studio-layer studio-page"
+                    data-on={active >= 2}
+                    data-refined={active === 3}
+                  >
+                    <span className="studio-browser">
+                      <span className="studio-browser-bar">
+                        <i />
+                        <i />
+                        <i />
+                        <span />
+                      </span>
+                      <span className="studio-wire">
+                        <span className="wire-nav" />
+                        <span className="wire-hero">
+                          <span className="wire-line wire-line-lg" />
+                          <span className="wire-line wire-line-md" />
+                          <span className="wire-button" />
+                          <span className="wire-media" />
+                        </span>
+                        <span className="wire-cards">
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                      </span>
+                      {/* Site final desenhado, nao um print: e o moodboard aplicado (mesma
+                          paleta, a ilustracao da foto, botoes em pilula) sobre o mesmo
+                          esqueleto do wireframe. */}
+                      <span className="studio-final" data-on={active === 3}>
+                        <span className="mock-nav">
+                          <span className="mock-logo">
+                            <i />
+                            Sua marca
+                          </span>
+                          <span className="mock-links">
+                            <i />
+                            <i />
+                            <i />
+                          </span>
+                          <span className="mock-cta">Contato</span>
+                        </span>
+                        <span className="mock-hero">
+                          <span className="mock-copy">
+                            <span className="mock-tag">Novo</span>
+                            <span className="mock-title">Seu negócio pronto para crescer.</span>
+                            <span className="mock-text">
+                              <i />
+                              <i />
+                            </span>
+                            <span className="mock-actions">
+                              <span className="mock-button">Começar</span>
+                              <span className="mock-link">Saiba mais</span>
+                            </span>
+                          </span>
+                          <span className="mock-art">
+                            <i className="mock-sun" />
+                            <i className="mock-hill mock-hill-back" />
+                            <i className="mock-hill" />
+                          </span>
+                        </span>
+                        <span className="mock-cards">
+                          {PALETTE.slice(1).map((hex) => (
+                            <span key={hex} style={{ "--accent": hex }}>
+                              <i />
+                              <b />
+                              <b />
+                            </span>
+                          ))}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="studio-approved" data-on={active === 3}>
+                      Aprovado
+                    </span>
+                  </div>
+
+                  <StudioCursor position={TOOLS[mode.id].cursor} />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="laptop-deck">
+            <span className="laptop-keys" />
+            <span className="laptop-pad" />
+            <span className="laptop-lip" />
+          </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -236,6 +253,15 @@ export function CreativeProcess() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
   const markerRefs = useRef([]);
+  const leadRef = useRef(null);
+
+  // Abertura do notebook: no comeco do trilho ha um trecho (--lead) so para a
+  // tampa subir, com o estudio ja preso na tela. A tampa vai de fechada a aberta
+  // enquanto esse trecho passa pelo topo da tela.
+  const { scrollYProgress: openProgress } = useScroll({
+    target: leadRef,
+    offset: ["start start", "end start"],
+  });
 
   useEffect(() => {
     // Cada etapa tem um marcador invisivel cobrindo sua fatia da altura de rolagem.
@@ -252,8 +278,6 @@ export function CreativeProcess() {
     markerRefs.current.forEach((marker) => marker && observer.observe(marker));
     return () => observer.disconnect();
   }, []);
-
-  const share = 100 / creativeModes.length;
 
   return (
     <section className="creative section" id="processo" aria-labelledby="creative-title">
@@ -287,13 +311,15 @@ export function CreativeProcess() {
       </motion.header>
 
       {/* Trilho de rolagem: o estudio fica preso na tela ocupando a largura toda
-          enquanto a rolagem passa pelos marcadores de cada etapa. */}
+          enquanto a rolagem passa primeiro pelo trecho de abertura do notebook e
+          depois pelos marcadores de cada etapa. */}
       <div className="creative-scroll" style={{ "--steps": creativeModes.length }}>
+        <span className="creative-lead" ref={leadRef} aria-hidden="true" />
         {creativeModes.map((mode, index) => (
           <span
             className="creative-marker"
             data-index={index}
-            style={{ top: `${index * share}%`, height: `${share}%` }}
+            style={{ "--i": index }}
             ref={(node) => {
               markerRefs.current[index] = node;
             }}
@@ -303,7 +329,7 @@ export function CreativeProcess() {
         ))}
 
         <div className="creative-sticky">
-          <Studio active={active} reducedMotion={reducedMotion} />
+          <Studio active={active} reducedMotion={reducedMotion} open={reducedMotion ? 1 : openProgress} />
         </div>
       </div>
 
