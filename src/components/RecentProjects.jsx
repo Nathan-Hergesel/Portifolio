@@ -30,16 +30,18 @@ const entrada = {
   transition: { duration: 0.38, ease: easeOutExpo },
 };
 
-// A ordem aqui e a ordem do destaque. No desktop as linhas saem: Morcegao e o
-// video do Trend Cast; TPark e EstudAi; ObraFlow e os tres designs. `aspect` e a
-// proporcao real da imagem (largura / altura): o destaque usa esse valor para
-// mostrar cada arte inteira, sem corte.
+// A ordem aqui e a ordem do destaque. A primeira linha e fixa: o Portal Morcegao
+// grande (`destaque: "grande"`) e, ao lado, os dois videos empilhados
+// (`destaque: "pilha"`). As demais saem em linhas justificadas: TPark e EstudAi;
+// ObraFlow e os tres designs. `aspect` e a proporcao real da imagem (largura /
+// altura): o destaque usa esse valor para mostrar cada arte inteira, sem corte.
 // Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
 // que toca no card.
 const projects = [
   {
     id: "morcegao",
     featured: true,
+    destaque: "grande",
     index: "01",
     category: "Sistema",
     title: "Portal Morcegão",
@@ -52,6 +54,7 @@ const projects = [
   {
     id: "trendcast",
     featured: true,
+    destaque: "pilha",
     index: "02",
     category: "Vídeo",
     title: "Trend Cast",
@@ -63,8 +66,22 @@ const projects = [
     alt: "Vídeo de apresentação do Trend Cast",
   },
   {
-    id: "vjs",
+    id: "anuncio",
+    featured: true,
+    destaque: "pilha",
     index: "03",
+    category: "Vídeo",
+    title: "Anúncio Hergesel.dev",
+    description: "Anúncio em motion para divulgar os serviços do site.",
+    image: "/assets/images/projects/anuncio-hergesel.webp",
+    wallImage: "/assets/images/projects/wall/anuncio-hergesel.webp",
+    video: "/assets/videos/anuncio-hergesel.mp4",
+    aspect: 16 / 9,
+    alt: "Vídeo de anúncio dos serviços de Nathan Hergesel",
+  },
+  {
+    id: "vjs",
+    index: "04",
     category: "Site",
     title: "VJS Sistemas",
     description: "Estratégia, interface e desenvolvimento comercial.",
@@ -76,7 +93,7 @@ const projects = [
   {
     id: "tpark",
     featured: true,
-    index: "04",
+    index: "05",
     category: "Site",
     title: "TPark Estacionamentos",
     description: "Site comercial para gestão e automação de estacionamentos.",
@@ -88,7 +105,7 @@ const projects = [
   {
     id: "estudai",
     featured: true,
-    index: "05",
+    index: "06",
     category: "App",
     title: "EstudAí",
     description: "Organização e rotina de estudos em uma experiência mobile.",
@@ -99,7 +116,7 @@ const projects = [
   },
   {
     id: "mercearia",
-    index: "06",
+    index: "07",
     category: "App",
     title: "Mercearia Fácil",
     description: "Vendas, estoque e fornecedores para pequenos comércios.",
@@ -111,7 +128,7 @@ const projects = [
   {
     id: "obraflow",
     featured: true,
-    index: "07",
+    index: "08",
     category: "Sistema",
     title: "ObraFlow",
     description: "Cronograma, equipe, custos e indicadores em um painel.",
@@ -123,7 +140,7 @@ const projects = [
   {
     id: "brisa",
     featured: true,
-    index: "08",
+    index: "09",
     category: "Design",
     title: "Brisa Solar",
     description: "Comunicação visual para energia residencial.",
@@ -135,7 +152,7 @@ const projects = [
   {
     id: "serra",
     featured: true,
-    index: "09",
+    index: "10",
     category: "Design",
     title: "Serra Labs",
     description: "Identidade para consultoria em tecnologia e IA.",
@@ -147,7 +164,7 @@ const projects = [
   {
     id: "aurora",
     featured: true,
-    index: "10",
+    index: "11",
     category: "Design",
     title: "Aurora Casa",
     description: "Identidade para interiores e decoração.",
@@ -155,18 +172,6 @@ const projects = [
     wallImage: "/assets/images/projects/wall/aurora-casa.webp",
     aspect: 1122 / 1402,
     alt: "Kit de identidade visual da Aurora Casa",
-  },
-  {
-    id: "anuncio",
-    index: "11",
-    category: "Vídeo",
-    title: "Anúncio Hergesel.dev",
-    description: "Anúncio em motion para divulgar os serviços do site.",
-    image: "/assets/images/projects/anuncio-hergesel.webp",
-    wallImage: "/assets/images/projects/wall/anuncio-hergesel.webp",
-    video: "/assets/videos/anuncio-hergesel.mp4",
-    aspect: 16 / 9,
-    alt: "Vídeo de anúncio dos serviços de Nathan Hergesel",
   },
 ];
 
@@ -260,6 +265,7 @@ function BentoTile({ project, reducedMotion, style }) {
       className={`bento-tile bento-tile-${project.id}`}
       id={`projeto-${project.id}`}
       data-sound={withSound || undefined}
+      data-destaque={project.destaque}
       style={style}
       layout={!reducedMotion}
       initial={reducedMotion ? false : entrada.initial}
@@ -308,24 +314,41 @@ function fatias(linhas) {
   return porId;
 }
 
+// Estilo de cada card do destaque. O Morcegao e os videos da pilha so precisam da
+// proporcao (a primeira linha tem medidas proprias no CSS); os demais recebem a
+// fatia da linha no tablet (pares) e no desktop (soma alvo).
 function linhasJustificadas(lista) {
+  const livres = lista.filter((project) => !project.destaque);
   const pares = [];
-  for (let i = 0; i < lista.length; i += 2) pares.push(lista.slice(i, i + 2));
+  for (let i = 0; i < livres.length; i += 2) pares.push(livres.slice(i, i + 2));
   const tablet = fatias(pares);
-  const desktop = fatias(agruparLinhas(lista, SOMA_DESKTOP));
+  const desktop = fatias(agruparLinhas(livres, SOMA_DESKTOP));
 
   return Object.fromEntries(
     lista.map((project) => [
       project.id,
-      {
-        "--ratio": project.aspect,
-        "--share-md": tablet[project.id].fatia,
-        "--gaps-md": tablet[project.id].vaos,
-        "--share-lg": desktop[project.id].fatia,
-        "--gaps-lg": desktop[project.id].vaos,
-      },
+      project.destaque
+        ? { "--ratio": project.aspect }
+        : {
+            "--ratio": project.aspect,
+            "--share-md": tablet[project.id].fatia,
+            "--gaps-md": tablet[project.id].vaos,
+            "--share-lg": desktop[project.id].fatia,
+            "--gaps-lg": desktop[project.id].vaos,
+          },
     ]),
   );
+}
+
+// No destaque os videos da pilha viram um bloco so, na posicao do primeiro deles.
+function blocosDoDestaque(lista) {
+  const pilha = lista.filter((project) => project.destaque === "pilha");
+  const blocos = [];
+  lista.forEach((project) => {
+    if (project.destaque !== "pilha") blocos.push(project);
+    else if (project === pilha[0]) blocos.push({ pilha });
+  });
+  return blocos;
 }
 
 export function RecentProjects() {
@@ -387,14 +410,35 @@ export function RecentProjects() {
 
         <div className={`bento-grid ${emDestaque ? "" : "is-filtered"}`.trim()}>
           <AnimatePresence mode="popLayout" initial={false}>
-            {visiveis.map((project) => (
-              <BentoTile
-                project={project}
-                reducedMotion={reducedMotion}
-                style={estilos[project.id]}
-                key={project.id}
-              />
-            ))}
+            {(emDestaque ? blocosDoDestaque(visiveis) : visiveis).map((bloco) =>
+              bloco.pilha ? (
+                <motion.div
+                  className="bento-stack"
+                  key="pilha"
+                  layout={!reducedMotion}
+                  initial={reducedMotion ? false : entrada.initial}
+                  animate={entrada.animate}
+                  exit={reducedMotion ? undefined : entrada.exit}
+                  transition={entrada.transition}
+                >
+                  {bloco.pilha.map((project) => (
+                    <BentoTile
+                      project={project}
+                      reducedMotion={reducedMotion}
+                      style={estilos[project.id]}
+                      key={project.id}
+                    />
+                  ))}
+                </motion.div>
+              ) : (
+                <BentoTile
+                  project={bloco}
+                  reducedMotion={reducedMotion}
+                  style={estilos[bloco.id]}
+                  key={bloco.id}
+                />
+              ),
+            )}
           </AnimatePresence>
         </div>
 

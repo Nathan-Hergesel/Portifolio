@@ -9756,17 +9756,18 @@ p {
 /* No destaque o bento deixa de ser grade de spans fixos: cada card tem a
    proporcao exata da sua imagem (--ratio, vindo do RecentProjects) e a imagem
    aparece inteira, sem corte. No celular e um card por linha; a partir do tablet
-   os cards vao em pares e cada um ocupa uma fatia da linha proporcional a sua
-   proporcao (--share), o que deixa os dois com a mesma altura. A linha escala por
-   igual com a tela. */
+   cada card ocupa uma fatia da linha proporcional a sua proporcao (--share-*), o
+   que deixa os cards da linha com a mesma altura. A linha escala por igual com a
+   tela. */
 .bento-grid:not(.is-filtered) {
   --bento-gap: clamp(0.85rem, 1.5vw, 1.25rem);
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--bento-gap);
 }
 
-.bento-grid:not(.is-filtered) > .bento-tile {
+.bento-grid:not(.is-filtered) .bento-tile {
   flex: 1 1 100%;
   width: auto;
   min-height: 0;
@@ -9781,19 +9782,40 @@ p {
 
 /* Com a caixa na proporcao da arte, `cover` preenche sem cortar. Os boards de
    design deixam de ter a moldura clara: aparecem inteiros, como os outros. */
-.bento-grid:not(.is-filtered) > .bento-tile > img {
+.bento-grid:not(.is-filtered) .bento-tile > img {
   object-fit: cover;
   object-position: center;
   padding: 0;
 }
 
-.bento-grid:not(.is-filtered) > .bento-tile .bento-tile-shade {
+.bento-grid:not(.is-filtered) .bento-tile .bento-tile-shade {
   background: linear-gradient(
     to top,
     oklch(12% 0.02 258 / 0.94) 0,
     oklch(12% 0.02 258 / 0.56) 28%,
     transparent 62%
   );
+}
+
+/* Os dois videos empilhados numa coluna ao lado do Portal Morcegao. */
+.bento-stack {
+  flex: 1 1 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bento-gap);
+}
+
+.bento-stack > .bento-tile {
+  flex: none;
+}
+
+/* Cards da pilha sao menores: titulo e respiro proporcionais, para o nome caber em
+   uma linha sem cobrir o video. */
+@media (min-width: 48rem) {
+  .bento-stack .bento-tile-copy h3 {
+    font-size: clamp(1.5rem, 2.3vw, 2.3rem);
+  }
 }
 
 /* A base e a fatia exata menos meio pixel, para a linha nunca quebrar antes da
@@ -9805,11 +9827,31 @@ p {
     flex: var(--ratio) 1
       calc((100% - var(--bento-gap) * var(--gaps-md)) * var(--share-md) - 0.5px);
   }
+
+  /* Primeira linha: o Morcegao (16:9) e a coluna com os dois videos (16:9 cada).
+     Para as alturas baterem, a coluna tem largura c = (L - vao * (1 + 16/9)) / 3 e
+     o Morcegao fica com o resto, L - vao - c: assim a altura dele, (L - vao - c) /
+     (16/9), e igual a das duas telas mais o vao entre elas. */
+  .bento-grid:not(.is-filtered) {
+    --stack-w: calc((100% - var(--bento-gap) * (1 + 16 / 9)) / 3);
+  }
+
+  .bento-grid:not(.is-filtered) > .bento-tile[data-destaque="grande"] {
+    flex: 1 1 calc(100% - var(--bento-gap) - var(--stack-w) - 0.5px);
+  }
+
+  .bento-stack {
+    flex: 0 0 var(--stack-w);
+  }
 }
 
 @media (min-width: 64rem) {
   .bento-grid:not(.is-filtered) > .bento-tile {
     flex: var(--ratio) 1
       calc((100% - var(--bento-gap) * var(--gaps-lg)) * var(--share-lg) - 0.5px);
+  }
+
+  .bento-grid:not(.is-filtered) > .bento-tile[data-destaque="grande"] {
+    flex: 1 1 calc(100% - var(--bento-gap) - var(--stack-w) - 0.5px);
   }
 }
