@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { BsArrowUpRight, BsPlayFill } from "react-icons/bs";
+import { BsArrowUpRight, BsXLg } from "react-icons/bs";
 
 import { ProjectFilter } from "./ProjectFilter";
 import { ProjectWall } from "./ProjectWall";
@@ -71,7 +71,7 @@ const projects = [
     destaque: "pilha",
     index: "03",
     category: "Vídeo",
-    title: "Anúncio Hergesel.dev",
+    title: "Hergesel.dev",
     description: "Anúncio em motion para divulgar os serviços do site.",
     image: "/assets/images/projects/anuncio-hergesel.webp",
     wallImage: "/assets/images/projects/wall/anuncio-hergesel.webp",
@@ -134,7 +134,7 @@ const projects = [
     description: "Cronograma, equipe, custos e indicadores em um painel.",
     image: "/assets/images/projects/obraflow.webp",
     wallImage: "/assets/images/projects/wall/obraflow.webp",
-    aspect: 1122 / 1402,
+    aspect: 1122 / 660,
     alt: "Interface do sistema de gestão de obras ObraFlow",
   },
   {
@@ -176,14 +176,14 @@ const projects = [
 ];
 
 // Video no card: toca sem som e em loop so enquanto o card esta visivel, para nao
-// pesar a pagina. "Assistir com som" liga o audio e os controles do player. Com
-// movimento reduzido nao ha autoplay; a capa fica ate a pessoa pedir.
-function TileVideo({ project, reducedMotion, withSound, onSound }) {
+// pesar a pagina. Com movimento reduzido nao ha autoplay; a capa fica parada. O
+// som e os controles ficam no modal.
+function TileVideo({ project, reducedMotion }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || reducedMotion || withSound) return undefined;
+    if (!video || reducedMotion) return undefined;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -194,87 +194,134 @@ function TileVideo({ project, reducedMotion, withSound, onSound }) {
     );
     observer.observe(video);
     return () => observer.disconnect();
-  }, [reducedMotion, withSound]);
-
-  const playWithSound = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = false;
-    video.currentTime = 0;
-    video.play().catch(() => {});
-    onSound();
-  };
+  }, [reducedMotion]);
 
   return (
-    <>
-      <video
-        ref={videoRef}
-        src={project.video}
-        poster={project.image}
-        muted
-        loop={!withSound}
-        playsInline
-        preload="none"
-        controls={withSound}
-        aria-label={project.alt}
-      />
-      {!withSound && (
-        <button className="bento-video-play" type="button" onClick={playWithSound}>
-          <BsPlayFill aria-hidden="true" />
-          Assistir com som
-        </button>
-      )}
-    </>
+    <video
+      ref={videoRef}
+      src={project.video}
+      poster={project.image}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-hidden="true"
+    />
   );
 }
 
-function BentoTile({ project, reducedMotion, style }) {
-  const [withSound, setWithSound] = useState(false);
+// Posicao do cursor no card, em %, para o brilho do hover seguir o mouse.
+function seguirCursor(event) {
+  const card = event.currentTarget;
+  const caixa = card.getBoundingClientRect();
+  card.style.setProperty("--mx", `${((event.clientX - caixa.left) / caixa.width) * 100}%`);
+  card.style.setProperty("--my", `${((event.clientY - caixa.top) / caixa.height) * 100}%`);
+}
 
-  const content = (
-    <>
-      {project.video ? (
-        <TileVideo
-          project={project}
-          reducedMotion={reducedMotion}
-          withSound={withSound}
-          onSound={() => setWithSound(true)}
-        />
-      ) : (
-        <img
-          src={project.image}
-          alt={project.alt}
-          loading="eager"
-          decoding="async"
-        />
-      )}
-      <span className="bento-tile-shade" aria-hidden="true" />
-      <header className="bento-tile-meta">
-        <span>{project.index}</span>
-        <small>{project.category}</small>
-      </header>
-      <div className="bento-tile-copy">
-        <h3>{project.title}</h3>
-        <p>{project.description}</p>
-      </div>
-    </>
-  );
-
+// No grid o card mostra so a arte; nome, tag e descricao aparecem no modal, que o
+// botao invisivel por cima do card abre.
+function BentoTile({ project, reducedMotion, style, onOpen }) {
   return (
     <motion.article
       className={`bento-tile bento-tile-${project.id}`}
       id={`projeto-${project.id}`}
-      data-sound={withSound || undefined}
       data-destaque={project.destaque}
       style={style}
+      onPointerMove={seguirCursor}
       layout={!reducedMotion}
       initial={reducedMotion ? false : entrada.initial}
       animate={entrada.animate}
       exit={reducedMotion ? undefined : entrada.exit}
       transition={entrada.transition}
     >
-      {content}
+      {project.video ? (
+        <TileVideo project={project} reducedMotion={reducedMotion} />
+      ) : (
+        <img src={project.image} alt="" loading="eager" decoding="async" />
+      )}
+      <button
+        className="bento-tile-open"
+        type="button"
+        aria-haspopup="dialog"
+        aria-label={`Ver ${project.title}`}
+        onClick={() => onOpen(project)}
+      />
     </motion.article>
+  );
+}
+
+// Modal do projeto, no centro da tela: em cima a tag, o nome e a descricao; embaixo
+// a arte inteira, na proporcao dela. Usa <dialog> nativo: prende o foco, fecha no Esc e
+// fica acima de tudo. Clicar fora do painel (no fundo) tambem fecha; ao fechar, o
+// foco volta para o card que abriu.
+function ProjectModal({ project, onClose }) {
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return undefined;
+    if (!project) {
+      if (dialog.open) dialog.close();
+      return undefined;
+    }
+
+    if (!dialog.open) dialog.showModal();
+    const root = document.documentElement;
+    const overflow = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = overflow;
+    };
+  }, [project]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="project-modal"
+      aria-labelledby="project-modal-title"
+      style={project ? { "--ratio": project.aspect } : undefined}
+      onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      {project && (
+        <div className="project-modal-panel">
+          <header className="project-modal-head">
+            <div className="project-modal-info">
+              <span className="project-modal-tag">
+                <span>{project.index}</span>
+                {project.category}
+              </span>
+              <h3 id="project-modal-title">{project.title}</h3>
+              <p>{project.description}</p>
+            </div>
+            <button
+              className="project-modal-close"
+              type="button"
+              aria-label="Fechar"
+              onClick={onClose}
+            >
+              <BsXLg aria-hidden="true" />
+            </button>
+          </header>
+          <div className="project-modal-media">
+            {project.video ? (
+              <video
+                src={project.video}
+                poster={project.image}
+                controls
+                autoPlay
+                playsInline
+                aria-label={project.alt}
+              />
+            ) : (
+              <img src={project.image} alt={project.alt} />
+            )}
+          </div>
+        </div>
+      )}
+    </dialog>
   );
 }
 
@@ -300,6 +347,12 @@ function agruparLinhas(lista, alvo) {
     linhas[linhas.length - 1].push(project);
     soma += project.aspect;
   });
+  // Sobra curta no fim (menos da metade do alvo) ficaria sozinha e enorme: junta
+  // na linha anterior.
+  if (linhas.length > 1 && soma < alvo / 2) {
+    const sobra = linhas.pop();
+    linhas[linhas.length - 1].push(...sobra);
+  }
   return linhas;
 }
 
@@ -354,6 +407,7 @@ function blocosDoDestaque(lista) {
 export function RecentProjects() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState("destaque");
+  const [aberto, setAberto] = useState(null);
 
   const counts = useMemo(() => {
     // "Em destaque" mostra um item por categoria, entao a contagem dele nao e o
@@ -426,6 +480,7 @@ export function RecentProjects() {
                       project={project}
                       reducedMotion={reducedMotion}
                       style={estilos[project.id]}
+                      onOpen={setAberto}
                       key={project.id}
                     />
                   ))}
@@ -435,12 +490,15 @@ export function RecentProjects() {
                   project={bloco}
                   reducedMotion={reducedMotion}
                   style={estilos[bloco.id]}
+                  onOpen={setAberto}
                   key={bloco.id}
                 />
               ),
             )}
           </AnimatePresence>
         </div>
+
+        <ProjectModal project={aberto} onClose={() => setAberto(null)} />
 
         <footer className="bento-outro">
           <p>O próximo espaço pode ser do seu projeto.</p>

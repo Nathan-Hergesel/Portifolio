@@ -7123,73 +7123,6 @@ p {
     filter 450ms;
 }
 
-.bento-tile-shade {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    oklch(12% 0.02 258 / 0.94) 0,
-    oklch(12% 0.02 258 / 0.56) 28%,
-    transparent 62%
-  );
-  pointer-events: none;
-}
-
-.bento-tile-meta {
-  position: absolute;
-  z-index: 2;
-  top: 0.8rem;
-  left: 0.8rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  background: oklch(15% 0.018 258 / 0.88);
-  color: var(--canvas);
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.bento-tile-meta > span {
-  color: var(--accent-yellow);
-  font-weight: 850;
-}
-
-.bento-tile-meta small {
-  font-size: inherit;
-  font-weight: 750;
-}
-
-.bento-tile-copy {
-  position: absolute;
-  z-index: 2;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: clamp(1rem, 2.4vw, 1.75rem);
-}
-
-.bento-tile-copy h3 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.1rem, 4vw, 3.6rem);
-  font-weight: 850;
-  letter-spacing: -0.035em;
-  line-height: 0.84;
-  text-transform: uppercase;
-}
-
-.bento-tile-copy p {
-  max-width: 40ch;
-  margin-top: 0.55rem;
-  color: oklch(92% 0.025 256);
-  font-size: 0.68rem;
-  line-height: 1.45;
-}
-
 .bento-tile-vjs {
   min-height: 20rem;
 }
@@ -7246,39 +7179,6 @@ p {
 .bento-tile-trendcast,
 .bento-tile-anuncio {
   min-height: 20rem;
-}
-
-.bento-video-play {
-  position: absolute;
-  z-index: 3;
-  top: 0.8rem;
-  right: 0.8rem;
-  min-height: 2.25rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
-  border: 0;
-  border-radius: 999px;
-  background: oklch(15% 0.018 258 / 0.88);
-  color: var(--canvas);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.bento-video-play svg {
-  color: var(--accent-yellow);
-  font-size: 1rem;
-}
-
-/* Com som, o player mostra os controles: sai tudo o que ficava por cima dele. */
-.bento-tile[data-sound] .bento-tile-shade,
-.bento-tile[data-sound] .bento-tile-meta,
-.bento-tile[data-sound] .bento-tile-copy {
-  display: none;
 }
 
 .bento-outro {
@@ -7793,28 +7693,15 @@ p {
 
 /* Os cards de Design mostram boards de identidade, que sao pecas fechadas: com
    `cover` o grid recortava parte da composicao (Brisa e quadrada num card 0.85,
-   Serra e Aurora sao 4:5). `contain` escala sem cortar e sem distorcer; o padding
-   inferior reserva a faixa do titulo para a arte nao ficar sob o texto. */
+   Serra e Aurora sao 4:5). `contain` escala sem cortar e sem distorcer, com uma
+   margem clara em volta. */
 .bento-tile-brisa > img,
 .bento-tile-serra > img,
 .bento-tile-aurora > img {
   object-fit: contain;
   object-position: center top;
   padding: clamp(0.7rem, 1.3vw, 1.25rem);
-  padding-bottom: clamp(3.25rem, 5vw, 4.25rem);
   background: var(--canvas);
-}
-
-/* Com a arte contida, o veu escuro so precisa cobrir a faixa do titulo. */
-.bento-tile-brisa .bento-tile-shade,
-.bento-tile-serra .bento-tile-shade,
-.bento-tile-aurora .bento-tile-shade {
-  background: linear-gradient(
-    to top,
-    oklch(16.5% 0.014 258 / 0.92) 0,
-    oklch(16.5% 0.014 258 / 0.82) clamp(3.5rem, 5.5vw, 4.75rem),
-    transparent clamp(5.5rem, 8vw, 7rem)
-  );
 }
 
 /* No modo filtrado a altura passa a vir da proporcao de cada card, nao de uma
@@ -9776,8 +9663,6 @@ p {
   /* O filete vira outline por dentro: a borda tirava 1px de cada lado da area da
      imagem e desalinhava a proporcao. */
   border: 0;
-  outline: 1px solid oklch(92% 0.025 256 / 0.68);
-  outline-offset: -1px;
 }
 
 /* Com a caixa na proporcao da arte, `cover` preenche sem cortar. Os boards de
@@ -9786,15 +9671,6 @@ p {
   object-fit: cover;
   object-position: center;
   padding: 0;
-}
-
-.bento-grid:not(.is-filtered) .bento-tile .bento-tile-shade {
-  background: linear-gradient(
-    to top,
-    oklch(12% 0.02 258 / 0.94) 0,
-    oklch(12% 0.02 258 / 0.56) 28%,
-    transparent 62%
-  );
 }
 
 /* Os dois videos empilhados numa coluna ao lado do Portal Morcegao. */
@@ -9810,13 +9686,6 @@ p {
   flex: none;
 }
 
-/* Cards da pilha sao menores: titulo e respiro proporcionais, para o nome caber em
-   uma linha sem cobrir o video. */
-@media (min-width: 48rem) {
-  .bento-stack .bento-tile-copy h3 {
-    font-size: clamp(1.5rem, 2.3vw, 2.3rem);
-  }
-}
 
 /* A base e a fatia exata menos meio pixel, para a linha nunca quebrar antes da
    hora por arredondamento; o crescimento proporcional (flex-grow = proporcao)
@@ -9853,5 +9722,236 @@ p {
 
   .bento-grid:not(.is-filtered) > .bento-tile[data-destaque="grande"] {
     flex: 1 1 calc(100% - var(--bento-gap) - var(--stack-w) - 0.5px);
+  }
+}
+
+/* --- Contorno e brilho dos cards ---------------------------------------- */
+
+/* Contorno claro levemente transparente (o mesmo filete que os cards ja tinham),
+   desenhado por fora do card: nao cobre nenhum pixel da arte. */
+.bento-tile {
+  border: 0;
+  outline: 1px solid oklch(92% 0.025 256 / 0.68);
+  outline-offset: 0;
+  transition:
+    box-shadow 420ms var(--ease-out),
+    outline-color 420ms var(--ease-out);
+}
+
+/* Brilho azulado que segue o cursor (--mx/--my vem do RecentProjects): uma luz
+   translucida por cima da arte, visivel tanto nas artes escuras quanto nas claras;
+   some fora do hover. */
+.bento-tile::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    oklch(80% 0.13 245 / 0.42) 0,
+    oklch(68% 0.17 252 / 0.16) 26%,
+    transparent 56%
+  );
+  opacity: 0;
+  transition: opacity 360ms var(--ease-out);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  /* Halo azul em volta do contorno. */
+  .bento-tile:hover {
+    outline-color: oklch(93% 0.05 245);
+    box-shadow:
+      0 0 0 2px oklch(80% 0.12 245 / 0.9),
+      0 0 1.5rem oklch(68% 0.18 252 / 0.8),
+      0 0 3.75rem oklch(62% 0.2 255 / 0.5);
+  }
+
+  .bento-tile:hover::after {
+    opacity: 1;
+  }
+}
+
+/* No foco do teclado o contorno vira amarelo, como o resto do site. */
+.bento-tile:has(.bento-tile-open:focus-visible) {
+  outline-color: var(--accent-yellow);
+}
+
+.bento-tile-open:focus-visible {
+  outline: none;
+}
+
+/* --- Card que abre o modal ---------------------------------------------- */
+
+/* Botao invisivel do tamanho do card: o card inteiro abre o modal do projeto. */
+.bento-tile-open {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+/* --- Modal do projeto ---------------------------------------------------- */
+
+/* Painel claro no centro da tela. Largura pela proporcao da arte: o maior tamanho
+   que cabe deixando espaco para o cabecalho de texto (--modal-info). Artes em pe
+   ficam mais estreitas, mas nunca menos que 24rem (ou a tela, no celular). O reset
+   global zera a margem do <dialog>; `margin: auto` com `inset: 0` devolve a
+   centralizacao. */
+.project-modal {
+  --modal-info: 16rem;
+  --modal-pad: clamp(0.85rem, 1.8vw, 1.25rem);
+  position: fixed;
+  inset: 0;
+  width: max(
+    min(92vw, 72rem, calc((100dvh - var(--modal-info)) * var(--ratio, 1.6) + 2 * var(--modal-pad))),
+    min(92vw, 24rem)
+  );
+  max-width: none;
+  height: fit-content;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.project-modal::backdrop {
+  background: oklch(12% 0.02 258 / 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.project-modal[open] {
+  animation: project-modal-in 420ms var(--ease-out);
+}
+
+.project-modal[open]::backdrop {
+  animation: project-modal-fade 320ms ease-out;
+}
+
+@keyframes project-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.96);
+  }
+}
+
+@keyframes project-modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.project-modal-panel {
+  display: grid;
+  gap: var(--modal-pad);
+  padding: var(--modal-pad);
+  border-radius: 1rem;
+  background: var(--canvas);
+  box-shadow: 0 2rem 5rem oklch(8% 0.02 258 / 0.45);
+}
+
+.project-modal-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+  padding: 0.25rem 0.25rem 0;
+}
+
+.project-modal-info {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.project-modal-tag {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--canvas);
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.project-modal-tag > span {
+  color: var(--accent-yellow);
+  font-weight: 850;
+}
+
+.project-modal-info h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 850;
+  letter-spacing: -0.035em;
+  line-height: 0.88;
+  text-transform: uppercase;
+}
+
+.project-modal-info p {
+  max-width: 56ch;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.project-modal-media {
+  overflow: hidden;
+  aspect-ratio: var(--ratio, 1.6);
+  border-radius: 0.6rem;
+  background: oklch(92% 0.012 256);
+}
+
+.project-modal-media img,
+.project-modal-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-modal-close {
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-yellow);
+  color: var(--ink);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 240ms var(--ease-out);
+}
+
+.project-modal-close:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .project-modal-close:hover {
+    transform: rotate(90deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-modal[open],
+  .project-modal[open]::backdrop {
+    animation: none;
   }
 }
