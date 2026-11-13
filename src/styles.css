@@ -9750,3 +9750,57 @@ p {
     transform: translate(0.15rem, -0.15rem);
   }
 }
+
+/* --- Destaque em linhas justificadas ------------------------------------ */
+
+/* No destaque o bento deixa de ser grade de spans fixos: cada card tem a
+   proporcao exata da sua imagem (--ratio, vindo do RecentProjects) e a imagem
+   aparece inteira, sem corte. No celular e um card por linha; a partir do tablet
+   os cards vao em pares e cada um ocupa uma fatia da linha proporcional a sua
+   proporcao (--share), o que deixa os dois com a mesma altura. A linha escala por
+   igual com a tela. */
+.bento-grid:not(.is-filtered) {
+  --bento-gap: clamp(0.85rem, 1.5vw, 1.25rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bento-gap);
+}
+
+.bento-grid:not(.is-filtered) > .bento-tile {
+  flex: 1 1 100%;
+  width: auto;
+  min-height: 0;
+  aspect-ratio: var(--ratio);
+  justify-self: auto;
+  /* O filete vira outline por dentro: a borda tirava 1px de cada lado da area da
+     imagem e desalinhava a proporcao. */
+  border: 0;
+  outline: 1px solid oklch(92% 0.025 256 / 0.68);
+  outline-offset: -1px;
+}
+
+/* Com a caixa na proporcao da arte, `cover` preenche sem cortar. Os boards de
+   design deixam de ter a moldura clara: aparecem inteiros, como os outros. */
+.bento-grid:not(.is-filtered) > .bento-tile > img {
+  object-fit: cover;
+  object-position: center;
+  padding: 0;
+}
+
+.bento-grid:not(.is-filtered) > .bento-tile .bento-tile-shade {
+  background: linear-gradient(
+    to top,
+    oklch(12% 0.02 258 / 0.94) 0,
+    oklch(12% 0.02 258 / 0.56) 28%,
+    transparent 62%
+  );
+}
+
+@media (min-width: 48rem) {
+  /* A base e a fatia exata menos meio pixel, para o par nunca quebrar de linha por
+     arredondamento; o crescimento proporcional (flex-grow = proporcao) devolve
+     esse meio pixel sem desigualar as alturas. */
+  .bento-grid:not(.is-filtered) > .bento-tile {
+    flex: var(--ratio) 1 calc((100% - var(--bento-gap)) * var(--share) - 0.5px);
+  }
+}

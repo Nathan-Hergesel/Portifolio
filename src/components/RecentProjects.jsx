@@ -30,9 +30,10 @@ const entrada = {
   transition: { duration: 0.38, ease: easeOutExpo },
 };
 
-// A ordem aqui e a ordem do destaque: Morcegao e o video do Trend Cast na primeira
-// faixa, TPark e EstudAi na segunda, ObraFlow e Brisa na terceira (ver os spans
-// no fim do styles.css).
+// A ordem aqui e a ordem do destaque, que forma pares por linha: Morcegao e o
+// video do Trend Cast, TPark e EstudAi, ObraFlow e Brisa. `aspect` e a proporcao
+// real da imagem (largura / altura): o destaque usa esse valor para mostrar cada
+// arte inteira, sem corte.
 // Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
 // que toca no card.
 const projects = [
@@ -45,7 +46,7 @@ const projects = [
     description: "Portal interno de supermercado com canal de escuta anônimo.",
     image: "/assets/images/projects/morcegao.webp",
     wallImage: "/assets/images/projects/wall/morcegao.webp",
-    aspect: 1.78,
+    aspect: 16 / 9,
     alt: "Tela de acesso do portal interno do Supermercado Morcegão",
   },
   {
@@ -58,7 +59,7 @@ const projects = [
     image: "/assets/images/projects/trendcast.webp",
     wallImage: "/assets/images/projects/wall/trendcast.webp",
     video: "/assets/videos/trendcast.mp4",
-    aspect: 1.78,
+    aspect: 16 / 9,
     alt: "Vídeo de apresentação do Trend Cast",
   },
   {
@@ -69,7 +70,7 @@ const projects = [
     description: "Estratégia, interface e desenvolvimento comercial.",
     image: "/assets/images/projects/vjs-sistemas.webp",
     wallImage: "/assets/images/projects/wall/vjs-sistemas.webp",
-    aspect: 2.1,
+    aspect: 1600 / 762,
     alt: "Página inicial do site VJS Sistemas",
   },
   {
@@ -81,7 +82,7 @@ const projects = [
     description: "Site comercial para gestão e automação de estacionamentos.",
     image: "/assets/images/projects/tpark.webp",
     wallImage: "/assets/images/projects/wall/tpark.webp",
-    aspect: 1.78,
+    aspect: 16 / 9,
     alt: "Página inicial do site da TPark Estacionamentos",
   },
   {
@@ -93,7 +94,7 @@ const projects = [
     description: "Organização e rotina de estudos em uma experiência mobile.",
     image: "/assets/images/projects/estudai.webp",
     wallImage: "/assets/images/projects/wall/estudai.webp",
-    aspect: 1.46,
+    aspect: 1600 / 1095,
     alt: "Apresentação do aplicativo EstudAí com a tela de acesso no celular",
   },
   {
@@ -115,7 +116,7 @@ const projects = [
     description: "Identidade para consultoria em tecnologia e IA.",
     image: "/assets/images/projects/serra-labs.webp",
     wallImage: "/assets/images/projects/wall/serra-labs.webp",
-    aspect: 0.8,
+    aspect: 1122 / 1402,
     alt: "Kit de identidade visual da Serra Labs",
   },
   {
@@ -126,7 +127,7 @@ const projects = [
     description: "Identidade para interiores e decoração.",
     image: "/assets/images/projects/aurora-casa.webp",
     wallImage: "/assets/images/projects/wall/aurora-casa.webp",
-    aspect: 0.8,
+    aspect: 1122 / 1402,
     alt: "Kit de identidade visual da Aurora Casa",
   },
   {
@@ -138,7 +139,7 @@ const projects = [
     description: "Cronograma, equipe, custos e indicadores em um painel.",
     image: "/assets/images/projects/obraflow.webp",
     wallImage: "/assets/images/projects/wall/obraflow.webp",
-    aspect: 0.8,
+    aspect: 1122 / 1402,
     alt: "Interface do sistema de gestão de obras ObraFlow",
   },
   {
@@ -162,7 +163,7 @@ const projects = [
     image: "/assets/images/projects/anuncio-hergesel.webp",
     wallImage: "/assets/images/projects/wall/anuncio-hergesel.webp",
     video: "/assets/videos/anuncio-hergesel.mp4",
-    aspect: 1.78,
+    aspect: 16 / 9,
     alt: "Vídeo de anúncio dos serviços de Nathan Hergesel",
   },
 ];
@@ -220,7 +221,7 @@ function TileVideo({ project, reducedMotion, withSound, onSound }) {
   );
 }
 
-function BentoTile({ project, reducedMotion }) {
+function BentoTile({ project, reducedMotion, style }) {
   const [withSound, setWithSound] = useState(false);
 
   const content = (
@@ -257,6 +258,7 @@ function BentoTile({ project, reducedMotion }) {
       className={`bento-tile bento-tile-${project.id}`}
       id={`projeto-${project.id}`}
       data-sound={withSound || undefined}
+      style={style}
       layout={!reducedMotion}
       initial={reducedMotion ? false : entrada.initial}
       animate={entrada.animate}
@@ -266,6 +268,18 @@ function BentoTile({ project, reducedMotion }) {
       {content}
     </motion.article>
   );
+}
+
+// Destaque em linhas justificadas: os cards vao em pares e cada um ocupa uma fatia
+// da linha proporcional a proporcao da propria imagem. Como todos tem
+// `aspect-ratio` igual ao da arte, os dois do par saem com a mesma altura e
+// nenhuma imagem e cortada nem distorcida; a linha inteira escala por igual com a
+// largura da tela.
+function linhaJustificada(lista, posicao) {
+  const parceiro = lista[posicao % 2 === 0 ? posicao + 1 : posicao - 1];
+  const proprio = lista[posicao].aspect;
+  const fatia = parceiro ? proprio / (proprio + parceiro.aspect) : 1;
+  return { "--ratio": proprio, "--share": fatia };
 }
 
 export function RecentProjects() {
@@ -323,10 +337,11 @@ export function RecentProjects() {
 
         <div className={`bento-grid ${emDestaque ? "" : "is-filtered"}`.trim()}>
           <AnimatePresence mode="popLayout" initial={false}>
-            {visiveis.map((project) => (
+            {visiveis.map((project, posicao) => (
               <BentoTile
                 project={project}
                 reducedMotion={reducedMotion}
+                style={emDestaque ? linhaJustificada(visiveis, posicao) : undefined}
                 key={project.id}
               />
             ))}
