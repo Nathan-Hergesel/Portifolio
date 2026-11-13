@@ -88,8 +88,6 @@ export const creativeModes = [
 
 // `weight` e a fatia da regua de cronograma, proporcional a duracao tipica.
 // Prazos de referencia para um site institucional; revisar se mudar o escopo padrao.
-// Etapas do projeto: a secao que as mostrava saiu da pagina por enquanto; os
-// dados ficam aqui para a proxima versao dela.
 export const projectStages = [
   {
     id: "briefing",

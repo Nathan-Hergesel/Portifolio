@@ -92,7 +92,7 @@ export function Testimonials() {
             loopDelay={2800}
             aria-hidden="true"
           />
-          03 / Depoimentos
+          04 / Depoimentos
         </span>
         <h2 id="testimonials-title">
           Palavra

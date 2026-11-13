@@ -70,7 +70,7 @@ export function ProjectCta() {
             loopDelay={2400}
             aria-hidden="true"
           />
-          04 / Próximo projeto
+          05 / Próximo projeto
         </span>
         <h2 id="cta-title">
           Tem uma ideia?
