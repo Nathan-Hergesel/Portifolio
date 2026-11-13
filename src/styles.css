@@ -7675,64 +7675,10 @@ p {
   background: oklch(24% 0.055 262 / 0.56);
 }
 
-/* Modo filtrado: uma categoria tem 1 a 3 itens, e manter os spans do bento
-   deixaria sobra de coluna. Com `auto-fit` e `1fr` as trilhas vazias colapsam e os
-   itens presentes dividem a largura inteira -- um item ocupa tudo, dois metade
-   cada, tres um terco. */
-.bento-grid.is-filtered {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
-  grid-auto-rows: clamp(17rem, 26vw, 24rem);
-}
-
-.bento-grid.is-filtered > .bento-tile {
-  grid-column: auto;
-  grid-row: span 1;
-}
-
 /* O filtro passou a remover em vez de atenuar. */
 .bento-tile[data-dimmed="true"] {
   opacity: 1;
   filter: none;
-}
-
-/* Os cards de Design mostram boards de identidade, que sao pecas fechadas: com
-   `cover` o grid recortava parte da composicao (Brisa e quadrada num card 0.85,
-   Serra e Aurora sao 4:5). `contain` escala sem cortar e sem distorcer, com uma
-   margem clara em volta. */
-.bento-tile-brisa > img,
-.bento-tile-serra > img,
-.bento-tile-aurora > img {
-  object-fit: contain;
-  object-position: center top;
-  padding: clamp(0.7rem, 1.3vw, 1.25rem);
-  background: var(--canvas);
-}
-
-/* No modo filtrado a altura passa a vir da proporcao de cada card, nao de uma
-   linha de altura fixa: assim a caixa acompanha a arte e o `contain` escala a peca
-   ate o limite, em vez de deixar margem morta dos lados. */
-.bento-grid.is-filtered {
-  grid-auto-rows: auto;
-}
-
-.bento-grid.is-filtered > .bento-tile {
-  grid-row: auto;
-  aspect-ratio: 4 / 3;
-}
-
-.bento-grid.is-filtered > .bento-tile-brisa,
-.bento-grid.is-filtered > .bento-tile-serra,
-.bento-grid.is-filtered > .bento-tile-aurora {
-  aspect-ratio: 0.8;
-}
-
-.bento-grid.is-filtered > .bento-tile-estudai {
-  aspect-ratio: 2048 / 1402;
-}
-
-.bento-grid.is-filtered > .bento-tile-trendcast,
-.bento-grid.is-filtered > .bento-tile-anuncio {
-  aspect-ratio: 16 / 9;
 }
 
 /* ==========================================================================
@@ -9642,15 +9588,15 @@ p {
   }
 }
 
-/* --- Destaque em linhas justificadas ------------------------------------ */
+/* --- Bento em linhas justificadas --------------------------------------- */
 
-/* No destaque o bento deixa de ser grade de spans fixos: cada card tem a
+/* Em todas as abas o bento deixa de ser grade de spans fixos: cada card tem a
    proporcao exata da sua imagem (--ratio, vindo do RecentProjects) e a imagem
    aparece inteira, sem corte. No celular e um card por linha; a partir do tablet
    cada card ocupa uma fatia da linha proporcional a sua proporcao (--share-*), o
    que deixa os cards da linha com a mesma altura. A linha escala por igual com a
    tela. */
-.bento-grid:not(.is-filtered) {
+.bento-grid {
   --bento-gap: clamp(0.85rem, 1.5vw, 1.25rem);
   display: flex;
   flex-wrap: wrap;
@@ -9658,7 +9604,7 @@ p {
   gap: var(--bento-gap);
 }
 
-.bento-grid:not(.is-filtered) .bento-tile {
+.bento-grid .bento-tile {
   flex: 1 1 100%;
   width: auto;
   min-height: 0;
@@ -9671,7 +9617,7 @@ p {
 
 /* Com a caixa na proporcao da arte, `cover` preenche sem cortar. Os boards de
    design deixam de ter a moldura clara: aparecem inteiros, como os outros. */
-.bento-grid:not(.is-filtered) .bento-tile > img {
+.bento-grid .bento-tile > img {
   object-fit: cover;
   object-position: center;
   padding: 0;
@@ -9696,7 +9642,7 @@ p {
    devolve esse meio pixel sem desigualar as alturas. A fatia desconta os vaos da
    linha: --gaps-md/--gaps-lg e quantos vaos ha na linha do card. */
 @media (min-width: 48rem) {
-  .bento-grid:not(.is-filtered) > .bento-tile {
+  .bento-grid > .bento-tile {
     flex: var(--ratio) 1
       calc((100% - var(--bento-gap) * var(--gaps-md)) * var(--share-md) - 0.5px);
   }
@@ -9719,7 +9665,7 @@ p {
 }
 
 @media (min-width: 64rem) {
-  .bento-grid:not(.is-filtered) > .bento-tile {
+  .bento-grid > .bento-tile {
     flex: var(--ratio) 1
       calc((100% - var(--bento-gap) * var(--gaps-lg)) * var(--share-lg) - 0.5px);
   }

@@ -220,12 +220,12 @@ function seguirCursor(event) {
 
 // No grid o card mostra so a arte; nome, tag e descricao aparecem no modal, que o
 // botao invisivel por cima do card abre.
-function BentoTile({ project, reducedMotion, style, onOpen }) {
+function BentoTile({ project, reducedMotion, style, onOpen, destaque }) {
   return (
     <motion.article
       className={`bento-tile bento-tile-${project.id}`}
       id={`projeto-${project.id}`}
-      data-destaque={project.destaque}
+      data-destaque={destaque}
       style={style}
       onPointerMove={seguirCursor}
       layout={!reducedMotion}
@@ -367,20 +367,27 @@ function fatias(linhas) {
   return porId;
 }
 
-// Estilo de cada card do destaque. O Morcegao e os videos da pilha so precisam da
-// proporcao (a primeira linha tem medidas proprias no CSS); os demais recebem a
-// fatia da linha no tablet (pares) e no desktop (soma alvo).
-function linhasJustificadas(lista) {
-  const livres = lista.filter((project) => !project.destaque);
+// Estilo de cada card, em qualquer aba. No destaque, o Morcegao e os videos da
+// pilha so precisam da proporcao (a primeira linha tem medidas proprias no CSS);
+// os demais recebem a fatia da linha no tablet (pares) e no desktop (soma alvo).
+// Nas outras abas todos entram nas linhas. No tablet, um card que sobraria
+// sozinho no fim e estreito (em pe ou quadrado) junta no par anterior.
+function linhasJustificadas(lista, emDestaque) {
+  const fixo = (project) => emDestaque && project.destaque;
+  const livres = lista.filter((project) => !fixo(project));
   const pares = [];
   for (let i = 0; i < livres.length; i += 2) pares.push(livres.slice(i, i + 2));
+  const ultimo = pares[pares.length - 1];
+  if (pares.length > 1 && ultimo.length === 1 && ultimo[0].aspect < 1.2) {
+    pares[pares.length - 2].push(...pares.pop());
+  }
   const tablet = fatias(pares);
   const desktop = fatias(agruparLinhas(livres, SOMA_DESKTOP));
 
   return Object.fromEntries(
     lista.map((project) => [
       project.id,
-      project.destaque
+      fixo(project)
         ? { "--ratio": project.aspect }
         : {
             "--ratio": project.aspect,
@@ -429,7 +436,7 @@ export function RecentProjects() {
     [active, emDestaque],
   );
   const estilos = useMemo(
-    () => (emDestaque ? linhasJustificadas(visiveis) : {}),
+    () => linhasJustificadas(visiveis, emDestaque),
     [emDestaque, visiveis],
   );
 
@@ -480,6 +487,7 @@ export function RecentProjects() {
                       project={project}
                       reducedMotion={reducedMotion}
                       style={estilos[project.id]}
+                      destaque={project.destaque}
                       onOpen={setAberto}
                       key={project.id}
                     />
@@ -490,6 +498,7 @@ export function RecentProjects() {
                   project={bloco}
                   reducedMotion={reducedMotion}
                   style={estilos[bloco.id]}
+                  destaque={emDestaque ? bloco.destaque : undefined}
                   onOpen={setAberto}
                   key={bloco.id}
                 />
