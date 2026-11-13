@@ -31,7 +31,8 @@ const entrada = {
 };
 
 // A ordem aqui e a ordem do destaque: Morcegao e o video do Trend Cast na primeira
-// faixa, TPark e Mercearia na terceira (ver os spans no fim do styles.css).
+// faixa, TPark e Brisa na segunda, ObraFlow e Mercearia na terceira (ver os spans
+// no fim do styles.css).
 // Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
 // que toca no card.
 const projects = [
@@ -74,16 +75,16 @@ const projects = [
     href: "https://vjssistemas.com.br/",
   },
   {
-    id: "obraflow",
+    id: "tpark",
     featured: true,
     index: "04",
-    category: "Sistema",
-    title: "ObraFlow",
-    description: "Cronograma, equipe, custos e indicadores em um painel.",
-    image: "/assets/images/projects/obraflow.webp",
-    wallImage: "/assets/images/projects/wall/obraflow.webp",
-    aspect: 0.8,
-    alt: "Interface do sistema de gestão de obras ObraFlow",
+    category: "Site",
+    title: "TPark Estacionamentos",
+    description: "Site comercial para gestão e automação de estacionamentos.",
+    image: "/assets/images/projects/tpark.webp",
+    wallImage: "/assets/images/projects/wall/tpark.webp",
+    aspect: 1.78,
+    alt: "Página inicial do site da TPark Estacionamentos",
   },
   {
     id: "estudai",
@@ -131,16 +132,16 @@ const projects = [
     alt: "Kit de identidade visual da Aurora Casa",
   },
   {
-    id: "tpark",
+    id: "obraflow",
     featured: true,
     index: "09",
-    category: "Site",
-    title: "TPark Estacionamentos",
-    description: "Site comercial para gestão e automação de estacionamentos.",
-    image: "/assets/images/projects/tpark.webp",
-    wallImage: "/assets/images/projects/wall/tpark.webp",
-    aspect: 1.78,
-    alt: "Página inicial do site da TPark Estacionamentos",
+    category: "Sistema",
+    title: "ObraFlow",
+    description: "Cronograma, equipe, custos e indicadores em um painel.",
+    image: "/assets/images/projects/obraflow.webp",
+    wallImage: "/assets/images/projects/wall/obraflow.webp",
+    aspect: 0.8,
+    alt: "Interface do sistema de gestão de obras ObraFlow",
   },
   {
     id: "mercearia",

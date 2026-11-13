@@ -7415,7 +7415,7 @@ p {
   /* Spans em vez de posicao absoluta. Com o filtro removendo tiles, coordenadas
      fixas deixariam buracos onde estava o item retirado; spans mais
      `grid-auto-flow: dense` reempacotam qualquer subconjunto. Os pares somam 12
-     nas combinacoes que importam: morcegao+trendcast, obraflow+brisa, e os tres
+     nas combinacoes que importam: morcegao+trendcast, tpark+brisa, e os tres
      designs entre si. */
   .bento-tile-morcegao {
     grid-column: span 7;
@@ -9715,13 +9715,20 @@ p {
 
   /* Faixas do destaque, repetidas aqui porque a regra de 48rem acima vem depois
      das originais e as sobrescrevia: Morcegao (7) e o video do Trend Cast (5) na
-     primeira; TPark (8) e Mercearia (4) na terceira. */
+     primeira; TPark (8) e Brisa (4), com quatro linhas, na segunda; ObraFlow (8) e
+     Mercearia (4), com tres, na terceira. */
   .bento-tile-morcegao {
     grid-column: span 7;
   }
 
   .bento-tile-tpark {
     grid-column: span 8;
+    grid-row: span 4;
+  }
+
+  .bento-grid:not(.is-filtered) > .bento-tile-obraflow {
+    grid-column: span 8;
+    grid-row: span 3;
   }
 
   .bento-grid:not(.is-filtered) > .bento-tile-trendcast {
