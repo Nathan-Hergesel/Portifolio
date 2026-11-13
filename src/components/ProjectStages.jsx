@@ -1,25 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { BsArrowUpRight } from "react-icons/bs";
 
 import { BadgeCheck } from "./animate-ui/icons/badge-check";
 import { Compass } from "./animate-ui/icons/compass";
 import { Layers } from "./animate-ui/icons/layers";
-import { MapPin } from "./animate-ui/icons/map-pin";
 import { MessageSquare } from "./animate-ui/icons/message-square";
 import { Route } from "./animate-ui/icons/route";
+import { Send } from "./animate-ui/icons/send";
+import { ExpandingCards } from "./ui/expanding-cards";
 import { projectStages } from "../data/site";
-import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const easeOutExpo = [0.16, 1, 0.3, 1];
 
@@ -36,404 +27,72 @@ const STAGE_ICONS = {
   planejamento: { Icon: Compass, animation: "default-loop" },
   producao: { Icon: Layers, animation: "default-loop" },
   validacao: { Icon: BadgeCheck },
-  entrega: { Icon: MapPin },
+  entrega: { Icon: Send },
 };
 
-/* --- Geometria da trilha ---------------------------------------------------
-   O mapa ocupa a secao inteira, entao a proporcao da area muda com a janela.
-   Em vez de esticar um viewBox fixo (o que deformaria traco e relevo), as
-   paradas ficam em coordenadas normalizadas e a trilha e recalculada em pixels
-   no tamanho real. Entre duas paradas a trilha e uma Bezier cubica que sai e
-   chega na horizontal, o que da o serpenteio. Viajante, desenho da trilha e
-   etapa ativa saem todos da mesma tabela de amostras. */
-
-const STOPS = [
-  [0.07, 0.72],
-  [0.29, 0.15],
-  [0.5, 0.78],
-  [0.71, 0.15],
-  [0.9, 0.52],
-];
-
-// Para onde o cartao de cada parada abre. Escolhido a mao, e nao por regra, para
-// que nenhum cartao cubra o pino de outra parada.
-const CARD_DIRECTIONS = [
-  { side: "right", dir: "up" },
-  { side: "right", dir: "down" },
-  { side: "left", dir: "up" },
-  { side: "left", dir: "down" },
-  { side: "left", dir: "down" },
-];
-
-// Cartao ancorado no pino ativo, na direcao de CARD_DIRECTIONS. O canto mais
-// proximo fica rente ao pino e e dali que ele cresce, com a ponta apontando
-// para o icone.
-const PIN_GAP = "3rem";
-const NOTCH_OFFSET = "1.75rem";
-
-const cardPlacement = (index) => {
-  const [x, y] = STOPS[index];
-  const { side, dir } = CARD_DIRECTIONS[index];
-  const style = {
-    transformOrigin: `${side === "right" ? "left" : "right"} ${dir === "up" ? "bottom" : "top"}`,
-  };
-
-  if (side === "right") style.left = `calc(${x * 100}% + ${PIN_GAP})`;
-  else style.right = `calc(${(1 - x) * 100}% + ${PIN_GAP})`;
-
-  if (dir === "up") style.bottom = `calc(${(1 - y) * 100}% - ${NOTCH_OFFSET})`;
-  else style.top = `calc(${y * 100}% - ${NOTCH_OFFSET})`;
-
-  return { side, dir, style };
-};
-
-const bezierPoint = ([p0, p1, p2, p3], t) => {
-  const u = 1 - t;
-  return [0, 1].map(
-    (axis) =>
-      u * u * u * p0[axis] +
-      3 * u * u * t * p1[axis] +
-      3 * u * t * t * p2[axis] +
-      t * t * t * p3[axis],
-  );
-};
-
-function buildTrail(width, height) {
-  const waypoints = STOPS.map(([x, y]) => [x * width, y * height]);
-  const segments = waypoints.slice(1).map((end, index) => {
-    const start = waypoints[index];
-    const handle = (end[0] - start[0]) * 0.45;
-    return [start, [start[0] + handle, start[1]], [end[0] - handle, end[1]], end];
-  });
-
-  const d = `M${waypoints[0].join(" ")} ${segments
-    .map(([, c1, c2, end]) => `C${c1.join(" ")} ${c2.join(" ")} ${end.join(" ")}`)
-    .join(" ")}`;
-
-  // Amostras com comprimento acumulado: transformam "fracao da trilha" em ponto.
-  const points = [{ length: 0, x: waypoints[0][0], y: waypoints[0][1] }];
-  const stopLengths = [0];
-  segments.forEach((segment) => {
-    for (let step = 1; step <= 64; step += 1) {
-      const [x, y] = bezierPoint(segment, step / 64);
-      const previous = points[points.length - 1];
-      points.push({ length: previous.length + Math.hypot(x - previous.x, y - previous.y), x, y });
-    }
-    stopLengths.push(points[points.length - 1].length);
-  });
-
-  const total = points[points.length - 1].length;
-  return { width, height, waypoints, d, points, total, stops: stopLengths.map((length) => length / total) };
-}
-
-const pointAt = (trail, fraction) => {
-  const target = Math.min(Math.max(fraction, 0), 1) * trail.total;
-  const index = trail.points.findIndex((point) => point.length >= target);
-  if (index <= 0) return trail.points[0];
-  const a = trail.points[index - 1];
-  const b = trail.points[index];
-  const t = (target - a.length) / (b.length - a.length || 1);
-  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
-};
-
-const stageAt = (trail, fraction) =>
-  trail.stops.reduce((found, stop, index) => (fraction >= stop - 0.004 ? index : found), 0);
-
-// Rolagem -> trilha. Cada parada tem um trecho de pausa (o viajante fica parado
-// enquanto o cartao e lido) e um trecho de caminhada ate a proxima.
-const SCROLL_IN = [0, 0.08, 0.22, 0.3, 0.44, 0.52, 0.66, 0.74, 0.88, 1];
-const DWELL_CENTER = [0.04, 0.26, 0.48, 0.7, 0.94];
-
-const trailOutput = (stops) => [0, 0, ...stops.slice(1, -1).flatMap((stop) => [stop, stop]), 1, 1];
-
-const interpolate = (value, input, output) => {
-  if (value <= input[0]) return output[0];
-  for (let index = 1; index < input.length; index += 1) {
-    if (value <= input[index]) {
-      const t = (value - input[index - 1]) / (input[index] - input[index - 1]);
-      return output[index - 1] + (output[index] - output[index - 1]) * t;
-    }
-  }
-  return output[output.length - 1];
-};
-
-function StageIcon({ stage, on, reducedMotion, size = 22 }) {
+// Conteudo de um card de etapa. Fechado, mostra o numero, o icone (parado) e o
+// nome na vertical; aberto, ganha o fundo azul da marca, o icone anima uma vez e
+// aparecem o prazo, o resumo e o que cada lado faz. O texto do card aberto fica sempre no DOM (so some visualmente nos
+// fechados), entao leitores de tela leem todas as etapas.
+function StageCard({ stage, active, reducedMotion }) {
   const { Icon, animation } = STAGE_ICONS[stage.id];
 
   return (
-    <Icon
-      size={size}
-      strokeWidth={2.2}
-      animation={animation}
-      animate={on && !reducedMotion}
-      loop={on && !reducedMotion}
-      loopDelay={1500}
-      aria-hidden="true"
-    />
-  );
-}
+    <article className="stage-card" aria-labelledby={`etapa-${stage.id}`}>
+      <span className="stage-card-glow" aria-hidden="true" />
+      <span className="stage-card-number" aria-hidden="true">
+        {stage.index}
+      </span>
 
-function StageFacts({ stage }) {
-  return (
-    <dl className="stage-facts">
-      <div>
-        <dt>Você recebe</dt>
-        <dd>
-          <ul>
-            {stage.deliverables.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </dd>
+      <div className="stage-card-rail" aria-hidden="true">
+        <span className="stage-card-index">{stage.index}</span>
+        <Icon size={22} strokeWidth={2.2} />
+        <span className="stage-card-vertical">{stage.title}</span>
       </div>
-      <div>
-        <dt>Sua parte</dt>
-        <dd>{stage.clientRole}</dd>
-      </div>
-    </dl>
-  );
-}
 
-function TreasureMap({ reducedMotion }) {
-  const questRef = useRef(null);
-  const stickyRef = useRef(null);
-  const fieldRef = useRef(null);
-  const trailRef = useRef(null);
-  const [size, setSize] = useState(null);
-  const [active, setActive] = useState(0);
-  const progress = useMotionValue(0);
-  const travelerX = useMotionValue(0);
-  const travelerY = useMotionValue(0);
-  const { scrollY } = useScroll();
-
-  useEffect(() => {
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      setSize({ width, height });
-    });
-    observer.observe(fieldRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const trail = useMemo(() => (size ? buildTrail(size.width, size.height) : null), [size]);
-
-  // Janela de rolagem em que o mapa fica preso: do topo do bloco encostar sob o
-  // cabecalho ate o fim do bloco encostar no fim da tela.
-  const range = useCallback(() => {
-    const quest = questRef.current;
-    const stickyTop = parseFloat(getComputedStyle(stickyRef.current).top) || 0;
-    const top = quest.getBoundingClientRect().top + window.scrollY;
-    return { start: top - stickyTop, end: top + quest.offsetHeight - window.innerHeight };
-  }, []);
-
-  const update = useCallback(() => {
-    const { start, end } = range();
-    progress.set(Math.min(Math.max((window.scrollY - start) / (end - start), 0), 1));
-  }, [progress, range]);
-
-  useMotionValueEvent(scrollY, "change", update);
-
-  useEffect(() => {
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [update]);
-
-  const travel = useTransform(progress, (value) =>
-    trailRef.current ? interpolate(value, SCROLL_IN, trailOutput(trailRef.current.stops)) : 0,
-  );
-
-  const place = useCallback(
-    (fraction) => {
-      const current = trailRef.current;
-      if (!current) return;
-      const point = pointAt(current, fraction);
-      travelerX.set(point.x);
-      travelerY.set(point.y);
-      setActive(stageAt(current, fraction));
-    },
-    [travelerX, travelerY],
-  );
-
-  useMotionValueEvent(travel, "change", place);
-
-  // A trilha muda de forma no resize; o viajante e a etapa sao reposicionados
-  // sem esperar a proxima rolagem.
-  useEffect(() => {
-    trailRef.current = trail;
-    if (trail) place(interpolate(progress.get(), SCROLL_IN, trailOutput(trail.stops)));
-  }, [trail, place, progress]);
-
-  const jumpTo = (index) => {
-    const { start, end } = range();
-    window.scrollTo({ top: start + DWELL_CENTER[index] * (end - start) });
-  };
-
-  const stage = projectStages[active];
-  const placement = cardPlacement(active);
-  const treasure = trail?.waypoints[trail.waypoints.length - 1];
-
-  return (
-    <div className="quest" ref={questRef}>
-      <div className="quest-sticky" ref={stickyRef}>
-        <div className="map" ref={fieldRef}>
-          {trail && (
-            <svg
-              className="map-svg"
-              viewBox={`0 0 ${trail.width} ${trail.height}`}
+      <div className="stage-card-body">
+        <header className="stage-card-head">
+          <span className="stage-card-icon">
+            <Icon
+              size={28}
+              strokeWidth={2.2}
+              animation={animation}
+              animate={active && !reducedMotion}
               aria-hidden="true"
-            >
-              <g className="map-x" transform={`translate(${treasure[0] + 84} ${treasure[1] - 4})`}>
-                <path d="M-22 -22 22 22M22 -22-22 22" />
-              </g>
-
-              <path className="map-trail" d={trail.d} />
-              <motion.path className="map-trail-done" d={trail.d} style={{ pathLength: travel }} />
-              <motion.circle className="map-traveler-ring" cx={travelerX} cy={travelerY} r="20" />
-              <motion.circle className="map-traveler" cx={travelerX} cy={travelerY} r="10" />
-            </svg>
-          )}
-
-          <span className="map-compass" aria-hidden="true">
-            <Compass
-              size={40}
-              strokeWidth={1.6}
-              animation="default-loop"
-              animate={!reducedMotion}
-              loop={!reducedMotion}
-              loopDelay={3200}
             />
           </span>
+          <span className="stage-card-chip">
+            <b>{stage.index}</b> Etapa
+          </span>
+          <span className="stage-duration">{stage.duration}</span>
+        </header>
 
-          {projectStages.map((item, index) => (
-            <button
-              className="map-stop"
-              type="button"
-              data-active={index === active}
-              data-done={index < active}
-              // Rotulo do lado oposto ao da trilha: paradas do alto (trilha descendo
-              // dos dois lados) levam o rotulo em cima, as de baixo levam embaixo.
-              data-below={STOPS[index][1] > 0.5}
-              style={{ left: `${STOPS[index][0] * 100}%`, top: `${STOPS[index][1] * 100}%` }}
-              onClick={() => jumpTo(index)}
-              aria-label={`Ir para a etapa ${item.index}: ${item.title}`}
-              key={item.id}
-            >
-              <span className="map-stop-pin">
-                <StageIcon stage={item} on={index === active} reducedMotion={reducedMotion} size={30} />
-              </span>
-              <span className="map-stop-label">
-                <b>{item.index}</b>
-                {item.title}
-              </span>
-            </button>
-          ))}
+        <h3 id={`etapa-${stage.id}`}>{stage.title}</h3>
+        <p className="stage-card-summary">{stage.summary}</p>
 
-          {/* Sem `mode="wait"`: o cartao antigo some no pino dele enquanto o novo
-              cresce a partir do proximo, cada um no proprio lugar. */}
-          <AnimatePresence initial={false}>
-            <motion.div
-              className="map-card"
-              data-side={placement.side}
-              data-dir={placement.dir}
-              style={placement.style}
-              key={stage.id}
-              initial={{ opacity: 0, scale: 0.86 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.18 } }}
-              transition={{ duration: 0.42, ease: easeOutExpo }}
-              aria-hidden="true"
-            >
-              <div className="map-card-head">
-                <span className="map-card-step">
-                  Etapa {stage.index} / {String(projectStages.length).padStart(2, "0")}
-                </span>
-                <strong>{stage.title}</strong>
-                <span className="stage-duration">{stage.duration}</span>
-              </div>
-              <p className="map-card-summary">{stage.summary}</p>
-              <StageFacts stage={stage} />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <dl className="stage-facts">
+          <div>
+            <dt>Você recebe</dt>
+            <dd>
+              <ul>
+                {stage.deliverables.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt>Sua parte</dt>
+            <dd>{stage.clientRole}</dd>
+          </div>
+        </dl>
       </div>
-
-      {/* O mapa e o cartao sao visuais; leitores de tela recebem as etapas
-          completas e em ordem aqui. */}
-      <ol className="sr-only">
-        {projectStages.map((item) => (
-          <li key={item.id}>
-            <h3>
-              {item.index}. {item.title} ({item.duration})
-            </h3>
-            <p>{item.summary}</p>
-            <StageFacts stage={item} />
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-}
-
-// Versao em coluna para celular e para quem prefere menos movimento: a mesma
-// trilha, vertical, preenchida conforme a leitura.
-function Trail({ reducedMotion }) {
-  const listRef = useRef(null);
-  const stopRefs = useRef([]);
-  const [active, setActive] = useState(-1);
-  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 65%", "end 65%"] });
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(Number(entry.target.dataset.index));
-        });
-      },
-      { rootMargin: "-40% 0px -55%", threshold: 0 },
-    );
-
-    stopRefs.current.forEach((stop) => stop && observer.observe(stop));
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div className="trail">
-      <span className="trail-line" aria-hidden="true">
-        <motion.span style={{ scaleY: scrollYProgress }} />
-      </span>
-      <ol className="trail-list" ref={listRef}>
-        {projectStages.map((stage, index) => (
-          <li
-            className="trail-stop"
-            data-index={index}
-            data-active={index === active}
-            data-done={index < active}
-            ref={(node) => {
-              stopRefs.current[index] = node;
-            }}
-            key={stage.id}
-          >
-            <span className="trail-pin" aria-hidden="true">
-              <StageIcon stage={stage} on={index === active} reducedMotion={reducedMotion} size={20} />
-            </span>
-            <div className="trail-card">
-              <span className="map-card-step">Etapa {stage.index}</span>
-              <h3>{stage.title}</h3>
-              <span className="stage-duration">{stage.duration}</span>
-              <p className="map-card-summary">{stage.summary}</p>
-              <StageFacts stage={stage} />
-            </div>
-          </li>
-        ))}
-      </ol>
-    </div>
+    </article>
   );
 }
 
 export function ProjectStages() {
   const reducedMotion = useReducedMotion();
-  const isDesktop = useMediaQuery("(min-width: 64rem)");
 
   return (
     <section
@@ -463,22 +122,25 @@ export function ProjectStages() {
             03 / Etapas do projeto
           </span>
           <h2 id="stages-title">
-            O mapa
+            Cinco etapas,
             <br />
-            do projeto<span>.</span>
+            um caminho<span>.</span>
           </h2>
         </div>
         <p className="chapter-lede">
-          Cinco paradas entre a primeira conversa e o lançamento. Em cada uma você recebe algo
-          concreto e decide antes de seguir, sem atalho escondido nem surpresa no caminho.
+          Da primeira conversa ao lançamento. Em cada etapa você recebe algo concreto e
+          decide antes de seguir, sem atalho escondido nem surpresa no caminho.
         </p>
       </motion.header>
 
-      {isDesktop && !reducedMotion ? (
-        <TreasureMap reducedMotion={reducedMotion} />
-      ) : (
-        <Trail reducedMotion={reducedMotion} />
-      )}
+      <ExpandingCards
+        className="stage-cards"
+        items={projectStages}
+        aria-label="Etapas do projeto"
+        renderCard={(stage, { active }) => (
+          <StageCard stage={stage} active={active} reducedMotion={reducedMotion} />
+        )}
+      />
 
       <footer className="stages-outro">
         <p>

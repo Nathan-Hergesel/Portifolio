@@ -8552,279 +8552,314 @@ p {
   text-transform: uppercase;
 }
 
-/* --- Etapas do projeto: mapa do tesouro ---------------------------------- */
+/* --- Etapas do projeto: cards que se expandem ---------------------------- */
 
+/* Secao clara: usa os padroes claros do capitulo (ponto e icones em azul). */
 .stages {
-  --chapter-accent: var(--accent-yellow);
-  --chapter-icon: var(--accent-yellow);
-  --chapter-soft: oklch(80% 0.014 91);
-  --chapter-code-line: oklch(92% 0.025 256 / 0.32);
-  --chapter-code-fill: oklch(22% 0.018 258);
-  background: var(--ink);
-  color: var(--canvas);
+  --chapter-icon: var(--blue);
+  --chapter-code-line: var(--line);
+  background: var(--canvas);
+  color: var(--ink);
 }
 
-.stages :focus-visible,
 .testimonials :focus-visible {
   outline-color: var(--accent-yellow);
 }
 
-/* Altura de rolagem do mapa: cada parada ganha um trecho de pausa e um de
-   caminhada (ver SCROLL_IN em ProjectStages). */
-.quest {
+@media (hover: hover) {
+  .stages .chapter-cta:hover {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+}
+
+/* Lista que se expande (ui/expanding-cards): as trilhas mudam entre 5fr e 1fr e
+   a transicao de grid-template anima a troca. No celular os cards ficam em
+   faixas empilhadas; a partir do tablet, em colunas. A lista e um container de
+   tamanho para o conteudo do card aberto ter medida fixa (--open-w/--open-h) e
+   nao se rearranjar enquanto o card cresce. */
+.expanding-cards {
+  --gap: 0.6rem;
+  --open-w: 100cqw;
+  --open-h: calc((100cqh - (var(--count) - 1) * var(--gap)) * 5 / (var(--count) + 4));
+  display: grid;
+  gap: var(--gap);
+  height: 56rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  container-type: size;
+  transition:
+    grid-template-columns 560ms var(--ease-out),
+    grid-template-rows 560ms var(--ease-out);
+}
+
+/* `contain` isola cada card: a troca de tamanho nao recalcula nada fora dele. */
+.expanding-card {
   position: relative;
-  height: 520vh;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 1rem;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+  background: oklch(98.5% 0.006 256);
+  color: var(--ink);
+  cursor: pointer;
+  contain: layout paint style;
+  transition: outline-color 400ms var(--ease-out);
 }
 
-/* Sangra ate as bordas da janela, por cima do padding da secao. */
-/* O pontilhado de carta nautica fica na camada presa, nao na secao: assim ele
-   para junto com a trilha em vez de correr por baixo dela durante a rolagem. */
-.quest-sticky {
-  position: sticky;
-  top: var(--header-h);
-  width: 100vw;
-  height: calc(100vh - var(--header-h));
-  margin-left: calc(50% - 50vw);
-  padding-block: 1.5rem 2rem;
-  background:
-    radial-gradient(oklch(92% 0.025 256 / 0.09) 1px, transparent 1.4px) 0 0 / 1.4rem 1.4rem,
-    var(--ink);
+.expanding-card:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
 }
 
-.map {
-  position: relative;
-  height: 100%;
+.expanding-card[data-active="true"] {
+  outline-color: transparent;
+  cursor: default;
 }
 
-.map-svg {
+@media (min-width: 48rem) {
+  .expanding-cards {
+    --gap: 0.75rem;
+    --open-w: calc((100cqw - (var(--count) - 1) * var(--gap)) * 5 / (var(--count) + 4));
+    --open-h: 100cqh;
+    height: clamp(31rem, 40vw, 36rem);
+  }
+}
+
+/* Card de etapa: tudo absoluto, para o card poder encolher ate virar uma coluna
+   fina sem empurrar nada. */
+.stage-card {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
 }
 
-.map-x path {
-  fill: none;
-  stroke: var(--accent-yellow);
-  stroke-width: 9;
-  stroke-linecap: round;
-}
-
-.map-trail {
-  fill: none;
-  stroke: oklch(92% 0.025 256 / 0.45);
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-dasharray: 2 13;
-}
-
-.map-trail-done {
-  fill: none;
-  stroke: var(--accent-yellow);
-  stroke-width: 6;
-  stroke-linecap: round;
-}
-
-.map-traveler {
-  fill: var(--accent-yellow);
-  stroke: var(--ink);
-  stroke-width: 3;
-}
-
-.map-traveler-ring {
-  fill: none;
-  stroke: var(--accent-yellow);
-  stroke-width: 2;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: map-ping 1.8s var(--ease-out) infinite;
-}
-
-@keyframes map-ping {
-  from {
-    opacity: 0.9;
-    transform: scale(0.5);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(1.7);
-  }
-}
-
-.map-compass {
-  position: absolute;
-  top: 0;
-  right: var(--page-pad);
-  width: 4.5rem;
-  height: 4.5rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: oklch(24% 0.02 258);
-  color: oklch(92% 0.025 256 / 0.8);
-}
-
-.map-stop {
-  position: absolute;
-  z-index: 2;
-  display: grid;
-  justify-items: center;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  transform: translate(-50%, -50%);
-}
-
-.map-stop:focus-visible {
-  outline: none;
-}
-
-.map-stop:focus-visible .map-stop-pin {
-  outline: 3px solid var(--accent-yellow);
-  outline-offset: 4px;
-}
-
-.map-stop-pin {
-  width: 4.25rem;
-  height: 4.25rem;
-  display: grid;
-  place-items: center;
-  border: 2px solid oklch(92% 0.025 256 / 0.55);
-  border-radius: 50%;
-  background: oklch(24% 0.02 258);
-  color: var(--canvas);
-  box-shadow: 0 0.75rem 1.5rem oklch(10% 0.02 258 / 0.55);
-  transition:
-    background-color 300ms var(--ease-out),
-    border-color 300ms var(--ease-out),
-    color 300ms var(--ease-out),
-    transform 400ms var(--ease-out);
-}
-
-.map-stop[data-done="true"] .map-stop-pin {
-  border-color: var(--accent-yellow);
-  color: var(--accent-yellow);
-}
-
-.map-stop[data-active="true"] .map-stop-pin {
-  border-color: var(--accent-yellow);
-  background: var(--accent-yellow);
-  color: var(--ink);
-  transform: scale(1.15);
-}
-
-.map-stop-label {
-  position: absolute;
-  bottom: calc(100% + 0.75rem);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 1rem;
-  border-radius: 999px;
-  background: oklch(24% 0.02 258 / 0.94);
-  color: var(--canvas);
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: opacity 300ms var(--ease-out);
-}
-
-.map-stop[data-below="true"] .map-stop-label {
-  top: calc(100% + 0.75rem);
-  bottom: auto;
-}
-
-.map-stop-label b {
-  color: var(--accent-yellow);
-  font-size: 0.9rem;
-}
-
-/* O cartao ja traz o titulo da etapa ativa; o rotulo sai para nao duplicar nem
-   ficar por baixo do cartao. */
-.map-stop[data-active="true"] .map-stop-label {
-  opacity: 0;
-}
-
-/* Cartao da etapa ativa, preso ao pino (posicao vem de cardPlacement). */
-.map-card {
-  --notch: 0.6rem;
-  position: absolute;
-  z-index: 3;
-  width: min(28rem, 36vw);
-  display: grid;
-  gap: 0.9rem;
-  padding: 1.5rem 1.6rem;
-  border-radius: 1rem;
-  background: oklch(25% 0.02 258);
-  box-shadow: 0 1.5rem 3rem oklch(8% 0.02 258 / 0.55);
-}
-
-/* Ponta apontando para o pino, no lado e na altura de onde o cartao nasce. */
-.map-card::before {
+/* Pontilhado do card, na medida do card aberto e em camada propria: o card so
+   recorta, nao repinta o padrao a cada quadro da animacao. */
+.stage-card::before {
   content: "";
   position: absolute;
-  width: calc(var(--notch) * 2);
-  aspect-ratio: 1;
-  background: inherit;
-  rotate: 45deg;
+  top: 0;
+  left: 0;
+  width: var(--open-w);
+  height: var(--open-h);
+  background: radial-gradient(oklch(16.5% 0.014 258 / 0.09) 1px, transparent 1.4px) 0 0 / 1.1rem 1.1rem;
+  will-change: transform;
 }
 
-.map-card[data-side="right"]::before {
-  left: calc(var(--notch) * -1 + 1px);
+/* Fundo azul da marca do card aberto, em camada propria para a troca ser um
+   fade (gradiente nao anima). */
+.stage-card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--open-w);
+  height: var(--open-h);
+  will-change: opacity;
+  background:
+    radial-gradient(oklch(92% 0.025 256 / 0.2) 1px, transparent 1.4px) 0 0 / 1.1rem 1.1rem,
+    var(--brand-gradient);
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
 }
 
-.map-card[data-side="left"]::before {
-  right: calc(var(--notch) * -1 + 1px);
+/* Numero grande vazado no canto, como marca de fundo da etapa. */
+.stage-card-number {
+  position: absolute;
+  top: -0.12em;
+  right: 0.04em;
+  color: transparent;
+  font-family: var(--font-display);
+  font-size: clamp(8rem, 15vw, 14rem);
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  -webkit-text-stroke: 1.5px oklch(16.5% 0.014 258 / 0.1);
+  transition: -webkit-text-stroke-color 500ms var(--ease-out);
+  pointer-events: none;
+  will-change: transform;
 }
 
-.map-card[data-dir="up"]::before {
-  bottom: calc(1.75rem - var(--notch));
+/* Card fechado: numero, icone e nome. No celular numa linha; nas colunas do
+   desktop, empilhados com o nome na vertical. */
+.stage-card-rail {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0 1.15rem;
+  transition: opacity 260ms var(--ease-out);
 }
 
-.map-card[data-dir="down"]::before {
-  top: calc(1.75rem - var(--notch));
+.stage-card-index {
+  color: var(--brand);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 850;
 }
 
-.map-card-head {
+.stage-card-rail svg {
+  flex: none;
+  color: var(--blue);
+}
+
+.stage-card-vertical {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 850;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (min-width: 48rem) {
+  .stage-card-rail {
+    flex-direction: column;
+    padding: 1.4rem 0;
+  }
+
+  .stage-card-vertical {
+    margin-top: auto;
+    font-size: clamp(1.3rem, 1.8vw, 1.7rem);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+}
+
+/* Conteudo do card aberto, com medida fixa do tamanho aberto: o card cresce por
+   cima dele em vez de o texto se rearranjar durante a animacao. */
+.stage-card-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--open-w);
+  height: var(--open-h);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.85rem;
+  padding: clamp(1.25rem, 2.6vw, 2.25rem);
+  color: var(--canvas);
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity;
+  transition:
+    opacity 300ms var(--ease-out),
+    visibility 0s linear 300ms;
+}
+
+.stage-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: auto;
+}
+
+.stage-card-icon {
+  width: 3.1rem;
+  height: 3.1rem;
   display: grid;
-  justify-items: start;
-  gap: 0.5rem;
+  place-items: center;
+  margin-right: 0.25rem;
+  border-radius: 0.8rem;
+  background: var(--accent-yellow);
+  color: var(--ink);
 }
 
-.map-card-step {
-  color: var(--accent-yellow);
-  font-size: 0.75rem;
+.stage-card-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: oklch(16% 0.02 258 / 0.45);
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.map-card-head strong {
+.stage-card-chip b {
+  color: var(--accent-yellow);
+  font-weight: 850;
+}
+
+.stage-card-body h3 {
+  margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 2.8vw, 2.75rem);
-  font-weight: 800;
-  line-height: 0.9;
+  font-size: clamp(2.2rem, 4.2vw, 3.8rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 0.86;
   text-transform: uppercase;
 }
 
-.map-card-summary {
-  color: oklch(84% 0.014 91);
-  font-size: 1.02rem;
+.stage-card-summary {
+  max-width: 54ch;
+  margin: 0;
+  color: oklch(95% 0.015 256 / 0.9);
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
   line-height: 1.5;
 }
 
-.map-card .stage-facts dt {
-  font-size: 0.74rem;
+.stage-card-body .stage-facts {
+  padding-top: 0.95rem;
+  border-top: 1px solid oklch(92% 0.025 256 / 0.28);
 }
 
-.map-card .stage-facts dd {
-  font-size: 1rem;
+.stage-card-body .stage-facts li::before {
+  color: var(--accent-yellow);
+}
+
+@media (min-width: 48rem) {
+  .stage-card-body .stage-facts {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* Aberto: fundo azul, numero mais visivel, o conteudo entra depois que o card
+   ja comecou a crescer e o trilho fechado some. */
+.expanding-card[data-active="true"] .stage-card-glow {
+  opacity: 1;
+}
+
+.expanding-card[data-active="true"] .stage-card-number {
+  -webkit-text-stroke-color: oklch(96% 0.02 256 / 0.24);
+}
+
+.expanding-card[data-active="true"] .stage-card-rail {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.expanding-card[data-active="true"] .stage-card-body {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 420ms var(--ease-out) 220ms,
+    visibility 0s;
+}
+
+@media (hover: hover) {
+  .expanding-card:not([data-active="true"]):hover {
+    outline-color: var(--blue);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expanding-cards,
+  .stage-card-glow,
+  .stage-card-body,
+  .expanding-card[data-active="true"] .stage-card-body {
+    transition: none;
+  }
 }
 
 .stage-duration {
@@ -8872,98 +8907,6 @@ p {
   color: var(--brand-bright);
 }
 
-/* Trilha vertical: celular e preferencia por menos movimento. */
-.trail {
-  position: relative;
-}
-
-.trail-line {
-  position: absolute;
-  top: 1.6rem;
-  bottom: 1.6rem;
-  left: 1.6rem;
-  width: 3px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: repeating-linear-gradient(to bottom, oklch(92% 0.025 256 / 0.45) 0 4px, transparent 4px 14px);
-  translate: -50% 0;
-}
-
-.trail-line span {
-  position: absolute;
-  inset: 0;
-  background: var(--accent-yellow);
-  transform-origin: top;
-}
-
-.trail-list {
-  display: grid;
-  gap: 1.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.trail-stop {
-  display: grid;
-  grid-template-columns: 3.2rem minmax(0, 1fr);
-  align-items: start;
-  gap: 0.9rem;
-}
-
-.trail-pin {
-  position: relative;
-  z-index: 1;
-  width: 3.2rem;
-  height: 3.2rem;
-  display: grid;
-  place-items: center;
-  border: 2px solid oklch(92% 0.025 256 / 0.6);
-  border-radius: 50%;
-  background: var(--ink);
-  transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out), color 300ms var(--ease-out);
-}
-
-.trail-stop[data-done="true"] .trail-pin {
-  border-color: var(--accent-yellow);
-  color: var(--accent-yellow);
-}
-
-.trail-stop[data-active="true"] .trail-pin {
-  border-color: var(--accent-yellow);
-  background: var(--accent-yellow);
-  color: var(--ink);
-}
-
-.trail-card {
-  max-width: 52rem;
-  display: grid;
-  justify-items: start;
-  gap: 0.6rem;
-  padding: 1.25rem;
-  border: 1px solid var(--line-dark);
-  border-radius: 1rem;
-  background: oklch(21% 0.016 258);
-  transition: border-color 300ms var(--ease-out);
-}
-
-.trail-stop[data-active="true"] .trail-card {
-  border-color: oklch(92% 0.025 256 / 0.45);
-}
-
-.trail-card h3 {
-  font-family: var(--font-display);
-  font-size: clamp(1.9rem, 6vw, 2.6rem);
-  font-weight: 800;
-  line-height: 0.9;
-  text-transform: uppercase;
-}
-
-.trail-card .stage-facts {
-  width: 100%;
-  margin-top: 0.3rem;
-}
-
 .stages-outro {
   display: flex;
   flex-wrap: wrap;
@@ -8975,7 +8918,7 @@ p {
 
 .stages-outro > p {
   max-width: 52ch;
-  color: oklch(80% 0.014 91);
+  color: var(--ink-soft);
   font-size: 0.9rem;
 }
 
@@ -9555,14 +9498,6 @@ p {
 
   .chapter-cta:hover svg {
     transform: translate(0.15rem, -0.15rem);
-  }
-
-  .map-stop:hover .map-stop-pin {
-    transform: scale(1.1);
-  }
-
-  .map-stop[data-active="true"]:hover .map-stop-pin {
-    transform: scale(1.18);
   }
 
   .cta-topic:hover {
