@@ -5,19 +5,19 @@ import { RotatingHeadline } from "./RotatingHeadline";
 const projectCards = [
   {
     className: "stack-card-left",
-    image: "/assets/images/projects/vjs-sistemas.webp",
+    image: "/assets/images/projects/estudai.webp",
     width: 1600,
-    height: 762,
-    title: "VJS Sistemas",
-    description: "Site comercial"
+    height: 1095,
+    title: "EstudAí",
+    description: "Aplicativo de estudos"
   },
   {
     className: "stack-card-right",
-    image: "/assets/images/projects/obraflow.webp",
-    width: 1122,
-    height: 1408,
-    title: "ObraFlow",
-    description: "Sistema de gestão"
+    image: "/assets/images/projects/tpark.webp",
+    width: 1600,
+    height: 900,
+    title: "TPark",
+    description: "Site comercial"
   },
   {
     className: "stack-card-front",
