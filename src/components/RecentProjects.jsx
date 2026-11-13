@@ -30,8 +30,10 @@ const entrada = {
   transition: { duration: 0.38, ease: easeOutExpo },
 };
 
-// A ordem aqui e a ordem do destaque: o primeiro destacado ocupa o card grande
-// do topo (ver os spans de .bento-tile-morcegao no CSS).
+// A ordem aqui e a ordem do destaque: Morcegao e o video do Trend Cast na primeira
+// faixa, TPark e Mercearia na terceira (ver os spans no fim do styles.css).
+// Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
+// que toca no card.
 const projects = [
   {
     id: "morcegao",
@@ -47,8 +49,21 @@ const projects = [
     href: "https://supermercadomorcegao.tech/entrar",
   },
   {
-    id: "vjs",
+    id: "trendcast",
+    featured: true,
     index: "02",
+    category: "Vídeo",
+    title: "Trend Cast",
+    description: "Vídeo em motion graphics apresentando o produto.",
+    image: "/assets/images/projects/trendcast.webp",
+    wallImage: "/assets/images/projects/wall/trendcast.webp",
+    video: "/assets/videos/trendcast.mp4",
+    aspect: 1.78,
+    alt: "Vídeo de apresentação do Trend Cast",
+  },
+  {
+    id: "vjs",
+    index: "03",
     category: "Site",
     title: "VJS Sistemas",
     description: "Estratégia, interface e desenvolvimento comercial.",
@@ -57,18 +72,6 @@ const projects = [
     aspect: 2.1,
     alt: "Página inicial do site VJS Sistemas",
     href: "https://vjssistemas.com.br/",
-  },
-  {
-    id: "mercearia",
-    featured: true,
-    index: "03",
-    category: "App",
-    title: "Mercearia Fácil",
-    description: "Vendas, estoque e fornecedores para pequenos comércios.",
-    image: "/assets/images/projects/mercearia-facil.webp",
-    wallImage: "/assets/images/projects/wall/mercearia-facil.webp",
-    aspect: 1,
-    alt: "Apresentação do aplicativo Mercearia Fácil",
   },
   {
     id: "obraflow",
@@ -139,20 +142,17 @@ const projects = [
     aspect: 1.78,
     alt: "Página inicial do site da TPark Estacionamentos",
   },
-  // Videos: `image` e a capa (um quadro do proprio video) e `video` o arquivo que
-  // toca no card.
   {
-    id: "trendcast",
+    id: "mercearia",
     featured: true,
     index: "10",
-    category: "Vídeo",
-    title: "Trend Cast",
-    description: "Vídeo em motion graphics apresentando o produto.",
-    image: "/assets/images/projects/trendcast.webp",
-    wallImage: "/assets/images/projects/wall/trendcast.webp",
-    video: "/assets/videos/trendcast.mp4",
-    aspect: 1.78,
-    alt: "Vídeo de apresentação do Trend Cast",
+    category: "App",
+    title: "Mercearia Fácil",
+    description: "Vendas, estoque e fornecedores para pequenos comércios.",
+    image: "/assets/images/projects/mercearia-facil.webp",
+    wallImage: "/assets/images/projects/wall/mercearia-facil.webp",
+    aspect: 1,
+    alt: "Apresentação do aplicativo Mercearia Fácil",
   },
   {
     id: "anuncio",
