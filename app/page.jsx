@@ -3,7 +3,6 @@ import { CreativeProcess } from "../src/components/CreativeProcess";
 import { Footer } from "../src/components/Footer";
 import { Hero } from "../src/components/Hero";
 import { ProjectCta } from "../src/components/ProjectCta";
-import { ProjectStages } from "../src/components/ProjectStages";
 import { RecentProjects } from "../src/components/RecentProjects";
 import { Testimonials } from "../src/components/Testimonials";
 
@@ -17,7 +16,6 @@ export default function HomePage() {
         <div className="ticker" aria-hidden="true" />
         <RecentProjects />
         <CreativeProcess />
-        <ProjectStages />
         <Testimonials />
         <ProjectCta />
       </main>
