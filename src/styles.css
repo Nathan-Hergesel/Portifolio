@@ -9796,11 +9796,20 @@ p {
   );
 }
 
+/* A base e a fatia exata menos meio pixel, para a linha nunca quebrar antes da
+   hora por arredondamento; o crescimento proporcional (flex-grow = proporcao)
+   devolve esse meio pixel sem desigualar as alturas. A fatia desconta os vaos da
+   linha: --gaps-md/--gaps-lg e quantos vaos ha na linha do card. */
 @media (min-width: 48rem) {
-  /* A base e a fatia exata menos meio pixel, para o par nunca quebrar de linha por
-     arredondamento; o crescimento proporcional (flex-grow = proporcao) devolve
-     esse meio pixel sem desigualar as alturas. */
   .bento-grid:not(.is-filtered) > .bento-tile {
-    flex: var(--ratio) 1 calc((100% - var(--bento-gap)) * var(--share) - 0.5px);
+    flex: var(--ratio) 1
+      calc((100% - var(--bento-gap) * var(--gaps-md)) * var(--share-md) - 0.5px);
+  }
+}
+
+@media (min-width: 64rem) {
+  .bento-grid:not(.is-filtered) > .bento-tile {
+    flex: var(--ratio) 1
+      calc((100% - var(--bento-gap) * var(--gaps-lg)) * var(--share-lg) - 0.5px);
   }
 }

@@ -30,10 +30,10 @@ const entrada = {
   transition: { duration: 0.38, ease: easeOutExpo },
 };
 
-// A ordem aqui e a ordem do destaque, que forma pares por linha: Morcegao e o
-// video do Trend Cast, TPark e EstudAi, ObraFlow e Brisa. `aspect` e a proporcao
-// real da imagem (largura / altura): o destaque usa esse valor para mostrar cada
-// arte inteira, sem corte.
+// A ordem aqui e a ordem do destaque. No desktop as linhas saem: Morcegao e o
+// video do Trend Cast; TPark e EstudAi; ObraFlow e os tres designs. `aspect` e a
+// proporcao real da imagem (largura / altura): o destaque usa esse valor para
+// mostrar cada arte inteira, sem corte.
 // Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
 // que toca no card.
 const projects = [
@@ -109,31 +109,9 @@ const projects = [
     alt: "Apresentação do aplicativo Mercearia Fácil",
   },
   {
-    id: "serra",
-    index: "07",
-    category: "Design",
-    title: "Serra Labs",
-    description: "Identidade para consultoria em tecnologia e IA.",
-    image: "/assets/images/projects/serra-labs.webp",
-    wallImage: "/assets/images/projects/wall/serra-labs.webp",
-    aspect: 1122 / 1402,
-    alt: "Kit de identidade visual da Serra Labs",
-  },
-  {
-    id: "aurora",
-    index: "08",
-    category: "Design",
-    title: "Aurora Casa",
-    description: "Identidade para interiores e decoração.",
-    image: "/assets/images/projects/aurora-casa.webp",
-    wallImage: "/assets/images/projects/wall/aurora-casa.webp",
-    aspect: 1122 / 1402,
-    alt: "Kit de identidade visual da Aurora Casa",
-  },
-  {
     id: "obraflow",
     featured: true,
-    index: "09",
+    index: "07",
     category: "Sistema",
     title: "ObraFlow",
     description: "Cronograma, equipe, custos e indicadores em um painel.",
@@ -145,7 +123,7 @@ const projects = [
   {
     id: "brisa",
     featured: true,
-    index: "10",
+    index: "08",
     category: "Design",
     title: "Brisa Solar",
     description: "Comunicação visual para energia residencial.",
@@ -153,6 +131,30 @@ const projects = [
     wallImage: "/assets/images/projects/wall/brisa-solar.webp",
     aspect: 1,
     alt: "Composição visual da marca Brisa Solar",
+  },
+  {
+    id: "serra",
+    featured: true,
+    index: "09",
+    category: "Design",
+    title: "Serra Labs",
+    description: "Identidade para consultoria em tecnologia e IA.",
+    image: "/assets/images/projects/serra-labs.webp",
+    wallImage: "/assets/images/projects/wall/serra-labs.webp",
+    aspect: 1122 / 1402,
+    alt: "Kit de identidade visual da Serra Labs",
+  },
+  {
+    id: "aurora",
+    featured: true,
+    index: "10",
+    category: "Design",
+    title: "Aurora Casa",
+    description: "Identidade para interiores e decoração.",
+    image: "/assets/images/projects/aurora-casa.webp",
+    wallImage: "/assets/images/projects/wall/aurora-casa.webp",
+    aspect: 1122 / 1402,
+    alt: "Kit de identidade visual da Aurora Casa",
   },
   {
     id: "anuncio",
@@ -270,16 +272,60 @@ function BentoTile({ project, reducedMotion, style }) {
   );
 }
 
-// Destaque em linhas justificadas: os cards vao em pares e cada um ocupa uma fatia
-// da linha proporcional a proporcao da propria imagem. Como todos tem
-// `aspect-ratio` igual ao da arte, os dois do par saem com a mesma altura e
-// nenhuma imagem e cortada nem distorcida; a linha inteira escala por igual com a
-// largura da tela.
-function linhaJustificada(lista, posicao) {
-  const parceiro = lista[posicao % 2 === 0 ? posicao + 1 : posicao - 1];
-  const proprio = lista[posicao].aspect;
-  const fatia = parceiro ? proprio / (proprio + parceiro.aspect) : 1;
-  return { "--ratio": proprio, "--share": fatia };
+// Destaque em linhas justificadas: cada card ocupa uma fatia da linha proporcional
+// a proporcao da propria imagem. Como todos tem `aspect-ratio` igual ao da arte,
+// os cards de uma linha saem com a mesma altura e nenhuma imagem e cortada nem
+// distorcida; a linha inteira escala por igual com a largura da tela.
+//
+// A altura de uma linha e a largura dividida pela soma das proporcoes, entao fechar
+// cada linha quando a soma passa de um alvo deixa as linhas com alturas parecidas:
+// duas artes 16:9 somam ~3,5, e quatro artes em pe (0,8 a 1) somam ~3,4. No tablet
+// a linha e mais estreita e o alvo cai para pares; no celular e um card por linha.
+const SOMA_DESKTOP = 3;
+
+function agruparLinhas(lista, alvo) {
+  const linhas = [[]];
+  let soma = 0;
+  lista.forEach((project) => {
+    if (soma >= alvo) {
+      linhas.push([]);
+      soma = 0;
+    }
+    linhas[linhas.length - 1].push(project);
+    soma += project.aspect;
+  });
+  return linhas;
+}
+
+function fatias(linhas) {
+  const porId = {};
+  linhas.forEach((linha) => {
+    const soma = linha.reduce((total, project) => total + project.aspect, 0);
+    linha.forEach((project) => {
+      porId[project.id] = { fatia: project.aspect / soma, vaos: linha.length - 1 };
+    });
+  });
+  return porId;
+}
+
+function linhasJustificadas(lista) {
+  const pares = [];
+  for (let i = 0; i < lista.length; i += 2) pares.push(lista.slice(i, i + 2));
+  const tablet = fatias(pares);
+  const desktop = fatias(agruparLinhas(lista, SOMA_DESKTOP));
+
+  return Object.fromEntries(
+    lista.map((project) => [
+      project.id,
+      {
+        "--ratio": project.aspect,
+        "--share-md": tablet[project.id].fatia,
+        "--gaps-md": tablet[project.id].vaos,
+        "--share-lg": desktop[project.id].fatia,
+        "--gaps-lg": desktop[project.id].vaos,
+      },
+    ]),
+  );
 }
 
 export function RecentProjects() {
@@ -304,6 +350,10 @@ export function RecentProjects() {
         emDestaque ? project.featured : project.category === active,
       ),
     [active, emDestaque],
+  );
+  const estilos = useMemo(
+    () => (emDestaque ? linhasJustificadas(visiveis) : {}),
+    [emDestaque, visiveis],
   );
 
   return (
@@ -337,11 +387,11 @@ export function RecentProjects() {
 
         <div className={`bento-grid ${emDestaque ? "" : "is-filtered"}`.trim()}>
           <AnimatePresence mode="popLayout" initial={false}>
-            {visiveis.map((project, posicao) => (
+            {visiveis.map((project) => (
               <BentoTile
                 project={project}
                 reducedMotion={reducedMotion}
-                style={emDestaque ? linhaJustificada(visiveis, posicao) : undefined}
+                style={estilos[project.id]}
                 key={project.id}
               />
             ))}
