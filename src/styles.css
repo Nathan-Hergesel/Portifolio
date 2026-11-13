@@ -7204,10 +7204,16 @@ p {
   min-height: 21rem;
 }
 
-/* A arte do EstudAi e uma peca completa (quase quadrada), entao entra em cover
-   como a da Mercearia. */
+/* A arte do EstudAi e uma peca completa e larga (cerca de 3:2), entao entra em
+   cover como a da Mercearia, com altura baixa no celular para nao cortar os lados. */
 .bento-tile-estudai {
-  min-height: 22rem;
+  min-height: 16rem;
+}
+
+/* Em caixas mais estreitas que a arte o corte sai mais da direita: com o ponto em
+   20% o titulo da esquerda e o celular cabem inteiros. */
+.bento-tile-estudai > img {
+  object-position: 20% top;
 }
 
 .bento-tile-brisa {
@@ -7830,7 +7836,7 @@ p {
 }
 
 .bento-grid.is-filtered > .bento-tile-estudai {
-  aspect-ratio: 2048 / 1842;
+  aspect-ratio: 2048 / 1402;
 }
 
 .bento-grid.is-filtered > .bento-tile-trendcast,
@@ -9546,7 +9552,7 @@ p {
     grid-row: span 3;
   }
 
-  /* No destaque o EstudAi fecha par com o ObraFlow, que tem tres linhas. */
+  /* No destaque o EstudAi tem tres linhas, como o Trend Cast e o TPark. */
   .bento-grid:not(.is-filtered) > .bento-tile-estudai {
     grid-row: span 3;
   }
@@ -9676,20 +9682,14 @@ p {
 
   /* Faixas do destaque, repetidas aqui porque a regra de 48rem acima vem depois
      das originais e as sobrescrevia: Morcegao (7) e o video do Trend Cast (5) na
-     primeira; TPark (8) e Brisa (4), com quatro linhas, na segunda; ObraFlow (8) e
-     EstudAi (4), com tres, na terceira. */
+     primeira; TPark (8) e EstudAi (4), com tres linhas, na segunda; ObraFlow (8) e
+     Brisa (4), com as quatro da regra original, na terceira. */
   .bento-tile-morcegao {
     grid-column: span 7;
   }
 
   .bento-tile-tpark {
     grid-column: span 8;
-    grid-row: span 4;
-  }
-
-  .bento-grid:not(.is-filtered) > .bento-tile-obraflow {
-    grid-column: span 8;
-    grid-row: span 3;
   }
 
   .bento-grid:not(.is-filtered) > .bento-tile-trendcast {

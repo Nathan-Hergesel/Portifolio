@@ -31,7 +31,7 @@ const entrada = {
 };
 
 // A ordem aqui e a ordem do destaque: Morcegao e o video do Trend Cast na primeira
-// faixa, TPark e Brisa na segunda, ObraFlow e EstudAi na terceira (ver os spans
+// faixa, TPark e EstudAi na segunda, ObraFlow e Brisa na terceira (ver os spans
 // no fim do styles.css).
 // Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
 // que toca no card.
@@ -85,8 +85,20 @@ const projects = [
     alt: "Página inicial do site da TPark Estacionamentos",
   },
   {
-    id: "mercearia",
+    id: "estudai",
+    featured: true,
     index: "05",
+    category: "App",
+    title: "EstudAí",
+    description: "Organização e rotina de estudos em uma experiência mobile.",
+    image: "/assets/images/projects/estudai.webp",
+    wallImage: "/assets/images/projects/wall/estudai.webp",
+    aspect: 1.46,
+    alt: "Apresentação do aplicativo EstudAí com a tela de acesso no celular",
+  },
+  {
+    id: "mercearia",
+    index: "06",
     category: "App",
     title: "Mercearia Fácil",
     description: "Vendas, estoque e fornecedores para pequenos comércios.",
@@ -94,18 +106,6 @@ const projects = [
     wallImage: "/assets/images/projects/wall/mercearia-facil.webp",
     aspect: 1,
     alt: "Apresentação do aplicativo Mercearia Fácil",
-  },
-  {
-    id: "brisa",
-    featured: true,
-    index: "06",
-    category: "Design",
-    title: "Brisa Solar",
-    description: "Comunicação visual para energia residencial.",
-    image: "/assets/images/projects/brisa-solar.webp",
-    wallImage: "/assets/images/projects/wall/brisa-solar.webp",
-    aspect: 1,
-    alt: "Composição visual da marca Brisa Solar",
   },
   {
     id: "serra",
@@ -142,16 +142,16 @@ const projects = [
     alt: "Interface do sistema de gestão de obras ObraFlow",
   },
   {
-    id: "estudai",
+    id: "brisa",
     featured: true,
     index: "10",
-    category: "App",
-    title: "EstudAí",
-    description: "Organização e rotina de estudos em uma experiência mobile.",
-    image: "/assets/images/projects/estudai.webp",
-    wallImage: "/assets/images/projects/wall/estudai.webp",
-    aspect: 1.11,
-    alt: "Apresentação do aplicativo EstudAí com a tela de acesso no celular",
+    category: "Design",
+    title: "Brisa Solar",
+    description: "Comunicação visual para energia residencial.",
+    image: "/assets/images/projects/brisa-solar.webp",
+    wallImage: "/assets/images/projects/wall/brisa-solar.webp",
+    aspect: 1,
+    alt: "Composição visual da marca Brisa Solar",
   },
   {
     id: "anuncio",
