@@ -7174,6 +7174,9 @@ p {
   height: 100%;
   object-fit: cover;
   background: var(--ink);
+  transition:
+    transform 850ms var(--ease-out),
+    filter 450ms;
 }
 
 .bento-tile-trendcast,
@@ -7324,7 +7327,8 @@ p {
 }
 
 @media (hover: hover) {
-  .bento-tile:hover > img {
+  .bento-tile:hover > img,
+  .bento-tile:hover > video {
     filter: saturate(1.06);
     transform: scale(1.025);
   }
@@ -9734,6 +9738,7 @@ p {
   outline: 1px solid oklch(92% 0.025 256 / 0.68);
   outline-offset: 0;
   transition:
+    scale 520ms var(--ease-out),
     box-shadow 420ms var(--ease-out),
     outline-color 420ms var(--ease-out);
 }
@@ -9758,8 +9763,13 @@ p {
 }
 
 @media (hover: hover) {
-  /* Halo azul em volta do contorno. */
+  /* O card cresce um pouco (alem do zoom da arte por dentro) e passa por cima dos
+     vizinhos, com halo azul em volta do contorno. `scale` e uma propriedade
+     separada de `transform`, que o motion usa nas animacoes de entrada e de
+     rearranjo: os dois se somam sem conflito. */
   .bento-tile:hover {
+    z-index: 3;
+    scale: 1.02;
     outline-color: oklch(93% 0.05 245);
     box-shadow:
       0 0 0 2px oklch(80% 0.12 245 / 0.9),
