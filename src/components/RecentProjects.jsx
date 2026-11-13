@@ -47,7 +47,6 @@ const projects = [
     wallImage: "/assets/images/projects/wall/morcegao.webp",
     aspect: 1.78,
     alt: "Tela de acesso do portal interno do Supermercado Morcegão",
-    href: "https://supermercadomorcegao.tech/entrar",
   },
   {
     id: "trendcast",
@@ -72,7 +71,6 @@ const projects = [
     wallImage: "/assets/images/projects/wall/vjs-sistemas.webp",
     aspect: 2.1,
     alt: "Página inicial do site VJS Sistemas",
-    href: "https://vjssistemas.com.br/",
   },
   {
     id: "tpark",
@@ -265,19 +263,7 @@ function BentoTile({ project, reducedMotion }) {
       exit={reducedMotion ? undefined : entrada.exit}
       transition={entrada.transition}
     >
-      {project.href ? (
-        <a
-          className="bento-tile-link"
-          href={project.href}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`Visitar ${project.title}`}
-        >
-          {content}
-        </a>
-      ) : (
-        content
-      )}
+      {content}
     </motion.article>
   );
 }

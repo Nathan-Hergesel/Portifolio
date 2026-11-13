@@ -1,7 +1,6 @@
 import { HeroBrand } from "./BrandIdentity";
 import { HeroToolCloud } from "./HeroToolCloud";
 import { RotatingHeadline } from "./RotatingHeadline";
-import { BsArrowUpRight } from "react-icons/bs";
 
 const projectCards = [
   {
@@ -10,8 +9,7 @@ const projectCards = [
     width: 1600,
     height: 762,
     title: "VJS Sistemas",
-    description: "Site comercial",
-    href: "https://vjssistemas.com.br/"
+    description: "Site comercial"
   },
   {
     className: "stack-card-right",
@@ -27,8 +25,7 @@ const projectCards = [
     width: 1600,
     height: 900,
     title: "Portal Morcegão",
-    description: "Portal interno",
-    href: "https://supermercadomorcegao.tech/entrar"
+    description: "Portal interno"
   }
 ];
 
@@ -36,35 +33,26 @@ function ProjectStack() {
   return (
     <div className="hero-project-stack">
       <span className="stack-heading">Últimos trabalhos</span>
-      {projectCards.map((card) => {
-        const Card = card.href ? "a" : "span";
-
-        return (
-          <Card
-            className={`stack-card ${card.className}`}
-            href={card.href}
-            target={card.href ? "_blank" : undefined}
-            rel={card.href ? "noreferrer" : undefined}
-            aria-label={card.href ? `Abrir ${card.title}` : undefined}
-            aria-hidden={card.href ? undefined : "true"}
-            key={card.title}
-          >
-            <img
-              src={card.image}
-              alt=""
-              width={card.width}
-              height={card.height}
-              loading="lazy"
-              decoding="async"
-            />
-            <span>
-              <strong>{card.title}</strong>
-              <small>{card.description}</small>
-              <BsArrowUpRight aria-hidden="true" />
-            </span>
-          </Card>
-        );
-      })}
+      {projectCards.map((card) => (
+        <span
+          className={`stack-card ${card.className}`}
+          aria-hidden="true"
+          key={card.title}
+        >
+          <img
+            src={card.image}
+            alt=""
+            width={card.width}
+            height={card.height}
+            loading="lazy"
+            decoding="async"
+          />
+          <span>
+            <strong>{card.title}</strong>
+            <small>{card.description}</small>
+          </span>
+        </span>
+      ))}
     </div>
   );
 }
