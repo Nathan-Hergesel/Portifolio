@@ -7204,26 +7204,10 @@ p {
   min-height: 21rem;
 }
 
+/* A arte do EstudAi e uma peca completa (quase quadrada), entao entra em cover
+   como a da Mercearia. */
 .bento-tile-estudai {
-  width: 84%;
-  min-height: 31rem;
-  background:
-    linear-gradient(to right, oklch(92% 0.025 256 / 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(92% 0.025 256 / 0.08) 1px, transparent 1px),
-    var(--ink);
-  background-size: 3rem 3rem, 3rem 3rem, auto;
-}
-
-.bento-tile-estudai > img {
-  left: 50%;
-  width: auto;
-  height: 94%;
-  object-fit: contain;
-  border: 0.28rem solid var(--canvas);
-  border-bottom: 0;
-  border-radius: 1.1rem 1.1rem 0 0;
-  box-shadow: 0 1.5rem 3rem oklch(10% 0.02 258 / 0.34);
-  transform: translateX(-50%);
+  min-height: 22rem;
 }
 
 .bento-tile-brisa {
@@ -7437,10 +7421,6 @@ p {
   .bento-tile:hover > img {
     filter: saturate(1.06);
     transform: scale(1.025);
-  }
-
-  .bento-tile-estudai:hover > img {
-    transform: translateX(-50%) translateY(-0.35rem);
   }
 
   .bento-outro > a:hover {
@@ -7850,7 +7830,7 @@ p {
 }
 
 .bento-grid.is-filtered > .bento-tile-estudai {
-  aspect-ratio: 0.62;
+  aspect-ratio: 2048 / 1842;
 }
 
 .bento-grid.is-filtered > .bento-tile-trendcast,
@@ -9565,6 +9545,11 @@ p {
     grid-column: span 6;
     grid-row: span 3;
   }
+
+  /* No destaque o EstudAi fecha par com o ObraFlow, que tem tres linhas. */
+  .bento-grid:not(.is-filtered) > .bento-tile-estudai {
+    grid-row: span 3;
+  }
 }
 
 @media (min-width: 64rem) {
@@ -9692,7 +9677,7 @@ p {
   /* Faixas do destaque, repetidas aqui porque a regra de 48rem acima vem depois
      das originais e as sobrescrevia: Morcegao (7) e o video do Trend Cast (5) na
      primeira; TPark (8) e Brisa (4), com quatro linhas, na segunda; ObraFlow (8) e
-     Mercearia (4), com tres, na terceira. */
+     EstudAi (4), com tres, na terceira. */
   .bento-tile-morcegao {
     grid-column: span 7;
   }
@@ -9712,7 +9697,7 @@ p {
     grid-row: span 3;
   }
 
-  .bento-grid:not(.is-filtered) > .bento-tile-mercearia {
+  .bento-grid:not(.is-filtered) > .bento-tile-estudai {
     grid-column: span 4;
     grid-row: span 3;
   }

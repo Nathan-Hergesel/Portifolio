@@ -31,7 +31,7 @@ const entrada = {
 };
 
 // A ordem aqui e a ordem do destaque: Morcegao e o video do Trend Cast na primeira
-// faixa, TPark e Brisa na segunda, ObraFlow e Mercearia na terceira (ver os spans
+// faixa, TPark e Brisa na segunda, ObraFlow e EstudAi na terceira (ver os spans
 // no fim do styles.css).
 // Nos videos, `image` e a capa (um quadro do proprio video) e `video` o arquivo
 // que toca no card.
@@ -85,15 +85,15 @@ const projects = [
     alt: "Página inicial do site da TPark Estacionamentos",
   },
   {
-    id: "estudai",
+    id: "mercearia",
     index: "05",
     category: "App",
-    title: "EstudAí",
-    description: "Organização e rotina de estudos em uma experiência mobile.",
-    image: "/assets/images/projects/estudai-atualizado.png",
-    wallImage: "/assets/images/projects/wall/estudai-atualizado.webp",
-    aspect: 0.462,
-    alt: "Tela de acesso atualizada do aplicativo EstudAí",
+    title: "Mercearia Fácil",
+    description: "Vendas, estoque e fornecedores para pequenos comércios.",
+    image: "/assets/images/projects/mercearia-facil.webp",
+    wallImage: "/assets/images/projects/wall/mercearia-facil.webp",
+    aspect: 1,
+    alt: "Apresentação do aplicativo Mercearia Fácil",
   },
   {
     id: "brisa",
@@ -142,16 +142,16 @@ const projects = [
     alt: "Interface do sistema de gestão de obras ObraFlow",
   },
   {
-    id: "mercearia",
+    id: "estudai",
     featured: true,
     index: "10",
     category: "App",
-    title: "Mercearia Fácil",
-    description: "Vendas, estoque e fornecedores para pequenos comércios.",
-    image: "/assets/images/projects/mercearia-facil.webp",
-    wallImage: "/assets/images/projects/wall/mercearia-facil.webp",
-    aspect: 1,
-    alt: "Apresentação do aplicativo Mercearia Fácil",
+    title: "EstudAí",
+    description: "Organização e rotina de estudos em uma experiência mobile.",
+    image: "/assets/images/projects/estudai.webp",
+    wallImage: "/assets/images/projects/wall/estudai.webp",
+    aspect: 1.11,
+    alt: "Apresentação do aplicativo EstudAí com a tela de acesso no celular",
   },
   {
     id: "anuncio",
